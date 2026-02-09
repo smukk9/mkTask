@@ -542,13 +542,28 @@
                                         placeholder="Objective...">
 
                                     <div class="mt-1 flex items-center justify-between">
-                                        <!-- Parent & Date Info -->
+                                        <!-- Parent, Tags, Date -->
                                         <div class="flex items-center gap-2">
                                             <template x-if="goal.parentId && getParentDetails(goal.parentId)">
                                                 <div
                                                     class="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400">
                                                     <span class="truncate max-w-[80px]"
                                                         x-text="getParentDetails(goal.parentId).title"></span>
+                                                </div>
+                                            </template>
+
+                                            <template x-if="goal.tags && goal.tags.length">
+                                                <div class="flex items-center gap-1 text-[10px]"
+                                                    :class="theme==='dark'?'text-gray-500':'text-slate-500'">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
+                                                        </path>
+                                                    </svg>
+                                                    <span x-text="(goal.tags || []).slice(0, 2).join(', ')"></span>
+                                                    <span x-show="goal.tags.length > 2" x-text="'+' + (goal.tags.length - 2)"></span>
                                                 </div>
                                             </template>
 
@@ -570,22 +585,23 @@
                                             x-show="getProgress(goal.id) > 0" x-text="getProgress(goal.id) + '%'"></div>
                                     </div>
 
-                                    <!-- Description Line -->
-                                    <textarea x-model="goal.description"
-                                        class="bg-transparent w-full focus:outline-none text-[10px] placeholder-gray-800 auto-expand resize-none overflow-hidden mt-1"
-                                        :class="theme==='dark'?'text-gray-500':'text-slate-400'" rows="1"
-                                        placeholder="Notes..."></textarea>
+                                    <!-- Description Preview -->
+                                    <div class="mt-1 text-[10px] truncate"
+                                        :class="theme==='dark'?'text-gray-500':'text-slate-400'"
+                                        x-show="getDescriptionPreview(goal.description)"
+                                        x-text="getDescriptionPreview(goal.description)"></div>
                                 </div>
                                 <div class="flex items-center gap-1">
-                                    <!-- Detail Trigger -->
+                                    <!-- View Details -->
                                     <button @click="openDetail(goal)"
                                         class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded hover:bg-purple-500/10"
                                         :class="theme==='dark'?'text-gray-500 hover:text-purple-400':'text-slate-400 hover:text-purple-500'"
-                                        title="Edit Details">
+                                        title="View Details">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
-                                            </path>
+                                                d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"></path>
+                                            <circle cx="12" cy="12" r="3" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="2"></circle>
                                         </svg>
                                     </button>
 
@@ -657,6 +673,21 @@
                                                 </div>
                                             </template>
 
+                                            <template x-if="goal.tags && goal.tags.length">
+                                                <div class="flex items-center gap-1 text-[10px]"
+                                                    :class="theme==='dark'?'text-gray-500':'text-slate-500'">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
+                                                        </path>
+                                                    </svg>
+                                                    <span x-text="(goal.tags || []).slice(0, 2).join(', ')"></span>
+                                                    <span x-show="goal.tags.length > 2" x-text="'+' + (goal.tags.length - 2)"></span>
+                                                </div>
+                                            </template>
+
                                             <!-- Date Badge -->
                                             <div class="flex items-center gap-1 text-[10px]"
                                                 :class="theme==='dark'?'text-gray-500':'text-slate-500'">
@@ -673,21 +704,22 @@
                                         <div class="text-[10px] font-mono text-blue-500/60"
                                             x-show="getProgress(goal.id) > 0" x-text="getProgress(goal.id) + '%'"></div>
                                     </div>
-                                    <textarea x-model="goal.description"
-                                        class="bg-transparent w-full focus:outline-none text-[10px] placeholder-gray-800 auto-expand resize-none overflow-hidden mt-1"
-                                        :class="theme==='dark'?'text-gray-500':'text-slate-400'" rows="1"
-                                        placeholder="Notes..."></textarea>
+                                    <div class="mt-1 text-[10px] truncate"
+                                        :class="theme==='dark'?'text-gray-500':'text-slate-400'"
+                                        x-show="getDescriptionPreview(goal.description)"
+                                        x-text="getDescriptionPreview(goal.description)"></div>
                                 </div>
                                 <div class="flex items-center gap-1">
-                                    <!-- Detail Trigger -->
+                                    <!-- View Details -->
                                     <button @click="openDetail(goal)"
                                         class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded hover:bg-blue-500/10"
                                         :class="theme==='dark'?'text-gray-50 hover:text-blue-400':'text-slate-400 hover:text-blue-500'"
-                                        title="Edit Details">
+                                        title="View Details">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
-                                            </path>
+                                                d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"></path>
+                                            <circle cx="12" cy="12" r="3" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="2"></circle>
                                         </svg>
                                     </button>
 
@@ -2327,6 +2359,15 @@
                     return firstLine ? firstLine.trim() : '';
                 },
 
+                getDescriptionPreview(text, maxLen = 120) {
+                    if (!text) return '';
+                    const firstLine = text.split('\n').find(line => line.trim());
+                    if (!firstLine) return '';
+                    const cleaned = firstLine.trim().replace(/\s+/g, ' ');
+                    if (cleaned.length <= maxLen) return cleaned;
+                    return cleaned.slice(0, maxLen - 3) + '...';
+                },
+
                 async copyKBToClipboard(bit) {
                     const title = bit.title ? bit.title.trim() : '';
                     const description = bit.description ? bit.description.trim() : '';
@@ -2560,7 +2601,11 @@
                     const sample = [
                         { "id": "year-1", "type": "yearly", "title": "Build MVP Identity Provider in Golang", "completed": false, "parentId": "", "createdAt": "2026-01-01T10:00:00.000Z", "description": "Full-featured IDP with SAML, OIDC, OAuth support.", "tags": ["golang", "security", "backend"], "date": "2026-12-31" },
                         { "id": "q1-1", "type": "quarterly", "title": "Core Auth Protocols (OIDC & OAuth)", "completed": false, "parentId": "year-1", "createdAt": "2026-01-02T10:00:00.000Z", "description": "Implement standard flows: Authorization Code, Client Credentials.", "tags": ["protocol", "core"], "date": "2026-03-31" },
+                        { "id": "q1-2", "type": "quarterly", "title": "Operational Readiness & Observability", "completed": false, "parentId": "year-1", "createdAt": "2026-01-05T10:00:00.000Z", "description": "Dashboards, alerts, and runbooks for auth services across environments.", "tags": ["ops", "observability", "reliability"], "date": "2026-03-31" },
                         { "id": "sprint-1", "type": "sprint", "title": "User API & Storage", "completed": true, "parentId": "q1-1", "createdAt": "2026-02-01T10:00:00.000Z", "description": "CRUDS for Users, Password Hashing (Argon2).", "tags": ["api", "db"], "date": pStr },
+                        { "id": "sprint-2", "type": "sprint", "title": "OIDC Token Generation", "completed": false, "parentId": "q1-1", "createdAt": "2026-02-08T10:00:00.000Z", "description": "JWT signing, Key rotation, Discovery endpoint.", "tags": ["oidc", "crypto"], "date": tStr },
+                        { "id": "sprint-3", "type": "sprint", "title": "Audit Trails & Security Events", "completed": false, "parentId": "q1-2", "createdAt": "2026-02-15T10:00:00.000Z", "description": "Capture auth events, admin actions, and sensitive changes with retention policies.", "tags": ["security", "logging", "audit"], "date": tStr },
+                        { "id": "sprint-4", "type": "sprint", "title": "Monitoring & Alerting Baselines", "completed": false, "parentId": "q1-2", "createdAt": "2026-03-01T10:00:00.000Z", "description": "Define SLOs, error budgets, and alert thresholds for auth services.", "tags": ["slo", "alerts", "metrics"], "date": tStr },
 
                         // Overdue task (should rollover on next load/init)
                         { "id": "day-overdue", "type": "daily", "title": "[ROLLOVER] Past Due Task", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": pStr, "description": "This was supposed to be done last sprint.", "tags": ["urgent"], "date": pStr },
@@ -2574,6 +2619,10 @@
                         { "id": "day-2", "type": "daily", "title": "Draft OIDC Discovery Doc", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Define /.well-known endpoints.", "tags": ["oidc"], "date": tStr },
                         { "id": "day-3", "type": "daily", "title": "Client Credentials Flow", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Token endpoint validations.", "tags": ["oauth"], "date": tStr },
                         { "id": "day-4", "type": "daily", "title": "Unit Tests for User Service", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Table-driven tests.", "tags": ["testing"], "date": tStr },
+                        { "id": "day-5", "type": "daily", "title": "Define JWT Claims", "completed": false, "parentId": "sprint-2", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Identify standard and custom claims for access and ID tokens.", "tags": ["oidc", "design"], "date": tStr },
+                        { "id": "day-6", "type": "daily", "title": "Rotate Signing Keys", "completed": false, "parentId": "sprint-2", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Implement JWKS rotation and update discovery endpoints.", "tags": ["crypto", "keys"], "date": tStr },
+                        { "id": "day-7", "type": "daily", "title": "Audit Event Schema", "completed": false, "parentId": "sprint-3", "quarterlyParentId": "q1-2", "createdAt": tStr, "description": "Define event payloads for login, token issuance, and admin actions.", "tags": ["audit", "schema"], "date": tStr },
+                        { "id": "day-8", "type": "daily", "title": "SLO Drafts", "completed": false, "parentId": "sprint-4", "quarterlyParentId": "q1-2", "createdAt": tStr, "description": "Draft latency and availability SLOs for auth endpoints.", "tags": ["slo", "reliability"], "date": tStr },
 
                         // Daily Bits (Notes/KB)
                         { "id": "bit-1", "type": "note", "title": "Splunk Troubleshooting: auth-service", "completed": false, "parentId": "", "createdAt": tStr, "description": "index=prod service=auth_service level=error | stats count by errorCode", "tags": ["splunk", "ops"], "date": tStr, "isKB": false },
