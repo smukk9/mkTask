@@ -2,12 +2,28 @@
 
 Goal: a lightweight, single-file task manager that keeps daily execution tied to bigger goals.
 
-Specialty:
+Feature list:
 - One HTML file (Alpine.js + Tailwind) with no build step.
-- Goal hierarchy: yearly, quarterly, weekly, daily.
-- Daily Focus with quick status filtering and Next Action spotlight.
-- In-progress state plus status tags (Blocked, Waiting, Review).
-- Daily Bits sidebar and pinned Knowledge Base.
+- Goal hierarchy: yearly, quarterly, weekly, daily, plus notes (Daily Bits).
+- Daily Focus view for the selected day.
+- Standup view with Yesterday, Selected Day, and Tomorrow columns.
+- Knowledge Base view with pinned bits, collapse/expand, and copy.
+- Daily Bits sidebar with quick markdown/code entry and convert-to-task.
+- Status system: In Progress cycle plus tags (Blocked, Waiting, Review).
+- Status filters with per-day counts.
+- Next Action spotlight and per-task next-action toggle.
+- Automatic rollover of unfinished daily tasks to today.
+- Overdue attention bell with a quick list.
+- Calendar date picker and history navigation.
+- Global search across title, notes, and tags.
+- Tags and parent linking (daily to weekly/quarterly, weekly to quarterly, quarterly to yearly).
+- Undo delete toast.
+- Review modal with cleanup for overdue tasks.
+- Metrics dashboard (completion rates, alignment score).
+- Light and dark themes.
+- File open/save flow with auto-save to localStorage.
+- Export CSV, load sample data, delete local database.
+- Keyboard shortcuts: Ctrl/Cmd+S save, Ctrl/Cmd+F search, B/W/R/P status hotkeys on selected task.
 
 Files:
 - mktask.html: the entire app (UI + logic) in a single file.
