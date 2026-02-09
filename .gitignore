@@ -1,6 +1,7 @@
 *
 !.gitignore
 !mktask.html
+!README.md
 
 # Local artifacts
 sample_data.json
