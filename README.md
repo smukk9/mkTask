@@ -8,3 +8,9 @@ Specialty:
 - Daily Focus with quick status filtering and Next Action spotlight.
 - In-progress state plus status tags (Blocked, Waiting, Review).
 - Daily Bits sidebar and pinned Knowledge Base.
+
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
+![alt text](image-3.png)
+![alt text](image-4.png)
