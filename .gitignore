@@ -1,0 +1,7 @@
+*
+!.gitignore
+!mktask.html
+
+# Local artifacts
+sample_data.json
+mktask.html.bak

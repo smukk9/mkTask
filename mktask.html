@@ -1,0 +1,2573 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mkTask - Goal Oriented Task Manager</title>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            850: '#1f2937',
+                            900: '#111827',
+                            950: '#0b0f19',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+
+        /* Auto-resize textarea */
+        textarea.auto-expand {
+            field-sizing: content;
+        }
+
+        /* Calm Light Theme Variables */
+        :root {
+            --bg-main: #0b0f19;
+            --bg-panel: #111827;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --border-color: #1f2937;
+            --accent-color: #6366f1;
+            /* Indigo */
+        }
+
+        [data-theme="light"] {
+            --bg-main: #f0f9ff;
+            /* Slate/Cyan tint */
+            --bg-panel: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --accent-color: #0ea5e9;
+            /* Sky Blue */
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .theme-panel {
+            background-color: var(--bg-panel);
+            border-color: var(--border-color);
+        }
+
+        .theme-border {
+            border-color: var(--border-color);
+        }
+
+        .theme-text-muted {
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-950 text-gray-200 font-sans h-screen flex flex-col overflow-hidden text-sm" x-data="taskApp()"
+    @keydown.window="handleKeydown($event)">
+
+    <!-- Toast -->
+    <div x-show="showToast" x-cloak
+        class="fixed top-3 left-1/2 -translate-x-1/2 z-[80] px-3 py-1.5 text-xs rounded border shadow-lg"
+        :class="theme === 'dark' ? 'bg-gray-900 border-gray-700 text-gray-200' : 'bg-white border-slate-200 text-slate-700'"
+        x-text="toastMessage"
+        x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1"
+        x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1"></div>
+
+    <!-- Undo Delete -->
+    <div x-show="showUndo" x-cloak
+        class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[80] px-3 py-2 text-xs rounded border shadow-lg flex items-center gap-3"
+        :class="theme === 'dark' ? 'bg-gray-900 border-gray-700 text-gray-200' : 'bg-white border-slate-200 text-slate-700'"
+        x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 translate-y-2"
+        x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-2">
+        <span x-text="undoMessage"></span>
+        <button @click="undoDelete()"
+            class="px-2 py-0.5 rounded border text-[10px] font-semibold"
+            :class="theme === 'dark' ? 'border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10' : 'border-emerald-400 text-emerald-600 hover:bg-emerald-50'">
+            Undo
+        </button>
+    </div>
+
+    <!-- Header / Toolbar -->
+    <header class="h-12 border-b flex items-center justify-between px-4 shrink-0 transition-colors duration-300"
+        :class="theme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-slate-200'">
+        <div class="flex items-center gap-4">
+            <!-- Logo Icon -->
+            <div class="flex items-center gap-2">
+                <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h1 class="font-bold tracking-tight text-lg"
+                    :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-800'">mkTask</h1>
+            </div>
+
+            <!-- Yearly Toggle -->
+            <button @click="showYearly = !showYearly" class="px-2 py-1 text-xs rounded transition-all border shrink-0"
+                :class="showYearly 
+                    ? (theme === 'dark' ? 'bg-indigo-500/20 border-indigo-500 text-indigo-400' : 'bg-indigo-50 border-indigo-200 text-indigo-600')
+                    : (theme === 'dark' ? 'border-gray-800 text-gray-500 hover:border-gray-700' : 'border-slate-200 text-slate-400 hover:border-slate-300')">
+                Vision
+            </button>
+
+            <div class="h-5 w-px theme-border border-l mx-1"></div>
+
+            <!-- Global Search -->
+            <div class="relative group">
+                <input type="text" x-model="searchQuery" x-ref="searchInput" placeholder="Search tasks... (Ctrl+F)"
+                    class="bg-transparent border theme-border rounded px-3 py-1.5 text-xs w-48 focus:w-64 focus:outline-none focus:border-indigo-500 transition-all placeholder-gray-500"
+                    :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-700'">
+                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg x-show="!searchQuery" class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <button x-show="searchQuery" @click="searchQuery = ''"
+                        class="pointer-events-auto text-gray-500 hover:text-gray-300"><svg class="w-3 h-3" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg></button>
+                </div>
+            </div>
+
+            <!-- History Navigation -->
+            <div class="flex items-center gap-2" title="Go to Date">
+                <button @click="goToday()"
+                    class="text-xs font-medium px-2 py-1 rounded hover:bg-indigo-500/20 text-indigo-400 transition-colors">Today</button>
+
+                <!-- Custom Calendar Dropdown -->
+                <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                    <button @click="open = !open; if(open) calendarDate = new Date(selectedDate)"
+                        class="flex items-center gap-2 bg-transparent border theme-border rounded px-2 py-1 text-xs hover:bg-gray-500/10 transition-colors focus:outline-none focus:border-indigo-500"
+                        :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-700'">
+                        <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        <span x-text="formatDate(selectedDate)"></span>
+                    </button>
+
+                    <!-- Calendar Popper -->
+                    <div x-show="open" x-cloak
+                        class="absolute left-0 mt-2 w-64 theme-panel border theme-border rounded-lg shadow-2xl z-[60] p-3 overflow-hidden"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+
+                        <!-- Month Header -->
+                        <div class="flex items-center justify-between mb-3 px-1">
+                            <button @click="prevMonth()"
+                                class="p-1 hover:bg-gray-500/20 rounded transition-colors theme-text-muted">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                            <span class="text-xs font-bold" x-text="formatCalendarMonth()"></span>
+                            <button @click="nextMonth()"
+                                class="p-1 hover:bg-gray-500/20 rounded transition-colors theme-text-muted">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Day Labels -->
+                        <div class="grid grid-cols-7 text-[10px] theme-text-muted font-bold mb-2">
+                            <div class="text-center">S</div>
+                            <div class="text-center">M</div>
+                            <div class="text-center">T</div>
+                            <div class="text-center">W</div>
+                            <div class="text-center">T</div>
+                            <div class="text-center">F</div>
+                            <div class="text-center">S</div>
+                        </div>
+
+                        <!-- Calendar Grid -->
+                        <div class="grid grid-cols-7 gap-1">
+                            <template x-for="d in getCalendarDays()" :key="d.fullDate + Math.random()">
+                                <button @click="if(d.fullDate) { selectCalendarDate(d.fullDate); open = false; }"
+                                    class="relative h-8 w-8 rounded text-[11px] flex items-center justify-center transition-all"
+                                    :class="[
+                                        !d.fullDate ? 'opacity-0 pointer-events-none' : '',
+                                        selectedDate === d.fullDate ? 'bg-indigo-600 text-white font-bold' : (theme === 'dark' ? 'hover:bg-gray-800 text-gray-400' : 'hover:bg-slate-100 text-slate-600'),
+                                        isToday(d.fullDate) ? 'ring-1 ring-indigo-500/50' : ''
+                                    ]">
+                                    <span x-text="d.day"></span>
+
+                                    <!-- Activity Dot -->
+                                    <div x-show="d.fullDate && getHasTasksForDate(d.fullDate)"
+                                        class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                                        :class="selectedDate === d.fullDate ? 'bg-white' : 'bg-indigo-500'">
+                                    </div>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <span x-show="fileName" x-text="fileName"
+                class="text-xs text-gray-500 opacity-70 hidden md:inline-block"></span>
+
+            <!-- Auto-Save Status -->
+            <div class="flex items-center gap-1.5 text-[10px] min-w-[60px] justify-end">
+                <span x-show="unsavedChanges" class="text-amber-500 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                    Saving...
+                </span>
+                <span x-show="!unsavedChanges && fileHandle" class="text-emerald-500/70 flex items-center gap-1"
+                    x-transition.duration.500ms>
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Saved
+                </span>
+            </div>
+
+            <!-- Attention Bell -->
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" @click.outside="open = false"
+                    class="relative p-1.5 rounded-md transition-colors"
+                    :class="getOverdueGoals().length > 0
+                        ? (theme === 'dark' ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/40' : 'bg-amber-100 text-amber-600 ring-1 ring-amber-400')
+                        : (theme === 'dark' ? 'text-gray-500 hover:text-amber-400 hover:bg-gray-800/60' : 'text-slate-500 hover:text-amber-600 hover:bg-slate-100')"
+                    title="Attention Needed">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0a3 3 0 11-6 0h6z"></path>
+                    </svg>
+                    <span x-show="getOverdueGoals().length > 0"
+                        class="absolute -top-1 -right-1 min-w-[14px] h-[14px] px-1 rounded-full text-[9px] leading-[14px] text-center"
+                        :class="theme === 'dark' ? 'bg-amber-500 text-gray-900' : 'bg-amber-500 text-white'"
+                        x-text="getOverdueGoals().length"></span>
+                </button>
+
+                <div x-show="open" x-cloak
+                    class="absolute right-0 mt-2 w-64 theme-panel border theme-border rounded-lg shadow-2xl z-[60] p-3"
+                    x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100">
+                    <div class="text-[10px] font-bold uppercase tracking-widest mb-2"
+                        :class="theme === 'dark' ? 'text-amber-400' : 'text-amber-600'">Attention Needed</div>
+                    <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
+                        <template x-for="goal in getOverdueGoals()" :key="goal.id">
+                            <div class="flex items-center justify-between text-[10px] p-2 rounded"
+                                :class="theme === 'dark' ? 'bg-amber-900/10 border border-amber-500/20 text-amber-400' : 'bg-amber-50 border border-amber-200 text-amber-700'">
+                                <span class="truncate" x-text="goal.title"></span>
+                                <span class="shrink-0 ml-2" x-text="formatDate(goal.date)"></span>
+                            </div>
+                        </template>
+                        <div x-show="getOverdueGoals().length === 0" class="text-[10px] italic"
+                            :class="theme === 'dark' ? 'text-gray-500' : 'text-slate-500'">
+                            No overdue tasks. You are on track!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-5 w-px theme-border border-l mx-1"></div>
+
+            <!-- Review & Metrics -->
+            <button @click="reviewMode = true"
+                class="px-2 py-1.5 text-xs rounded transition-colors flex items-center gap-1 border theme-border hover:bg-gray-800/50"
+                :class="theme === 'dark' ? 'text-purple-400 bg-purple-900/20 border-purple-500/30' : 'text-purple-600 bg-purple-100 border-purple-200'">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
+                    </path>
+                </svg>
+                <span class="hidden sm:inline">Review</span>
+            </button>
+
+            <button @click="showMetrics = true"
+                class="px-2 py-1.5 text-xs rounded transition-colors flex items-center gap-1 border theme-border hover:opacity-80 theme-text-muted bg-opacity-10 bg-gray-500">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                    </path>
+                </svg>
+            </button>
+
+            <!-- Theme Toggle -->
+            <button @click="toggleTheme()"
+                class="p-1.5 rounded-md hover:bg-gray-500/10 transition-colors text-yellow-500" title="Toggle Theme">
+                <svg x-show="theme === 'dark'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                    </path>
+                </svg>
+                <svg x-show="theme === 'light'" class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                    </path>
+                </svg>
+            </button>
+
+            <!-- Data Menu -->
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" @click.outside="open = false"
+                    class="px-2 py-1.5 text-xs rounded border theme-border flex items-center gap-1 hover:bg-gray-500/10 theme-text-muted">
+                    Data
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="open" x-cloak
+                    class="absolute right-0 mt-1 w-40 theme-panel border theme-border rounded shadow-xl z-50 flex flex-col py-1">
+                    <button @click="exportCSV(); open=false"
+                        class="px-3 py-2 text-left text-xs hover:bg-gray-500/10 theme-text-muted">Export CSV</button>
+                    <button @click="loadSampleData(); open=false"
+                        class="px-3 py-2 text-left text-xs hover:bg-gray-500/10 theme-text-muted">Load Sample
+                        Data</button>
+                    <div class="border-t theme-border my-1"></div>
+                    <button @click="deleteDatabase(); open=false"
+                        class="px-3 py-2 text-left text-xs hover:bg-red-900/30 text-red-500">Delete Database</button>
+                </div>
+            </div>
+
+            <button @click="openFile()"
+                class="px-3 py-1.5 text-xs rounded bg-indigo-600 hover:bg-indigo-500 text-white transition-colors font-medium shadow-lg shadow-indigo-500/20">
+                Open
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area - 2 Panes (Left: Strat/Tactical, Right: Daily Execution) -->
+    <main class="flex-1 flex overflow-hidden">
+
+        <!-- Yearly Sidebar (Overlay) -->
+        <div x-show="showYearly" x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 -translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
+            x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-x-0"
+            x-transition:leave-end="opacity-0 -translate-x-4"
+            class="absolute top-10 left-0 bottom-0 w-72 border-r flex flex-col z-30 shadow-2xl backdrop-blur-md"
+            :class="theme === 'dark' ? 'bg-gray-950/95 border-gray-800' : 'bg-white/95 border-slate-200'" x-cloak>
+            <div class="p-3 border-b flex justify-between items-center"
+                :class="theme === 'dark' ? 'border-gray-800 bg-gray-950/50' : 'border-slate-200 bg-slate-50/50'">
+                <div>
+                    <h2
+                        class="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400">
+                        Yearly Vision</h2>
+                </div>
+                <button @click="addGoal('yearly')" class="transition-colors"
+                    :class="theme==='dark'?'text-gray-500 hover:text-indigo-400':'text-slate-400 hover:text-indigo-500'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-2 space-y-2">
+                <template x-for="goal in getGoals('yearly')" :key="goal.id">
+                    <div class="relative p-2 rounded border transition-all group"
+                        :class="theme === 'dark' ? 'bg-gray-900/40 border-gray-800 hover:border-indigo-500/30' : 'bg-slate-50 border-slate-200 hover:border-indigo-400'">
+                        <div class="absolute bottom-0 left-0 h-0.5 bg-indigo-500/20 w-full rounded-b overflow-hidden">
+                            <div class="h-full bg-indigo-500 transition-all duration-500"
+                                :style="`width: ${getProgress(goal.id)}%`"></div>
+                        </div>
+                        <div class="flex items-start justify-between gap-2 mb-1">
+                            <input type="text" x-model="goal.title"
+                                class="bg-transparent w-full focus:outline-none text-sm font-semibold placeholder-gray-700"
+                                :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-800'"
+                                placeholder="Yearly Vision...">
+
+                            <!-- Actions -->
+                            <div class="flex items-center gap-1 shrink-0">
+                                <!-- Detail Button -->
+                                <button @click="openDetail(goal)"
+                                    class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded hover:bg-indigo-500/10"
+                                    :class="theme==='dark'?'text-gray-500 hover:text-indigo-400':'text-slate-400 hover:text-indigo-500'"
+                                    title="Edit Details">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                        </path>
+                                    </svg>
+                                </button>
+
+                                <!-- Inline Delete -->
+                                <button x-show="deletingId !== goal.id" @click="deletingId = goal.id"
+                                    class="opacity-0 group-hover:opacity-100 transition-opacity"
+                                    :class="theme==='dark'?'text-gray-600 hover:text-red-400':'text-slate-400 hover:text-red-500'">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                                <button x-show="deletingId === goal.id" @click="deleteGoal(goal.id)"
+                                    class="text-[10px] px-1 rounded border"
+                                    :class="theme==='dark'?'bg-red-900/50 text-red-200 hover:bg-red-800 border-red-700':'bg-red-100 text-red-700 hover:bg-red-200 border-red-200'">
+                                    Confirm
+                                </button>
+                                <button x-show="deletingId === goal.id" @click="deletingId = null"
+                                    class="hover:text-gray-300"
+                                    :class="theme==='dark'?'text-gray-500':'text-slate-500'">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                <div x-show="getGoalsByDay(0).length === 0" class="text-center py-12 text-gray-500">
+                    <p class="text-sm">No tasks for this day.</p>
+                    <button @click="addGoal('daily')" class="mt-2 text-xs text-indigo-500 hover:underline">Add something
+                        to focus on</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Left Column: Strategy (Quarterly & Weekly Stacked) -->
+        <div class="w-[320px] flex flex-col border-r shrink-0 transition-colors"
+            :class="theme === 'dark' ? 'border-gray-800 bg-gray-950' : 'border-slate-200 bg-slate-50'">
+
+            <!-- Quarterly Section (Top Half) -->
+            <section class="flex-1 flex flex-col min-h-0 border-b"
+                :class="theme === 'dark' ? 'border-gray-800' : 'border-slate-200'">
+                <div class="px-3 py-2 border-b flex justify-between items-center sticky top-0 z-10"
+                    :class="theme === 'dark' ? 'border-gray-800 bg-gray-950' : 'border-slate-200 bg-slate-50'">
+                    <h2 class="text-sm font-bold uppercase tracking-wider"
+                        :class="theme==='dark'?'text-gray-400':'text-slate-500'">Quarterly</h2>
+                    <button @click="addGoal('quarterly')" class="transition-colors"
+                        :class="theme==='dark'?'text-gray-600 hover:text-purple-400':'text-slate-400 hover:text-purple-500'">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-2 space-y-2 scrollbar-thin">
+                    <template x-for="goal in getGoals('quarterly')" :key="goal.id">
+                        <div class="group relative p-2 rounded border transition-all"
+                            :class="theme === 'dark' ? 'bg-gray-900/30 border-gray-800/80 hover:border-purple-500/30' : 'bg-white border-slate-200 hover:border-purple-400'">
+                            <div class="flex items-start gap-2">
+                                <button @click="toggleComplete(goal)" class="mt-0.5 shrink-0 transition-colors"
+                                    :class="[goal.completed ? 'text-green-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-700 hover:text-purple-400' : 'text-slate-300 hover:text-purple-500'))]">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path x-show="!goal.completed && !goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        <path x-show="goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M5 12h14"></path>
+                                        <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </button>
+                                <div class="flex-1 min-w-0">
+                                    <input type="text" x-model="goal.title"
+                                        class="bg-transparent w-full focus:outline-none text-sm font-medium placeholder-gray-700"
+                                        :class="[theme === 'dark' ? 'text-gray-300' : 'text-slate-800', {'line-through text-gray-600': goal.completed, 'text-amber-400/90': goal.inProgress && !goal.completed}]"
+                                        placeholder="Objective...">
+
+                                    <div class="mt-1 flex items-center justify-between">
+                                        <!-- Parent & Date Info -->
+                                        <div class="flex items-center gap-2">
+                                            <template x-if="goal.parentId && getParentDetails(goal.parentId)">
+                                                <div
+                                                    class="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400">
+                                                    <span class="truncate max-w-[80px]"
+                                                        x-text="getParentDetails(goal.parentId).title"></span>
+                                                </div>
+                                            </template>
+
+                                            <div class="flex items-center gap-1 text-[10px]"
+                                                :class="theme==='dark'?'text-gray-500':'text-slate-500'">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                    </path>
+                                                </svg>
+                                                <span x-text="formatDate(goal.date) || 'No Date'"></span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Progress -->
+                                        <div class="text-[10px] font-mono text-purple-500/60"
+                                            x-show="getProgress(goal.id) > 0" x-text="getProgress(goal.id) + '%'"></div>
+                                    </div>
+
+                                    <!-- Description Line -->
+                                    <textarea x-model="goal.description"
+                                        class="bg-transparent w-full focus:outline-none text-[10px] placeholder-gray-800 auto-expand resize-none overflow-hidden mt-1"
+                                        :class="theme==='dark'?'text-gray-500':'text-slate-400'" rows="1"
+                                        placeholder="Notes..."></textarea>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <!-- Detail Trigger -->
+                                    <button @click="openDetail(goal)"
+                                        class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded hover:bg-purple-500/10"
+                                        :class="theme==='dark'?'text-gray-500 hover:text-purple-400':'text-slate-400 hover:text-purple-500'"
+                                        title="Edit Details">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                            </path>
+                                        </svg>
+                                    </button>
+
+                                    <!-- Delete -->
+                                    <button x-show="deletingId !== goal.id" @click="deletingId = goal.id"
+                                        class="opacity-0 group-hover:opacity-100 transition-opacity"
+                                        :class="theme==='dark'?'text-gray-800 hover:text-red-900/60':'text-slate-300 hover:text-red-400'">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                    <button x-show="deletingId === goal.id" @click="deleteGoal(goal.id)"
+                                        class="text-[10px] px-1 rounded border"
+                                        :class="theme==='dark'?'bg-red-900/50 text-red-200 hover:bg-red-800 border-red-700':'bg-red-100 text-red-700 hover:bg-red-200 border-red-200'">
+                                        Confirm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+
+            <!-- Weekly Section (Bottom Half) -->
+            <section class="flex-1 flex flex-col min-h-0" :class="theme === 'dark' ? 'bg-gray-900/20' : 'bg-slate-50'">
+                <div class="px-3 py-2 border-b flex justify-between items-center sticky top-0 z-10"
+                    :class="theme === 'dark' ? 'border-gray-800 bg-gray-950/50' : 'border-slate-200 bg-slate-50/80'">
+                    <h2 class="text-sm font-bold uppercase tracking-wider"
+                        :class="theme==='dark'?'text-gray-400':'text-slate-500'">Weekly</h2>
+                    <button @click="addGoal('weekly')" class="transition-colors"
+                        :class="theme==='dark'?'text-gray-600 hover:text-blue-400':'text-slate-400 hover:text-blue-500'">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-2 space-y-2 scrollbar-thin">
+                    <template x-for="goal in getGoals('weekly')" :key="goal.id">
+                        <div class="group relative p-2 rounded border transition-all"
+                            :class="theme === 'dark' ? 'bg-gray-900/30 border-gray-800/80 hover:border-blue-500/30' : 'bg-white border-slate-200 hover:border-blue-400'">
+                            <div class="flex items-start gap-2">
+                                <button @click="toggleComplete(goal)" class="mt-0.5 shrink-0 transition-colors"
+                                    :class="[goal.completed ? 'text-green-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-700 hover:text-blue-400' : 'text-slate-300 hover:text-blue-500'))]">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path x-show="!goal.completed && !goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        <path x-show="goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M5 12h14"></path>
+                                        <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </button>
+                                <div class="flex-1 min-w-0">
+                                    <input type="text" x-model="goal.title"
+                                        class="bg-transparent w-full focus:outline-none text-sm font-medium placeholder-gray-700"
+                                        :class="[theme === 'dark' ? 'text-gray-300' : 'text-slate-800', {'line-through text-gray-600': goal.completed, 'text-amber-400/90': goal.inProgress && !goal.completed}]"
+                                        placeholder="Weekly Goal...">
+
+                                    <div class="mt-1 flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <!-- Parent Badge -->
+                                            <template x-if="goal.parentId && getParentDetails(goal.parentId)">
+                                                <div
+                                                    class="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border border-purple-500/20 bg-purple-500/10 text-purple-400">
+                                                    <span class="truncate max-w-[80px]"
+                                                        x-text="getParentDetails(goal.parentId).title"></span>
+                                                </div>
+                                            </template>
+
+                                            <!-- Date Badge -->
+                                            <div class="flex items-center gap-1 text-[10px]"
+                                                :class="theme==='dark'?'text-gray-500':'text-slate-500'">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                    </path>
+                                                </svg>
+                                                <span x-text="formatDate(goal.date) || 'No Date'"></span>
+                                            </div>
+                                        </div>
+                                        <div class="text-[10px] font-mono text-blue-500/60"
+                                            x-show="getProgress(goal.id) > 0" x-text="getProgress(goal.id) + '%'"></div>
+                                    </div>
+                                    <textarea x-model="goal.description"
+                                        class="bg-transparent w-full focus:outline-none text-[10px] placeholder-gray-800 auto-expand resize-none overflow-hidden mt-1"
+                                        :class="theme==='dark'?'text-gray-500':'text-slate-400'" rows="1"
+                                        placeholder="Notes..."></textarea>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <!-- Detail Trigger -->
+                                    <button @click="openDetail(goal)"
+                                        class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded hover:bg-blue-500/10"
+                                        :class="theme==='dark'?'text-gray-50 hover:text-blue-400':'text-slate-400 hover:text-blue-500'"
+                                        title="Edit Details">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                            </path>
+                                        </svg>
+                                    </button>
+
+                                    <!-- Delete -->
+                                    <button x-show="deletingId !== goal.id" @click="deletingId = goal.id"
+                                        class="opacity-0 group-hover:opacity-100 transition-opacity"
+                                        :class="theme==='dark'?'text-gray-800 hover:text-red-900/60':'text-slate-300 hover:text-red-400'">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                    <button x-show="deletingId === goal.id" @click="deleteGoal(goal.id)"
+                                        class="text-[10px] px-1 rounded border"
+                                        :class="theme==='dark'?'bg-red-900/50 text-red-200 hover:bg-red-800 border-red-700':'bg-red-100 text-red-700 hover:bg-red-200 border-red-200'">
+                                        Confirm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Right Column: Daily Execution + Daily Bits Sidebar -->
+        <div class="flex-1 flex min-w-0">
+            <!-- Daily Execution -->
+            <div class="flex-1 flex flex-col min-w-0 bg-gray-950 relative"
+                :class="theme === 'dark' ? 'bg-gray-950' : 'bg-slate-50'">
+                <!-- Header -->
+                <div class="px-6 py-4 border-b flex justify-between items-end z-10 transition-colors"
+                    :class="theme === 'dark' ? 'border-gray-800 bg-gray-950' : 'border-slate-200 bg-slate-50'">
+                    <!-- Standup View Toggle -->
+                    <div class="flex items-center gap-2 mb-1">
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <span :class="theme === 'dark' ? 'text-white' : 'text-slate-900'">Daily Focus</span>
+                            <span class="text-sm font-normal px-2 py-0.5 rounded-full border"
+                                :class="theme === 'dark' ? 'text-gray-400 bg-gray-900 border-gray-800' : 'text-slate-500 bg-white border-slate-200'"
+                                x-text="formatDate(selectedDate)"></span>
+                            <button @click="goToday()" x-show="selectedDate !== new Date().toISOString().split('T')[0]"
+                                class="text-xs text-indigo-500 hover:text-indigo-400 underline ml-2">
+                                Back to Today
+                            </button>
+                        </h2>
+                        <div class="flex items-center gap-1 ml-4 border-l pl-4"
+                            :class="theme === 'dark' ? 'border-gray-800' : 'border-slate-200'">
+                            <button @click="showBits = !showBits"
+                                class="px-2 py-0.5 text-[10px] rounded border transition-all"
+                                :class="showBits
+                                    ? (theme === 'dark'
+                                        ? 'bg-indigo-500/10 border-indigo-500 text-indigo-400'
+                                        : 'bg-indigo-50 border-indigo-300 text-indigo-600')
+                                    : (theme === 'dark'
+                                        ? 'border-gray-800 text-gray-500'
+                                        : 'border-slate-300 text-slate-500')">
+                                Daily Bits
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="flex items-center p-1 rounded-lg border mr-2"
+                            :class="theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-white border-slate-200'">
+                            <button @click="standupMode = false; viewMode = 'focus'"
+                                class="px-3 py-1 text-xs rounded-md transition-all"
+                                :class="!standupMode && viewMode === 'focus' ? (theme === 'dark' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-indigo-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
+                                Focus
+                            </button>
+                            <button @click="standupMode = true; viewMode = 'focus'"
+                                class="px-3 py-1 text-xs rounded-md transition-all"
+                                :class="standupMode ? (theme === 'dark' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-indigo-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
+                                Standup
+                            </button>
+                            <button @click="viewMode = 'kb'; standupMode = false"
+                                class="px-3 py-1 text-xs rounded-md transition-all"
+                                :class="viewMode === 'kb' ? (theme === 'dark' ? 'bg-amber-600 text-white shadow-lg' : 'bg-amber-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
+                                KB
+                            </button>
+                        </div>
+
+                        <button x-show="standupMode" @click="generateStandup()"
+                            class="px-3 py-1.5 rounded transition-colors border text-sm font-medium"
+                            :class="theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 border-gray-700' : 'bg-white hover:bg-slate-100 text-slate-600 border-slate-200'">
+                            Copy Report
+                        </button>
+                        <button @click="addGoal('daily')"
+                            class="px-3 py-1.5 rounded bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-500 hover:text-emerald-400 transition-colors border border-emerald-500/20 flex items-center gap-2 text-sm font-medium">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4">
+                                </path>
+                            </svg>
+                            Add Task
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Standup/Grid View -->
+                <div class="flex-1 overflow-hidden" x-show="standupMode">
+                    <div class="h-full grid grid-cols-3 divide-x"
+                        :class="theme === 'dark' ? 'divide-gray-800' : 'divide-slate-200'">
+                        <!-- Yesterday -->
+                        <div class="flex flex-col min-h-0" :class="theme === 'dark' ? 'bg-gray-950/50' : 'bg-slate-50'">
+                            <div class="p-3 border-b text-center font-bold text-xs uppercase tracking-wider"
+                                :class="theme === 'dark' ? 'border-gray-800 bg-gray-900/30 text-gray-500' : 'border-slate-200 bg-slate-100 text-slate-500'">
+                                Yesterday</div>
+                            <div class="flex-1 overflow-y-auto p-3 space-y-2">
+                                <template x-for="goal in getGoalsByDay(-1)" :key="goal.id">
+                                    <div class="p-2 rounded border"
+                                        :class="[theme === 'dark' ? 'border-gray-800' : 'border-slate-200', goal.completed ? (theme==='dark'?'bg-gray-900/20 opacity-75':'bg-slate-100/50 opacity-75') : (theme==='dark'?'bg-gray-900/50':'bg-white')]">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <div class="w-2 h-2 rounded-full"
+                                                :class="goal.completed ? 'bg-green-500' : (goal.inProgress ? 'bg-amber-400' : 'bg-red-500')"></div>
+                                            <span class="text-xs font-medium truncate"
+                                                :class="theme==='dark'?'text-gray-300':'text-slate-700'"
+                                                x-text="goal.title"></span>
+                                        </div>
+                                        <p class="text-[10px] truncate"
+                                            :class="theme==='dark'?'text-gray-500':'text-slate-400'"
+                                            x-text="goal.description"></p>
+                                    </div>
+                                </template>
+                                <div x-show="getGoalsByDay(-1).length === 0"
+                                    class="text-center py-4 text-xs text-gray-500">
+                                    Nothing recorded</div>
+                            </div>
+                        </div>
+                        <!-- Today -->
+                        <div class="flex flex-col min-h-0" :class="theme === 'dark' ? 'bg-gray-950/50' : 'bg-slate-50'">
+                            <div class="p-3 border-b text-center font-bold text-xs uppercase tracking-wider"
+                                :class="theme === 'dark' ? 'border-gray-800 bg-emerald-900/10 text-emerald-500' : 'border-slate-200 bg-emerald-50 text-emerald-600'">
+                                Selected Day</div>
+                            <div class="flex-1 overflow-y-auto p-3 space-y-2">
+                                <template x-for="goal in getGoalsByDay(0)" :key="goal.id">
+                                    <div class="p-2 rounded border transition-colors"
+                                        :class=" theme === 'dark' ? 'border-gray-800 bg-gray-900/60 hover:border-emerald-500/30' : 'border-slate-200 bg-white hover:border-emerald-400'">
+                                        <div class="flex items-start gap-2">
+                                            <button @click="toggleComplete(goal)" class="mt-0.5"
+                                                :class="goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme==='dark' ? 'text-gray-600 hover:text-emerald-500' : 'text-slate-400 hover:text-emerald-500'))">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path x-show="!goal.completed && !goal.inProgress"
+                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    <path x-show="goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M5 12h14"></path>
+                                                    <path x-show="goal.completed" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                            </button>
+                                            <div class="min-w-0 flex-1">
+                                                <div class="text-xs font-medium"
+                                                    :class="[theme==='dark'?'text-gray-200':'text-slate-800', {'line-through text-gray-500': goal.completed, 'text-amber-400/90': goal.inProgress && !goal.completed}]"
+                                                    x-text="goal.title">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <div x-show="getGoalsByDay(0).length === 0"
+                                    class="text-center py-4 text-xs text-gray-500">
+                                    Add tasks for this day</div>
+                            </div>
+                        </div>
+                        <!-- Tomorrow -->
+                        <div class="flex flex-col min-h-0" :class="theme === 'dark' ? 'bg-gray-950/50' : 'bg-slate-50'">
+                            <div class="p-3 border-b text-center font-bold text-xs uppercase tracking-wider"
+                                :class="theme === 'dark' ? 'border-gray-800 bg-gray-900/30 text-blue-400' : 'border-slate-200 bg-slate-100 text-blue-500'">
+                                Tomorrow</div>
+                            <div class="flex-1 overflow-y-auto p-3 space-y-2">
+                                <template x-for="goal in getGoalsByDay(1)" :key="goal.id">
+                                    <div class="p-2 rounded border"
+                                        :class="theme === 'dark' ? 'border-gray-800 bg-gray-900/30 text-gray-400' : 'border-slate-200 bg-white text-slate-600'">
+                                        <div class="text-xs" x-text="goal.title"></div>
+                                        <p class="text-[10px] mt-1 opacity-70" x-text="goal.date"></p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Knowledge Base View -->
+                <div class="flex-1 flex flex-col min-w-0 min-h-0" x-show="viewMode === 'kb' && !standupMode">
+                    <div class="p-6 border-b flex items-center justify-between gap-4"
+                        :class="theme === 'dark' ? 'border-gray-800' : 'border-slate-200'">
+                        <div class="flex items-center gap-3">
+                            <h3 class="text-sm font-bold uppercase tracking-widest text-amber-500">Pinned Knowledge Base
+                            </h3>
+                            <div class="text-[10px] theme-text-muted transition-colors"
+                                x-text="getKBItems().length + ' pinned items'"></div>
+                        </div>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
+                        <template x-for="(bit, idx) in getKBItems()" :key="bit.id">
+                            <div class="space-y-3">
+                                <template x-if="idx === 0 || getKBItems()[idx - 1]?.date !== bit.date">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-[9px] uppercase tracking-widest text-amber-500/70"
+                                            x-text="formatDate(bit.date)"></span>
+                                        <div class="flex-1 h-px"
+                                            :class="theme === 'dark' ? 'bg-gray-800' : 'bg-slate-200'"></div>
+                                    </div>
+                                </template>
+                                <div class="group border rounded-lg overflow-hidden transition-all shadow-sm"
+                                    :class="theme === 'dark' ? 'bg-gray-900/40 border-amber-500/20' : 'bg-white border-amber-200'">
+                                    <div class="px-4 py-2 border-b flex items-center justify-between cursor-pointer"
+                                        @click="toggleKBCollapse(bit)" title="Expand / Collapse"
+                                        :class="theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-amber-50 border-amber-100'">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[10px] font-mono text-amber-600"
+                                                x-text="formatDate(bit.date)"></span>
+                                            <h4 class="text-xs font-bold" x-text="bit.title"></h4>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <button @click.stop="copyKBToClipboard(bit)"
+                                                class="text-amber-500/80 hover:text-amber-400" title="Copy KB">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2M8 7a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2h-2"></path>
+                                                </svg>
+                                            </button>
+                                            <button @click.stop="toggleKBCollapse(bit)"
+                                                class="text-amber-500/80 hover:text-amber-400" title="Expand / Collapse">
+                                                <svg x-show="isKBCollapsed(bit)" class="w-3.5 h-3.5" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 9l-7 7-7-7"></path>
+                                                </svg>
+                                                <svg x-show="!isKBCollapsed(bit)" class="w-3.5 h-3.5" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M5 15l7-7 7 7"></path>
+                                                </svg>
+                                            </button>
+                                            <button x-show="!bit.kbPendingUnpin" @click.stop="requestUnpinKB(bit)"
+                                                class="text-amber-500 hover:text-amber-400" title="Unpin from KB">
+                                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3.5 7 3.5V5c0-1.1-.9-2-2-2z"></path>
+                                                </svg>
+                                            </button>
+                                            <div x-show="bit.kbPendingUnpin" class="flex items-center gap-1">
+                                                <button @click.stop="confirmUnpinKB(bit)"
+                                                    class="px-1.5 py-0.5 rounded border text-[9px] font-semibold"
+                                                    :class="theme === 'dark' ? 'border-amber-500/40 text-amber-400 hover:bg-amber-500/10' : 'border-amber-400 text-amber-600 hover:bg-amber-50'">
+                                                    Unpin
+                                                </button>
+                                                <button @click.stop="cancelUnpinKB(bit)"
+                                                    class="px-1.5 py-0.5 rounded border text-[9px]"
+                                                    :class="theme === 'dark' ? 'border-gray-700 text-gray-400 hover:bg-gray-800' : 'border-slate-200 text-slate-500 hover:bg-slate-100'">
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-4 space-y-3" x-show="!isKBCollapsed(bit)">
+                                        <template x-if="!isKBCollapsed(bit)">
+                                            <template x-for="(block, idx) in parseMarkdownBlocks(bit.description)"
+                                                :key="bit.id + '-block-' + idx">
+                                                <div>
+                                                    <template x-if="block.type === 'text'">
+                                                        <p class="text-[11px] whitespace-pre-wrap opacity-80"
+                                                            x-text="block.content"></p>
+                                                    </template>
+                                                    <template x-if="block.type === 'code'">
+                                                        <div>
+                                                            <div x-show="block.lang"
+                                                                class="text-[9px] uppercase tracking-widest text-amber-500 mb-1"
+                                                                x-text="block.lang"></div>
+                                                            <pre class="text-[11px] font-mono whitespace-pre-wrap opacity-90"
+                                                                x-text="block.content"></pre>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </template>
+                                    </div>
+                                    <div class="px-4 py-2 bg-gray-500/5 flex gap-2" x-show="bit.tags && bit.tags.length">
+                                        <template x-for="tag in (bit.tags || [])" :key="tag">
+                                            <span
+                                                class="text-[9px] px-1.5 py-0.5 rounded border border-gray-500/20 theme-text-muted"
+                                                x-text="tag"></span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <div x-show="getKBItems().length === 0" class="text-center py-20 opacity-30">
+                            <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                                </path>
+                            </svg>
+                            <p class="text-sm">Knowledge Base is Empty</p>
+                            <p class="text-[11px] mt-1">Pin bits from your daily focus to build your KB.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Standard List View (Focus Mode) -->
+                <div class="flex-1 overflow-y-auto p-6 space-y-2 scrollbar-thumb-gray-800 scrollbar-track-transparent"
+                    x-show="!standupMode && viewMode === 'focus'">
+                    <div class="flex flex-wrap items-center gap-2 pb-2" x-data="{ counts: getStatusCountsForSelectedDate() }"
+                        x-effect="counts = getStatusCountsForSelectedDate()">
+                        <span class="text-[10px] uppercase tracking-widest opacity-50">Status</span>
+                        <button @click="statusFilter = 'all'" class="px-2 py-0.5 text-[10px] rounded border"
+                            :class="statusFilter === 'all'
+                                ? (theme === 'dark' ? 'bg-gray-800 text-gray-200 border-gray-700' : 'bg-white text-slate-700 border-slate-300')
+                                : (theme === 'dark' ? 'text-gray-400 border-gray-800 hover:border-gray-700' : 'text-slate-500 border-slate-200 hover:border-slate-300')">
+                            All
+                            <span class="ml-1 px-1 rounded-full text-[9px] border"
+                                :class="theme === 'dark' ? 'border-gray-700 text-gray-400' : 'border-slate-300 text-slate-500'"
+                                x-text="counts.all"></span>
+                        </button>
+                        <button @click="statusFilter = 'in-progress'" class="px-2 py-0.5 text-[10px] rounded border"
+                            :class="statusFilter === 'in-progress'
+                                ? (theme === 'dark' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-amber-50 text-amber-700 border-amber-200')
+                                : (theme === 'dark' ? 'text-gray-400 border-gray-800 hover:border-gray-700' : 'text-slate-500 border-slate-200 hover:border-slate-300')">
+                            In Progress
+                            <span class="ml-1 px-1 rounded-full text-[9px] border"
+                                :class="theme === 'dark' ? 'border-amber-500/30 text-amber-300' : 'border-amber-200 text-amber-700'"
+                                x-text="counts.inProgress"></span>
+                        </button>
+                        <button @click="statusFilter = 'blocked'" class="px-2 py-0.5 text-[10px] rounded border"
+                            :class="statusFilter === 'blocked'
+                                ? (theme === 'dark' ? 'bg-red-500/15 text-red-400 border-red-500/30' : 'bg-red-50 text-red-700 border-red-200')
+                                : (theme === 'dark' ? 'text-gray-400 border-gray-800 hover:border-gray-700' : 'text-slate-500 border-slate-200 hover:border-slate-300')">
+                            Blocked
+                            <span class="ml-1 px-1 rounded-full text-[9px] border"
+                                :class="theme === 'dark' ? 'border-red-500/30 text-red-400' : 'border-red-200 text-red-700'"
+                                x-text="counts.blocked"></span>
+                        </button>
+                        <button @click="statusFilter = 'waiting'" class="px-2 py-0.5 text-[10px] rounded border"
+                            :class="statusFilter === 'waiting'
+                                ? (theme === 'dark' ? 'bg-amber-500/15 text-amber-300 border-amber-500/30' : 'bg-amber-50 text-amber-700 border-amber-200')
+                                : (theme === 'dark' ? 'text-gray-400 border-gray-800 hover:border-gray-700' : 'text-slate-500 border-slate-200 hover:border-slate-300')">
+                            Waiting
+                            <span class="ml-1 px-1 rounded-full text-[9px] border"
+                                :class="theme === 'dark' ? 'border-amber-500/30 text-amber-300' : 'border-amber-200 text-amber-700'"
+                                x-text="counts.waiting"></span>
+                        </button>
+                        <button @click="statusFilter = 'review'" class="px-2 py-0.5 text-[10px] rounded border"
+                            :class="statusFilter === 'review'
+                                ? (theme === 'dark' ? 'bg-blue-500/15 text-blue-300 border-blue-500/30' : 'bg-blue-50 text-blue-700 border-blue-200')
+                                : (theme === 'dark' ? 'text-gray-400 border-gray-800 hover:border-gray-700' : 'text-slate-500 border-slate-200 hover:border-slate-300')">
+                            Review
+                            <span class="ml-1 px-1 rounded-full text-[9px] border"
+                                :class="theme === 'dark' ? 'border-blue-500/30 text-blue-300' : 'border-blue-200 text-blue-700'"
+                                x-text="counts.review"></span>
+                        </button>
+                    </div>
+
+                    <template x-if="getNextAction()">
+                        <div x-data="{ next: getNextAction() }"
+                            class="p-3 rounded-lg border transition-all"
+                            :class="theme === 'dark' ? 'bg-amber-500/10 border-amber-500/30' : 'bg-amber-50 border-amber-200'">
+                            <div class="flex items-center justify-between gap-3">
+                                <div class="min-w-0">
+                                    <div class="text-[10px] uppercase tracking-widest text-amber-500">Next action</div>
+                                    <div class="text-sm font-semibold truncate" x-text="next.title"></div>
+                                    <div class="text-[11px] opacity-70 truncate" x-text="next.description"></div>
+                                </div>
+                                <button @click="setNextAction(next)"
+                                    class="px-2 py-1 text-[10px] rounded border"
+                                    :class="theme === 'dark' ? 'border-amber-500/30 text-amber-300 hover:bg-amber-500/10' : 'border-amber-300 text-amber-700 hover:bg-amber-100'">
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <template x-for="goal in getDailyFocusGoals()" :key="goal.id">
+                        <div class="group p-3 rounded-lg border transition-all"
+                            @click="selectedGoalId = goal.id"
+                            :class="[goal.completed ? 'opacity-50 hover:opacity-75' : '', theme === 'dark' ? 'bg-gray-900/40 border-gray-800 hover:border-emerald-500/30 hover:bg-gray-900/60' : 'bg-white border-slate-200 hover:border-emerald-400 hover:bg-slate-50', goal.id === selectedGoalId ? 'ring-1 ring-indigo-500/40' : '']">
+
+                            <div class="flex items-start gap-4">
+                                <!-- Checkbox -->
+                                <button @click="toggleComplete(goal)" class="mt-1 shrink-0 transition-colors p-1"
+                                    :class="[goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme === 'dark' ? 'text-gray-600 hover:text-emerald-400' : 'text-slate-400 hover:text-emerald-500'))]">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path x-show="!goal.completed && !goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        <path x-show="goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M5 12h14"></path>
+                                        <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </button>
+
+                                <!-- Content -->
+                                <div class="flex-1 min-w-0 space-y-1">
+                                    <input type="text" x-model="goal.title" @keydown.enter="addGoal('daily')"
+                                        @focus="selectedGoalId = goal.id"
+                                        class="bg-transparent w-full focus:outline-none text-base font-medium placeholder-gray-600"
+                                        :class="[theme === 'dark' ? 'text-gray-200' : 'text-slate-800', {'line-through text-gray-500': goal.completed, 'text-amber-400/90': goal.inProgress && !goal.completed}]"
+                                        placeholder="What needs to be done?">
+
+                                    <!-- Meta Row (Date/Tags/Link) -->
+                                    <div class="flex flex-wrap items-center gap-3 text-xs mt-1"
+                                        :class="theme === 'dark' ? 'text-gray-500' : 'text-slate-400'">
+
+                                        <!-- Date Badge -->
+                                        <div class="flex items-center gap-1" title="Due Date">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                </path>
+                                            </svg>
+                                            <span x-text="formatDate(goal.date) || 'Today'"></span>
+                                        </div>
+
+                                        <!-- Tags Badge -->
+                                        <template x-if="goal.tags && goal.tags.length > 0">
+                                            <div class="flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
+                                                    </path>
+                                                </svg>
+                                                <span x-text="goal.tags.join(', ')"></span>
+                                            </div>
+                                        </template>
+
+                                        <template x-if="goal.isNextAction">
+                                            <span
+                                                class="text-[10px] px-1.5 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-500">
+                                                Next
+                                            </span>
+                                        </template>
+
+                                        <template x-if="goal.inProgress">
+                                            <span
+                                                class="text-[10px] px-1.5 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-500">
+                                                In Progress
+                                            </span>
+                                        </template>
+
+                                        <template x-if="goal.statusTag">
+                                            <span class="text-[10px] px-1.5 py-0.5 rounded border"
+                                                :class="getStatusBadgeClass(goal.statusTag)"
+                                                x-text="goal.statusTag"></span>
+                                        </template>
+
+                                        <template
+                                            x-if="goal.statusTag === 'blocked' && getBlockedAgeDays(goal) >= blockedNudgeDays">
+                                            <span class="text-[10px] px-1.5 py-0.5 rounded border"
+                                                :class="theme === 'dark' ? 'border-red-500/30 text-red-400 bg-red-500/10' : 'border-red-200 text-red-700 bg-red-50'"
+                                                x-text="'Blocked ' + getBlockedAgeDays(goal) + 'd'"></span>
+                                        </template>
+
+                                        <!-- Weekly / Quarterly Links -->
+                                        <template x-if="goal.parentId && getParentDetails(goal.parentId)">
+                                            <div class="flex items-center gap-1 text-purple-500/60 pl-2 border-l border-gray-800"
+                                                title="Linked to weekly goal">
+                                                <span class="text-[10px]">W:</span>
+                                                <span class="truncate max-w-[100px] text-[10px]"
+                                                    x-text="getParentDetails(goal.parentId).title"></span>
+                                            </div>
+                                        </template>
+                                        <template x-if="goal.quarterlyParentId && getParentDetails(goal.quarterlyParentId)">
+                                            <div class="flex items-center gap-1 text-amber-500/70 pl-2 border-l border-gray-800"
+                                                title="Linked to quarterly goal">
+                                                <span class="text-[10px]">Q:</span>
+                                                <span class="truncate max-w-[100px] text-[10px]"
+                                                    x-text="getParentDetails(goal.quarterlyParentId).title"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                    <textarea x-model="goal.description"
+                                        class="w-full bg-transparent focus:outline-none text-xs text-gray-500 focus:text-gray-400 placeholder-gray-800/50 italic auto-expand resize-none overflow-hidden mt-1"
+                                        rows="1" placeholder="Add details or notes..."></textarea>
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="flex items-center gap-1 p-1 shrink-0">
+                                    <button @click="setNextAction(goal)"
+                                        class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded"
+                                        :class="goal.isNextAction
+                                            ? 'text-amber-500'
+                                            : (theme === 'dark' ? 'text-gray-600 hover:text-amber-400' : 'text-slate-400 hover:text-amber-500')"
+                                        title="Set as Next Action">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                                        </svg>
+                                    </button>
+                                    <button @click="openDetail(goal)"
+                                        class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded hover:bg-emerald-500/10"
+                                        :class="theme==='dark'?'text-gray-500 hover:text-emerald-400':'text-slate-400 hover:text-emerald-500'"
+                                        title="Edit Details">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                    <button x-show="deletingId !== goal.id" @click="deletingId = goal.id"
+                                        class="text-gray-700 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                    <button x-show="deletingId === goal.id" @click="deleteGoal(goal.id)"
+                                        class="text-xs bg-red-900/50 text-red-200 px-2 py-0.5 rounded hover:bg-red-800 border border-red-700 whitespace-nowrap">
+                                        Confirm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <div x-show="getDailyFocusGoals().length === 0" class="text-center py-12 text-gray-700 opacity-50">
+                        <p class="text-sm">No tasks for today. Press 'Enter' or click Add Task.</p>
+                    </div>
+                </div>
+
+                <!-- Focus / Notification Panel (moved to header bell) -->
+            </div>
+        </div>
+<!-- Daily Bits Sidebar -->
+<div x-show="showBits" class="w-80 border-l flex flex-col transition-all shrink-0"
+    :class="theme === 'dark' ? 'bg-gray-900/20 border-gray-800' : 'bg-slate-50 border-slate-200'">
+    <!-- Bits Header -->
+    <div class="px-4 py-3 border-b flex items-center justify-between shrink-0"
+        :class="theme === 'dark' ? 'border-gray-800 bg-gray-900/40' : 'border-slate-200 bg-white'">
+        <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold uppercase tracking-widest opacity-50">Daily Bits</span>
+            <span class="px-1.5 py-0.5 rounded-full text-[9px]"
+                :class="theme === 'dark' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-100 text-indigo-700'"
+                x-text="getBitsByDay().length"></span>
+        </div>
+        <button @click="showBits = false"
+            :class="theme === 'dark' ? 'text-gray-500 hover:text-gray-300' : 'text-slate-500 hover:text-slate-700'">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Quick Entry -->
+    <div class="px-4 py-2 border-b space-y-2" :class="theme === 'dark' ? 'border-gray-800' : 'border-slate-200'">
+        <input type="text" x-model="newBitTitle"
+            placeholder="Title (optional)"
+            class="w-full text-[11px] border rounded px-2 py-1.5 focus:ring-1 focus:ring-indigo-500 placeholder-gray-600"
+            :class="theme === 'dark' ? 'bg-transparent text-gray-300 border-gray-700' : 'bg-white text-slate-800 border-slate-300 placeholder-slate-400'">
+        <textarea x-model="newBitText" rows="3" @keydown="handleQuickBitKeydown($event, $el)"
+            @input="autoResizeTextarea($el)"
+            placeholder="Markdown / code (Enter for new lines, Ctrl+Enter to add)"
+            class="w-full text-[11px] border rounded px-2 py-1.5 focus:ring-1 focus:ring-indigo-500 placeholder-gray-600 resize-none overflow-hidden"
+            :class="theme === 'dark' ? 'bg-transparent text-gray-300 border-gray-700' : 'bg-white text-slate-800 border-slate-300 placeholder-slate-400'"></textarea>
+    </div>
+
+    <!-- Bits List (Jupyter Style) -->
+    <div class="flex-1 overflow-y-auto px-4 py-3 space-y-2 scrollbar-thin">
+        <template x-for="bit in getBitsByDay()" :key="bit.id">
+            <div class="group relative">
+                <!-- Cell Index/Line -->
+                <div class="absolute -left-6 top-2 w-5 text-[9px] font-mono opacity-20 text-right"
+                    x-text="'[' + ($index + 1) + ']'"></div>
+
+                <!-- Bit Content -->
+                <div class="rounded border transition-all relative" :class="[
+                                bit.isKB ? (theme === 'dark' ? 'border-amber-500/30 bg-amber-500/5' : 'border-amber-500/20 bg-amber-50') : (theme === 'dark' ? 'border-gray-800 bg-gray-950/50' : 'border-slate-200 bg-white'),
+                                'hover:border-indigo-500/30'
+                            ]">
+                    <div class="p-2">
+                        <input type="text" x-model="bit.title"
+                            class="w-full bg-transparent border-none p-0 focus:ring-0 text-[11px] font-medium"
+                            :class="theme === 'dark' ? 'text-gray-200' : 'text-slate-800'" placeholder="Title...">
+
+                        <textarea x-model="bit.description" rows="1"
+                            @input="handleBitDescriptionInput(bit, $el)"
+                            class="w-full bg-transparent border-none p-0 focus:ring-0 text-[10px] font-mono mt-1 opacity-70 resize-none overflow-hidden"
+                            :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'"
+                            placeholder="Code, query, or details..."></textarea>
+                    </div>
+
+                    <!-- Actions floating on hover -->
+                    <div
+                        class="absolute right-1 top-1 opacity-0 group-hover:opacity-100 flex items-center gap-0.5 transition-opacity">
+                        <button @click="toggleBitKB(bit)" class="p-0.5 rounded hover:bg-amber-500/10"
+                            :title="bit.isKB ? 'Remove from KB' : 'Pin to KB'"
+                            :class="bit.isKB ? 'text-amber-500' : 'text-gray-500'">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3.5 7 3.5V5c0-1.1-.9-2-2-2z"></path>
+                            </svg>
+                        </button>
+                        <button @click="convertBitToTask(bit)"
+                            class="p-0.5 rounded hover:bg-emerald-500/10 text-gray-500 hover:text-emerald-500"
+                            title="Convert to Task">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+                        <button @click="deleteGoal(bit.id)"
+                            class="p-0.5 rounded hover:bg-red-500/10 text-gray-500 hover:text-red-500" title="Delete">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- KB Indicator -->
+                    <div x-show="bit.isKB" class="absolute left-0 top-0 bottom-0 w-0.5 bg-amber-500/50 rounded-l"></div>
+                </div>
+            </div>
+        </template>
+        <div x-show="getBitsByDay().length === 0" class="text-center py-12 opacity-20">
+            <p class="text-[9px] uppercase tracking-widest italic">Bits appear here</p>
+        </div>
+    </div>
+</div>
+</div>
+    </main>
+
+    <!-- Metrics Modal -->
+    <div x-show="showMetrics" x-cloak
+        class="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/80 backdrop-blur-sm"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+
+        <div class="bg-gray-900 border border-gray-800 rounded-xl shadow-2xl w-[600px] max-w-full max-h-[90vh] flex flex-col"
+            @click.outside="showMetrics = false">
+            <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                <h3
+                    class="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-400">
+                    Dashboards</h3>
+                <button @click="showMetrics = false" class="text-gray-500 hover:text-white"><svg class="w-5 h-5"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg></button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-6">
+                <!-- Completion Rates -->
+                <div>
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Completion Rates</h4>
+                    <div class="space-y-4">
+                        <!-- Quarterly -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-purple-400">Quarterly Goals</span>
+                                <span class="text-gray-400" x-text="getCompletionStats('quarterly').text"></span>
+                            </div>
+                            <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-purple-500 transition-all duration-1000"
+                                    :style="`width: ${getCompletionStats('quarterly').percent}%`"></div>
+                            </div>
+                        </div>
+                        <!-- Weekly -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-blue-400">Weekly Goals</span>
+                                <span class="text-gray-400" x-text="getCompletionStats('weekly').text"></span>
+                            </div>
+                            <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 transition-all duration-1000"
+                                    :style="`width: ${getCompletionStats('weekly').percent}%`"></div>
+                            </div>
+                        </div>
+                        <!-- Daily -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-emerald-400">Daily Tasks</span>
+                                <span class="text-gray-400" x-text="getCompletionStats('daily').text"></span>
+                            </div>
+                            <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-emerald-500 transition-all duration-1000"
+                                    :style="`width: ${getCompletionStats('daily').percent}%`"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alignment Score -->
+                <div class="p-4 bg-indigo-900/20 rounded border border-indigo-500/20 flex items-center justify-between">
+                    <div>
+                        <h4 class="text-sm font-bold text-indigo-300">Strategy Alignment</h4>
+                        <p class="text-xs text-indigo-400/70 mt-1">Percentage of daily tasks linked to higher goals</p>
+                    </div>
+                    <div class="text-2xl font-bold text-indigo-400" x-text="getAlignmentScore() + '%'"></div>
+                </div>
+
+                <!-- Simple History Stats -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 bg-gray-800/50 rounded border border-gray-700">
+                        <div class="text-2xl font-bold text-white mb-1"
+                            x-text="goals.filter(g => g.type==='daily' && g.completed).length"></div>
+                        <div class="text-xs text-gray-500">Total Tasks Completed</div>
+                    </div>
+                    <div class="p-4 bg-gray-800/50 rounded border border-gray-700">
+                        <div class="text-2xl font-bold text-white mb-1" x-text="getGoals('quarterly').length"></div>
+                        <div class="text-xs text-gray-500">Active Quarterly Goals</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- App Logic -->
+    <!-- Weekly Review Wizard Modal -->
+    <div x-show="reviewMode" x-cloak
+        class="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/90 backdrop-blur-md"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95"
+        x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+
+        <div
+            class="bg-gray-900 border border-purple-500/30 rounded-xl shadow-2xl w-[600px] max-w-full flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-900/50">
+                <div>
+                    <h2
+                        class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+                        Weekly Review</h2>
+                    <p class="text-xs text-purple-400/60 mt-1">Reflect, Clean up, and Plan.</p>
+                </div>
+                <button @click="reviewMode = false" class="text-gray-500 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-8 space-y-6 overflow-y-auto">
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div class="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                        <div class="text-2xl font-bold text-emerald-400"
+                            x-text="goals.filter(g => g.type === 'daily' && g.completed).length">0</div>
+                        <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Completed Tasks</div>
+                    </div>
+                    <div class="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                        <div class="text-2xl font-bold text-blue-400" x-text="getCompletionStats('weekly').text">0/0
+                        </div>
+                        <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Weekly Goals</div>
+                    </div>
+                    <div class="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                        <div class="text-2xl font-bold text-amber-500" x-text="getOverdueGoals().length">0</div>
+                        <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Overdue Items</div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-bold text-gray-300 mb-3 flex items-center justify-between">
+                        <span>Cleanup Overdue Tasks</span>
+                        <span x-show="getOverdueGoals().length === 0" class="text-xs text-emerald-500 font-normal">All
+                            caught up!</span>
+                    </h3>
+
+                    <div x-show="getOverdueGoals().length > 0"
+                        class="space-y-2 max-h-60 overflow-y-auto pr-2 bg-gray-950/30 p-2 rounded border border-gray-800">
+                        <template x-for="goal in getOverdueGoals()" :key="goal.id">
+                            <div
+                                class="flex items-center justify-between p-2 bg-gray-900/60 rounded border border-gray-800 group hover:border-gray-700 transition-colors">
+                                <div class="min-w-0 flex items-center gap-2">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
+                                    <div class="flex flex-col">
+                                        <div class="text-xs text-gray-300 truncate max-w-[200px]" x-text="goal.title">
+                                        </div>
+                                        <div class="text-[10px] text-red-400" x-text="formatDate(goal.date)"></div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="flex items-center gap-2 shrink-0 opacity-100 group-hover:opacity-100 transition-opacity">
+                                    <button @click="goal.date = new Date().toISOString().split('T')[0]"
+                                        class="px-2 py-1 text-[10px] bg-emerald-900/20 text-emerald-400 rounded hover:bg-emerald-900/40 border border-emerald-900/30 transition-colors">
+                                        Move to Today
+                                    </button>
+                                    <button @click="deleteGoal(goal.id)"
+                                        class="px-2 py-1 text-[10px] bg-red-900/20 text-red-400 rounded hover:bg-red-900/40 border border-red-900/30 transition-colors">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div x-show="getOverdueGoals().length === 0"
+                        class="p-4 bg-emerald-900/10 rounded border border-emerald-900/20 text-center">
+                        <p class="text-sm text-emerald-400">You are completely up to date. Great work!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-gray-800 bg-gray-900/50 flex justify-end">
+                <button @click="reviewMode = false"
+                    class="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded transition-colors shadow-lg shadow-indigo-900/20 hover:scale-105 active:scale-95 transform duration-150">
+                    Finish Review
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right-Side Detail Panel (Slide-over) -->
+    <div x-show="showDetailPanel" class="fixed inset-0 z-50 flex justify-end" x-cloak>
+        <!-- Backdrop -->
+        <div class="absolute inset-0 transition-opacity"
+            :class="theme === 'dark' ? 'bg-gray-950/60 backdrop-blur-sm' : 'bg-slate-900/20 backdrop-blur-sm'"
+            x-show="showDetailPanel" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="closeDetail()"></div>
+
+        <!-- Panel -->
+        <div class="relative w-full max-w-md h-full shadow-2xl flex flex-col transition-transform transform"
+            :class="theme === 'dark' ? 'bg-gray-900 border-l border-gray-800' : 'bg-white border-l border-slate-200'"
+            x-show="showDetailPanel" x-transition:enter="translate-x-full" x-transition:enter-end="translate-x-0"
+            x-transition:leave="translate-x-0" x-transition:leave-end="translate-x-full">
+
+            <template x-if="editingGoal">
+                <div class="flex flex-col h-full">
+                    <!-- Header -->
+                    <div class="px-6 py-4 border-b flex justify-between items-center"
+                        :class="theme==='dark'?'border-gray-800':'border-slate-200'">
+                        <div class="flex items-center gap-3">
+                            <button @click="toggleComplete(editingGoal)" class="transition-colors"
+                                :class="editingGoal.completed ? 'text-emerald-500' : (editingGoal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-600 hover:text-emerald-500' : 'text-slate-400 hover:text-emerald-500'))">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path x-show="!editingGoal.completed && !editingGoal.inProgress" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    <path x-show="editingGoal.inProgress" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="M5 12h14"></path>
+                                    <path x-show="editingGoal.completed" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </button>
+                            <span class="text-xs font-mono uppercase tracking-widest opacity-50"
+                                x-text="editingGoal.type"></span>
+                        </div>
+                        <button @click="closeDetail()" class="transition-colors"
+                            :class="theme==='dark'?'text-gray-500 hover:text-white':'text-slate-400 hover:text-slate-800'">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                        <!-- Title -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Task
+                                Name</label>
+                            <textarea x-model="editingGoal.title"
+                                class="w-full bg-transparent text-lg font-bold focus:outline-none resize-none"
+                                :class="theme === 'dark' ? 'text-white placeholder-gray-700' : 'text-slate-900 placeholder-slate-300'"
+                                rows="2" placeholder="What needs to be done?"></textarea>
+                        </div>
+
+                        <!-- Date -->
+                        <div x-show="editingGoal.type === 'daily'">
+                            <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Scheduled
+                                For</label>
+                            <input type="date" x-model="editingGoal.date"
+                                class="w-full bg-transparent border rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'">
+                        </div>
+
+                        <div x-show="editingGoal.type === 'daily'">
+                            <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Status</label>
+                            <select x-model="editingGoal.statusTag"
+                                @change="setStatusTag(editingGoal, editingGoal.statusTag)"
+                                class="w-full bg-transparent border rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
+                                :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'">
+                                <option value="">None</option>
+                                <option value="blocked">Blocked</option>
+                                <option value="waiting">Waiting</option>
+                                <option value="review">Review</option>
+                            </select>
+                        </div>
+
+                        <!-- Description -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Notes /
+                                Description</label>
+                            <textarea x-model="editingGoal.description"
+                                class="w-full bg-transparent border rounded p-3 h-64 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none text-sm leading-relaxed"
+                                :class="theme==='dark' ? 'border-gray-700 text-gray-300 placeholder-gray-700' : 'border-slate-300 text-slate-700 placeholder-slate-400'"
+                                placeholder="Add specific details, sub-tasks, or thoughts..."></textarea>
+                        </div>
+
+                        <!-- Parent Link -->
+                        <div x-show="editingGoal.type === 'daily'" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Linked
+                                    Weekly Goal</label>
+                                <select x-model="editingGoal.parentId"
+                                    class="w-full bg-transparent border rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
+                                    :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'">
+                                    <option value="">No Link</option>
+                                    <template x-for="p in goals.filter(g => g.type === 'weekly')" :key="p.id">
+                                        <option :value="p.id" x-text="p.title"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Linked
+                                    Quarterly Goal</label>
+                                <select x-model="editingGoal.quarterlyParentId"
+                                    class="w-full bg-transparent border rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
+                                    :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'">
+                                    <option value="">No Link</option>
+                                    <template x-for="p in goals.filter(g => g.type === 'quarterly')" :key="p.id">
+                                        <option :value="p.id" x-text="p.title"></option>
+                                    </template>
+                                </select>
+                            </div>
+                        </div>
+                        <div x-show="editingGoal.type !== 'yearly' && editingGoal.type !== 'daily'">
+                            <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Linked
+                                Goal</label>
+                            <select x-model="editingGoal.parentId"
+                                class="w-full bg-transparent border rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
+                                :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'">
+                                <option value="">No Link</option>
+                                <template
+                                    x-for="p in goals.filter(g => g.type === (editingGoal.type === 'weekly' ? 'quarterly' : 'yearly'))"
+                                    :key="p.id">
+                                    <option :value="p.id" x-text="p.title"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <!-- Tags -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Tags (comma
+                                separated)</label>
+                            <input type="text" :value="editingGoal.tags ? editingGoal.tags.join(', ') : ''"
+                                @input="editingGoal.tags = $event.target.value.split(',').map(t => t.trim()).filter(t => t)"
+                                class="w-full bg-transparent border rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
+                                :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'"
+                                placeholder="work, urgent, dev...">
+                        </div>
+                    </div>
+
+                    <!-- Footer Actions -->
+                    <div class="p-6 border-t flex justify-between items-center"
+                        :class="theme==='dark'?'border-gray-800 bg-gray-900/50':'border-slate-200 bg-slate-50'">
+                        <button @click="deleteGoal(editingGoal.id); closeDetail()"
+                            class="text-red-500 hover:text-red-600 text-sm font-medium flex items-center gap-2 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                </path>
+                            </svg>
+                            Delete Task
+                        </button>
+                        <button @click="closeDetail()"
+                            class="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded shadow-lg shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95">
+                            Done
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- App Logic -->
+    <script>
+        function taskApp() {
+            return {
+                goals: [],
+                fileHandle: null,
+                fileName: '',
+                unsavedChanges: false,
+                reviewMode: false,
+                standupMode: false,
+                showMetrics: false,
+                deletingId: null,
+                // New States
+                showYearly: false,
+                filterTag: '',
+                statusFilter: 'all',
+                selectedGoalId: null,
+                blockedNudgeDays: 3,
+                searchQuery: '', // Global Search
+                selectedDate: new Date().toISOString().split('T')[0], // History Navigation
+                theme: 'dark', // 'dark' or 'light'
+                showDetailPanel: false,
+                editingGoal: null,
+                showCalendar: false,
+                calendarDate: new Date(), // Month being viewed
+                showBits: true, // Show Daily Bits by default
+                newBitText: '', // For quick entry
+                newBitTitle: '', // Quick entry title
+                viewMode: 'focus', // 'focus', 'kb'
+                showToast: false,
+                toastMessage: '',
+                toastTimeoutId: null,
+                lastDeleted: null,
+                lastUndoAction: null,
+                undoMessage: '',
+                showUndo: false,
+                undoTimeoutId: null,
+
+                async init() {
+                    // Theme Init
+                    const savedTheme = localStorage.getItem('mktask_theme');
+                    if (savedTheme) {
+                        this.theme = savedTheme;
+                        document.body.setAttribute('data-theme', this.theme);
+                    }
+
+                    const saved = localStorage.getItem('mktask_backup');
+                    if (saved) {
+                        try {
+                            const data = JSON.parse(saved);
+                            this.goals = data.goals || [];
+                            // Migration
+                            this.goals.forEach(g => {
+                                if (!g.date && g.type === 'daily') g.date = g.createdAt.split('T')[0];
+                                if (!g.description) g.description = "";
+                                if (!g.tags) g.tags = [];
+                                if (typeof g.inProgress === 'undefined') g.inProgress = false;
+                                if (typeof g.statusTag === 'undefined') g.statusTag = '';
+                                if (typeof g.isNextAction === 'undefined') g.isNextAction = false;
+                                if (typeof g.blockedAt === 'undefined' || g.blockedAt === null) {
+                                    g.blockedAt = g.statusTag === 'blocked'
+                                        ? (g.date || (g.createdAt ? g.createdAt.split('T')[0] : ''))
+                                        : '';
+                                }
+                                if (g.type === 'daily' && typeof g.quarterlyParentId === 'undefined') {
+                                    g.quarterlyParentId = '';
+                                }
+                                delete g.time;
+                            });
+                        } catch (e) {
+                            console.error("Failed to load backup", e);
+                        }
+                    }
+
+                    // Auto-Save Watcher
+                    this.$watch('goals', (val) => {
+                        this.unsavedChanges = true;
+                        localStorage.setItem('mktask_backup', JSON.stringify({ goals: val }));
+                        this.debouncedSave();
+                    });
+
+                    this.$watch('theme', (val) => {
+                        localStorage.setItem('mktask_theme', val);
+                        document.body.setAttribute('data-theme', val);
+                    });
+
+                    this.checkRollover();
+                },
+
+                checkRollover() {
+                    const today = new Date().toISOString().split('T')[0];
+                    let count = 0;
+                    this.goals.forEach(g => {
+                        if (g.type === 'daily' && !g.completed && g.date && g.date < today) {
+                            g.date = today;
+                            count++;
+                        }
+                    });
+                    if (count > 0) {
+                        console.log(`Rolled over ${count} uncompleted tasks to today.`);
+                    }
+                },
+
+                // Debounced Auto-Save
+                debouncedSave: Alpine.debounce(function () {
+                    if (this.fileHandle) {
+                        this.saveFile(true); // silent save
+                    }
+                }, 2000),
+
+                toggleTheme() {
+                    this.theme = this.theme === 'dark' ? 'light' : 'dark';
+                },
+
+                handleKeydown(e) {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                        e.preventDefault();
+                        this.saveFile();
+                    }
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                        e.preventDefault();
+                        this.$refs.searchInput.focus();
+                    }
+                    if (e.key === 'Escape') {
+                        this.deletingId = null;
+                        this.showMetrics = false;
+                        this.reviewMode = false;
+                        this.searchQuery = '';
+                        this.$refs.searchInput.blur();
+                        return;
+                    }
+                    if (this.isTypingTarget(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
+                    const key = e.key.toLowerCase();
+                    const selected = this.getSelectedGoal();
+                    if (selected && selected.type === 'daily') {
+                        if (key === 'b') return this.toggleStatusTag(selected, 'blocked');
+                        if (key === 'w') return this.toggleStatusTag(selected, 'waiting');
+                        if (key === 'r') return this.toggleStatusTag(selected, 'review');
+                        if (key === 'p') return this.toggleInProgress(selected);
+                    }
+                },
+
+                getGoals(type) {
+                    let list = this.goals.filter(g => g.type === type);
+
+                    // Add bits if searching and type is daily/relevant? 
+                    // Actually, let's keep it clean.
+
+                    // Search Filter
+                    if (this.searchQuery) {
+                        const q = this.searchQuery.toLowerCase();
+                        list = list.filter(g =>
+                            g.title.toLowerCase().includes(q) ||
+                            (g.description && g.description.toLowerCase().includes(q)) ||
+                            (g.tags && g.tags.some(t => t.toLowerCase().includes(q)))
+                        );
+                    }
+
+                    // Tag Filter
+                    if (this.filterTag) {
+                        list = list.filter(g => g.tags && g.tags.includes(this.filterTag));
+                    }
+
+                    if (type === 'daily') {
+                        return list.sort((a, b) => {
+                            const rankDiff = this.getStatusRank(a) - this.getStatusRank(b);
+                            if (rankDiff === 0) {
+                                const dateA = a.date || '00000000';
+                                const dateB = b.date || '00000000';
+                                return dateB.localeCompare(dateA);
+                            }
+                            return rankDiff;
+                        });
+                    }
+
+                    return list.sort((a, b) => {
+                        const rankDiff = this.getStatusRank(a) - this.getStatusRank(b);
+                        if (rankDiff === 0) return new Date(b.createdAt) - new Date(a.createdAt);
+                        return rankDiff;
+                    });
+                },
+
+                getGoalsByDay(offset) {
+                    // Based on selectedDate
+                    const targetDate = new Date(this.selectedDate);
+                    targetDate.setDate(targetDate.getDate() + offset);
+                    // Fix timezone offset issue for pure date calculation
+                    const yyyyMmDd = targetDate.toISOString().split('T')[0];
+
+                    let list = this.goals.filter(g => g.type === 'daily' && g.date === yyyyMmDd);
+
+                    if (this.searchQuery) {
+                        // Search overrides day view? Or filters within day?
+                        // Let's filter within day for context
+                        const q = this.searchQuery.toLowerCase();
+                        list = list.filter(g => g.title.toLowerCase().includes(q) || (g.description && g.description.toLowerCase().includes(q)));
+                    }
+
+                    return list.sort((a, b) => this.getStatusRank(a) - this.getStatusRank(b));
+                },
+
+                getDailyFocusGoals() {
+                    const yyyyMmDd = this.selectedDate;
+                    let list = this.goals.filter(g => g.type === 'daily' && g.date === yyyyMmDd);
+
+                    if (this.searchQuery) {
+                        const q = this.searchQuery.toLowerCase();
+                        list = list.filter(g => g.title.toLowerCase().includes(q) || (g.description && g.description.toLowerCase().includes(q)));
+                    }
+
+                    if (this.statusFilter && this.statusFilter !== 'all') {
+                        list = list.filter(g => this.matchesStatusFilter(g));
+                    }
+
+                    return list.sort((a, b) => this.getStatusRank(a) - this.getStatusRank(b));
+                },
+
+                getUniqueTags() {
+                    const allTags = new Set();
+                    this.goals.forEach(g => {
+                        if (g.tags) g.tags.forEach(t => allTags.add(t));
+                    });
+                    return Array.from(allTags).sort();
+                },
+
+                getOverdueGoals() {
+                    const today = new Date().toISOString().split('T')[0];
+                    return this.goals.filter(g => {
+                        return g.type === 'daily' && !g.completed && g.date && g.date < today;
+                    });
+                },
+
+                getStatusRank(goal) {
+                    if (goal.completed) return 1;
+                    return 0;
+                },
+
+                getStatusCountsForSelectedDate() {
+                    const list = this.goals.filter(g =>
+                        g.type === 'daily' && g.date === this.selectedDate && !g.completed
+                    );
+                    return {
+                        all: list.length,
+                        inProgress: list.filter(g => g.inProgress).length,
+                        blocked: list.filter(g => g.statusTag === 'blocked').length,
+                        waiting: list.filter(g => g.statusTag === 'waiting').length,
+                        review: list.filter(g => g.statusTag === 'review').length
+                    };
+                },
+
+                matchesStatusFilter(goal) {
+                    if (!this.statusFilter || this.statusFilter === 'all') return true;
+                    if (this.statusFilter === 'in-progress') return !!goal.inProgress;
+                    return goal.statusTag === this.statusFilter;
+                },
+
+                getStatusBadgeClass(tag) {
+                    if (tag === 'blocked') return 'border-red-500/20 bg-red-500/10 text-red-500';
+                    if (tag === 'waiting') return 'border-amber-500/20 bg-amber-500/10 text-amber-500';
+                    if (tag === 'review') return 'border-blue-500/20 bg-blue-500/10 text-blue-500';
+                    return 'border-gray-500/20 bg-gray-500/10 text-gray-400';
+                },
+
+                getNextAction() {
+                    return this.goals.find(g => g.type === 'daily' && g.isNextAction && g.date === this.selectedDate);
+                },
+
+                getSelectedGoal() {
+                    if (!this.selectedGoalId) return null;
+                    return this.goals.find(g => g.id === this.selectedGoalId) || null;
+                },
+
+                getBlockedAgeDays(goal) {
+                    if (!goal || !goal.blockedAt) return 0;
+                    const start = new Date(goal.blockedAt);
+                    if (Number.isNaN(start.getTime())) return 0;
+                    const today = new Date();
+                    return Math.floor((today - start) / (1000 * 60 * 60 * 24));
+                },
+
+                // --- Helpers ---
+                getParentDetails(parentId) { return this.goals.find(g => g.id === parentId); },
+
+                isTypingTarget(target) {
+                    if (!target) return false;
+                    const tag = target.tagName;
+                    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable;
+                },
+
+                isToday(dateStr) {
+                    const today = new Date().toISOString().split('T')[0];
+                    return dateStr === today;
+                },
+
+                formatDate(dateStr) {
+                    if (!dateStr) return '';
+                    return new Date(dateStr).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', weekday: 'short' });
+                },
+
+                getHasTasksForDate(dateStr) {
+                    return this.goals.some(g => g.type === 'daily' && g.date === dateStr);
+                },
+
+                goToday() {
+                    const today = new Date().toISOString().split('T')[0];
+                    this.selectedDate = today;
+                    this.calendarDate = new Date();
+                },
+
+                // --- Calendar Helpers ---
+                getCalendarDays() {
+                    const year = this.calendarDate.getFullYear();
+                    const month = this.calendarDate.getMonth();
+                    const firstDay = new Date(year, month, 1);
+                    const lastDay = new Date(year, month + 1, 0);
+
+                    const days = [];
+                    // Padding for start of month
+                    const startPadding = firstDay.getDay();
+                    for (let i = 0; i < startPadding; i++) {
+                        days.push({ day: '', fullDate: '' });
+                    }
+
+                    for (let i = 1; i <= lastDay.getDate(); i++) {
+                        const date = new Date(year, month, i);
+                        days.push({
+                            day: i,
+                            fullDate: date.toISOString().split('T')[0]
+                        });
+                    }
+                    return days;
+                },
+
+                prevMonth() {
+                    this.calendarDate = new Date(this.calendarDate.setMonth(this.calendarDate.getMonth() - 1));
+                },
+
+                nextMonth() {
+                    this.calendarDate = new Date(this.calendarDate.setMonth(this.calendarDate.getMonth() + 1));
+                },
+
+                formatCalendarMonth() {
+                    return this.calendarDate.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+                },
+
+                selectCalendarDate(dateStr) {
+                    if (!dateStr) return;
+                    this.selectedDate = dateStr;
+                    this.showCalendar = false;
+                },
+
+                // --- Actions ---
+                openDetail(goal) {
+                    this.editingGoal = goal;
+                    this.selectedGoalId = goal.id;
+                    this.showDetailPanel = true;
+                },
+
+                closeDetail() {
+                    this.showDetailPanel = false;
+                    setTimeout(() => { this.editingGoal = null; }, 300); // Wait for transition
+                },
+
+                addGoal(type) {
+                    const emptyCount = this.goals.filter(g => g.type === type && !g.title.trim()).length;
+                    if (emptyCount >= 3) return;
+
+                    const goal = {
+                        id: crypto.randomUUID(),
+                        type: type,
+                        title: '',
+                        completed: false,
+                        inProgress: false,
+                        statusTag: '',
+                        isNextAction: false,
+                        blockedAt: '',
+                        parentId: '',
+                        createdAt: new Date().toISOString(),
+                        description: '',
+                        tags: [],
+                        date: ''
+                    };
+
+                    if (type === 'daily') {
+                        // Default to SELECTED date, not just today
+                        goal.date = this.selectedDate;
+                        goal.quarterlyParentId = '';
+                    }
+
+                    this.goals.unshift(goal);
+                },
+
+                deleteGoal(id) {
+                    const index = this.goals.findIndex(g => g.id === id);
+                    if (index === -1) return;
+
+                    if (this.selectedGoalId === id) this.selectedGoalId = null;
+
+                    const removed = this.goals[index];
+                    const childrenUpdates = this.goals
+                        .filter(g => g.parentId === id)
+                        .map(g => ({ id: g.id, parentId: g.parentId }));
+
+                    this.goals.splice(index, 1);
+                    this.goals.forEach(g => {
+                        if (g.parentId === id) g.parentId = '';
+                        if (g.quarterlyParentId === id) g.quarterlyParentId = '';
+                    });
+
+                    this.lastDeleted = { item: removed, index, childrenUpdates };
+                    this.lastUndoAction = { type: 'delete', payload: this.lastDeleted };
+                    this.showUndoMessage('Item deleted.');
+                    this.deletingId = null;
+                },
+
+                showUndoMessage(message) {
+                    this.undoMessage = message;
+                    this.showUndo = true;
+                    if (this.undoTimeoutId) {
+                        clearTimeout(this.undoTimeoutId);
+                    }
+                    this.undoTimeoutId = setTimeout(() => {
+                        this.showUndo = false;
+                        this.lastDeleted = null;
+                        this.lastUndoAction = null;
+                        this.undoTimeoutId = null;
+                    }, 6000);
+                },
+
+                undoDelete() {
+                    if (!this.lastUndoAction) return;
+                    const action = this.lastUndoAction;
+
+                    if (action.type === 'delete' && action.payload) {
+                        const { item, index, childrenUpdates } = action.payload;
+                        const insertIndex = Math.min(Math.max(index, 0), this.goals.length);
+                        this.goals.splice(insertIndex, 0, item);
+                        (childrenUpdates || []).forEach(update => {
+                            const child = this.goals.find(g => g.id === update.id);
+                            if (child) child.parentId = update.parentId;
+                        });
+                    }
+
+                    if (action.type === 'kb-unpin' && action.payload) {
+                        const { id, isKB, tags } = action.payload;
+                        const item = this.goals.find(g => g.id === id);
+                        if (item) {
+                            item.isKB = isKB;
+                            item.tags = Array.isArray(tags) ? [...tags] : [];
+                        }
+                    }
+
+                    this.lastDeleted = null;
+                    this.lastUndoAction = null;
+                    this.showUndo = false;
+                    if (this.undoTimeoutId) {
+                        clearTimeout(this.undoTimeoutId);
+                        this.undoTimeoutId = null;
+                    }
+                },
+
+                requestUnpinKB(bit) {
+                    if (!bit) return;
+                    bit.kbPendingUnpin = true;
+                },
+
+                cancelUnpinKB(bit) {
+                    if (!bit) return;
+                    bit.kbPendingUnpin = false;
+                },
+
+                confirmUnpinKB(bit) {
+                    if (!bit) return;
+                    const prev = {
+                        id: bit.id,
+                        isKB: bit.isKB,
+                        tags: Array.isArray(bit.tags) ? [...bit.tags] : []
+                    };
+                    bit.isKB = false;
+                    bit.tags = (bit.tags || []).filter(t => t !== 'kb');
+                    bit.kbPendingUnpin = false;
+
+                    this.lastUndoAction = { type: 'kb-unpin', payload: prev };
+                    this.showUndoMessage('KB item unpinned.');
+                },
+
+                toggleComplete(goal) {
+                    if (!goal) return;
+                    if (goal.completed) {
+                        goal.completed = false;
+                        goal.inProgress = false;
+                        return;
+                    }
+                    if (goal.inProgress) {
+                        goal.inProgress = false;
+                        goal.completed = true;
+                        return;
+                    }
+                    goal.inProgress = true;
+                },
+
+                toggleInProgress(goal) {
+                    if (!goal) return;
+                    if (goal.completed) goal.completed = false;
+                    goal.inProgress = !goal.inProgress;
+                },
+
+                setStatusTag(goal, tag) {
+                    if (!goal) return;
+                    goal.statusTag = tag || '';
+                    if (goal.statusTag === 'blocked') {
+                        goal.blockedAt = new Date().toISOString().split('T')[0];
+                    } else {
+                        goal.blockedAt = '';
+                    }
+                },
+
+                toggleStatusTag(goal, tag) {
+                    if (!goal) return;
+                    const nextTag = goal.statusTag === tag ? '' : tag;
+                    this.setStatusTag(goal, nextTag);
+                },
+
+                setNextAction(goal) {
+                    if (!goal) return;
+                    const wasNext = !!goal.isNextAction;
+                    this.goals.forEach(g => {
+                        if (g.isNextAction) g.isNextAction = false;
+                    });
+                    goal.isNextAction = !wasNext;
+                },
+
+                getProgress(parentId) {
+                    const children = this.goals.filter(g => g.parentId === parentId);
+                    if (children.length === 0) return 0;
+                    const completed = children.filter(g => g.completed).length;
+                    return Math.round((completed / children.length) * 100);
+                },
+
+                getCompletionStats(type) {
+                    const filtered = this.goals.filter(g => g.type === type);
+                    const total = filtered.length;
+                    if (total === 0) return { percent: 0, text: '0/0' };
+                    const completed = filtered.filter(g => g.completed).length;
+                    return {
+                        percent: Math.round((completed / total) * 100),
+                        text: `${completed}/${total}`
+                    };
+                },
+
+                getAlignmentScore() {
+                    const daily = this.goals.filter(g => g.type === 'daily');
+                    if (daily.length === 0) return 0;
+                    const linked = daily.filter(g =>
+                        (g.parentId && g.parentId !== '') || (g.quarterlyParentId && g.quarterlyParentId !== '')
+                    ).length;
+                    return Math.round((linked / daily.length) * 100);
+                },
+
+                getBitsByDay() {
+                    return this.goals.filter(g => g.type === 'note' && g.date === this.selectedDate)
+                        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                },
+
+                getKBItems() {
+                    let list = this.goals.filter(g => g.type === 'note' && (g.isKB || (g.tags && g.tags.includes('kb'))));
+
+                    if (this.searchQuery) {
+                        const q = this.searchQuery.toLowerCase();
+                        list = list.filter(g =>
+                            g.title.toLowerCase().includes(q) ||
+                            (g.description && g.description.toLowerCase().includes(q)) ||
+                            (g.tags && g.tags.some(t => t.toLowerCase().includes(q)))
+                        );
+                    }
+
+                    return list.sort((a, b) => {
+                        const dateA = a.date || a.createdAt || '';
+                        const dateB = b.date || b.createdAt || '';
+                        if (dateA !== dateB) return dateB.localeCompare(dateA);
+                        return new Date(b.createdAt) - new Date(a.createdAt);
+                    });
+                },
+
+                parseMarkdownBlocks(text) {
+                    if (!text) return [];
+                    const lines = text.split('\n');
+                    const blocks = [];
+                    let inCode = false;
+                    let codeLang = '';
+                    let textBuffer = [];
+                    let codeBuffer = [];
+
+                    const flushText = () => {
+                        const content = textBuffer.join('\n').trim();
+                        if (content) blocks.push({ type: 'text', content });
+                        textBuffer = [];
+                    };
+
+                    const flushCode = () => {
+                        const content = codeBuffer.join('\n').trimEnd();
+                        if (content || codeLang) blocks.push({ type: 'code', content, lang: codeLang });
+                        codeBuffer = [];
+                        codeLang = '';
+                    };
+
+                    lines.forEach((line) => {
+                        const fenceMatch = line.match(/^```\s*([^\s`]*)\s*$/);
+                        if (fenceMatch) {
+                            if (inCode) {
+                                flushCode();
+                                inCode = false;
+                            } else {
+                                flushText();
+                                inCode = true;
+                                codeLang = fenceMatch[1] || '';
+                            }
+                            return;
+                        }
+
+                        if (inCode) {
+                            codeBuffer.push(line);
+                        } else {
+                            textBuffer.push(line);
+                        }
+                    });
+
+                    if (inCode) {
+                        flushCode();
+                    } else {
+                        flushText();
+                    }
+
+                    return blocks;
+                },
+
+                isKBCollapsed(bit) {
+                    return bit.kbCollapsed !== false;
+                },
+
+                toggleKBCollapse(bit) {
+                    if (typeof bit.kbCollapsed === 'undefined') {
+                        bit.kbCollapsed = false;
+                        return;
+                    }
+                    bit.kbCollapsed = !bit.kbCollapsed;
+                },
+
+                getKBPreview(text) {
+                    if (!text) return '';
+                    const firstLine = text.split('\n').find(line => line.trim());
+                    return firstLine ? firstLine.trim() : '';
+                },
+
+                async copyKBToClipboard(bit) {
+                    const title = bit.title ? bit.title.trim() : '';
+                    const description = bit.description ? bit.description.trim() : '';
+                    const content = [title, description].filter(Boolean).join('\n\n');
+
+                    try {
+                        await navigator.clipboard.writeText(content);
+                        this.showToastMessage('KB copied to clipboard');
+                    } catch (err) {
+                        console.error('Copy failed', err);
+                        prompt('Copy your KB item:', content);
+                    }
+                },
+
+                showToastMessage(message) {
+                    this.toastMessage = message;
+                    this.showToast = true;
+                    if (this.toastTimeoutId) {
+                        clearTimeout(this.toastTimeoutId);
+                    }
+                    this.toastTimeoutId = setTimeout(() => {
+                        this.showToast = false;
+                        this.toastTimeoutId = null;
+                    }, 1800);
+                },
+
+                handleBitDescriptionInput(bit, el) {
+                    this.autoResizeTextarea(el);
+                    if (bit.title && bit.title.trim()) return;
+
+                    const extracted = this.extractTitleFromFencedCode(bit.description || '');
+                    if (extracted) {
+                        bit.title = extracted;
+                    }
+                },
+
+                autoResizeTextarea(el) {
+                    if (!el) return;
+                    el.style.height = 'auto';
+                    el.style.height = el.scrollHeight + 'px';
+                },
+
+                extractTitleFromFencedCode(text) {
+                    if (!text) return '';
+                    const lines = text.split('\n');
+                    let inCode = false;
+
+                    for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i];
+                        const fenceMatch = line.match(/^```\s*([^\s`]*)\s*$/);
+                        if (fenceMatch) {
+                            inCode = !inCode;
+                            continue;
+                        }
+                        if (inCode) {
+                            const trimmed = line.trim();
+                            if (trimmed) return trimmed;
+                        }
+                    }
+
+                    return '';
+                },
+
+                handleQuickBitKeydown(e, el) {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        e.preventDefault();
+                        this.addBit();
+                        this.autoResizeTextarea(el);
+                        return;
+                    }
+                },
+
+                addBit() {
+                    if (!this.newBitText.trim() && !this.newBitTitle.trim()) return;
+                    const raw = this.newBitText.replace(/\r\n/g, '\n');
+                    const titleFallback = raw.split('\n').find(line => line.trim());
+                    const title = (this.newBitTitle.trim() || titleFallback || 'Untitled').trim();
+                    const description = raw.trimEnd();
+
+                    const bit = {
+                        id: crypto.randomUUID(),
+                        type: 'note',
+                        title,
+                        completed: false,
+                        parentId: '',
+                        createdAt: new Date().toISOString(),
+                        description,
+                        tags: [],
+                        date: this.selectedDate,
+                        isKB: false
+                    };
+                    this.goals.push(bit);
+                    this.newBitText = '';
+                    this.newBitTitle = '';
+                },
+
+                toggleBitKB(bit) {
+                    bit.isKB = !bit.isKB;
+                    if (bit.isKB) {
+                        if (!bit.tags.includes('kb')) {
+                            bit.tags.push('kb');
+                        }
+                    } else {
+                        bit.tags = (bit.tags || []).filter(t => t !== 'kb');
+                    }
+                },
+
+                convertBitToTask(bit) {
+                    bit.type = 'daily';
+                    bit.inProgress = false;
+                    bit.completed = false;
+                    bit.statusTag = '';
+                    bit.isNextAction = false;
+                    bit.blockedAt = '';
+                    // keep title and description
+                },
+
+                async generateStandup() {
+                    const target = new Date(this.selectedDate);
+                    // Yesterday relative to selected day
+                    const yesterday = new Date(target);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    const yStr = yesterday.toISOString().split('T')[0];
+
+                    const todayStr = this.selectedDate;
+
+                    const doneYesterday = this.goals.filter(g => g.type === 'daily' && g.date === yStr && g.completed);
+                    const todoToday = this.goals.filter(g => g.type === 'daily' && g.date === todayStr);
+
+                    let report = `*Standup Report (${todayStr})*\n\n`;
+                    report += "*Yesterday:*\n";
+                    if (doneYesterday.length === 0) report += "- N/A\n";
+                    doneYesterday.forEach(g => report += `- [x] ${g.title} ${g.description ? '(' + g.description + ')' : ''}\n`);
+
+                    report += "\n*Today:*\n";
+                    if (todoToday.length === 0) report += "- Planning...\n";
+                    todoToday.forEach(g => report += `- [${g.completed ? 'x' : ' '}] ${g.title} ${g.description ? '(' + g.description + ')' : ''}\n`);
+
+                    report += "\n*Blockers:*\n- ";
+
+                    try {
+                        await navigator.clipboard.writeText(report);
+                        alert("Standup report copied to clipboard!");
+                    } catch (err) {
+                        console.error("Copy failed", err);
+                        prompt("Copy your report:", report);
+                    }
+                },
+
+                // --- Data & Persistence ---
+
+                async deleteDatabase() {
+                    const confirmName = prompt("This will DELETE ALL DATA. Type 'delete' to confirm:");
+                    if (confirmName === 'delete') {
+                        this.goals = [];
+                        this.fileName = '';
+                        this.fileHandle = null;
+                        localStorage.removeItem('mktask_backup');
+                        alert("Database deleted.");
+                    }
+                },
+
+                loadSampleData() {
+                    if (this.goals.length > 0 && !confirm("Replace current data with sample data?")) return;
+
+                    const today = new Date();
+                    const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+                    const lastWeek = new Date(today); lastWeek.setDate(today.getDate() - 7);
+
+                    const tStr = today.toISOString().split('T')[0];
+                    const yStr = yesterday.toISOString().split('T')[0];
+                    const lwStr = lastWeek.toISOString().split('T')[0];
+
+                    // EMBEDDED SAMPLE DATA
+                    const sample = [
+                        { "id": "year-1", "type": "yearly", "title": "Build MVP Identity Provider in Golang", "completed": false, "parentId": "", "createdAt": "2026-01-01T10:00:00.000Z", "description": "Full-featured IDP with SAML, OIDC, OAuth support.", "tags": ["golang", "security", "backend"], "date": "2026-12-31" },
+                        { "id": "q1-1", "type": "quarterly", "title": "Core Auth Protocols (OIDC & OAuth)", "completed": false, "parentId": "year-1", "createdAt": "2026-01-02T10:00:00.000Z", "description": "Implement standard flows: Authorization Code, Client Credentials.", "tags": ["protocol", "core"], "date": "2026-03-31" },
+                        { "id": "week-1", "type": "weekly", "title": "User API & Storage", "completed": true, "parentId": "q1-1", "createdAt": "2026-02-01T10:00:00.000Z", "description": "CRUDS for Users, Password Hashing (Argon2).", "tags": ["api", "db"], "date": lwStr },
+
+                        // Overdue task (should rollover on next load/init)
+                        { "id": "day-overdue", "type": "daily", "title": "[ROLLOVER] Past Due Task", "completed": false, "parentId": "week-1", "quarterlyParentId": "q1-1", "createdAt": lwStr, "description": "This was supposed to be done last week.", "tags": ["urgent"], "date": lwStr },
+
+                        // Historical tasks (to see dots)
+                        { "id": "day-hist-1", "type": "daily", "title": "Historical Research", "completed": true, "parentId": "week-1", "quarterlyParentId": "q1-1", "createdAt": lwStr, "description": "Checking logs.", "tags": ["research"], "date": lwStr },
+                        { "id": "day-hist-2", "type": "daily", "title": "Past Discussion", "completed": true, "parentId": "week-1", "quarterlyParentId": "q1-1", "createdAt": yStr, "description": "Met with team.", "tags": ["meeting"], "date": yStr },
+
+                        // Today's tasks
+                        { "id": "day-1", "type": "daily", "title": "Design User Schema", "completed": true, "parentId": "week-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Postgres schema for users.", "tags": ["db", "design"], "date": tStr },
+                        { "id": "day-2", "type": "daily", "title": "Draft OIDC Discovery Doc", "completed": false, "parentId": "week-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Define /.well-known endpoints.", "tags": ["oidc"], "date": tStr },
+                        { "id": "day-3", "type": "daily", "title": "Client Credentials Flow", "completed": false, "parentId": "week-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Token endpoint validations.", "tags": ["oauth"], "date": tStr },
+                        { "id": "day-4", "type": "daily", "title": "Unit Tests for User Service", "completed": false, "parentId": "week-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Table-driven tests.", "tags": ["testing"], "date": tStr },
+
+                        // Daily Bits (Notes/KB)
+                        { "id": "bit-1", "type": "note", "title": "Splunk Troubleshooting: auth-service", "completed": false, "parentId": "", "createdAt": tStr, "description": "index=prod service=auth_service level=error | stats count by errorCode", "tags": ["splunk", "ops"], "date": tStr, "isKB": false },
+                        { "id": "bit-2", "type": "note", "title": "OIDC redirect edge cases", "completed": false, "parentId": "", "createdAt": tStr, "description": "Remember to enforce exact redirect URI match.", "tags": ["oidc"], "date": tStr, "isKB": false },
+                        { "id": "kb-1", "type": "note", "title": "Argon2 Configuration Best Practices", "completed": false, "parentId": "", "createdAt": lwStr, "description": "Memory: 64MB, Iterations: 3, Parallelism: 4\nUse crypto/rand for salt generation.", "tags": ["security", "kb"], "date": lwStr, "isKB": true },
+                        { "id": "kb-2", "type": "note", "title": "Splunk Auth Error Triage", "completed": false, "parentId": "", "createdAt": tStr, "description": "```spl\nindex=prod service=auth_service level=error\n| stats count by errorCode\n| sort -count\n```\nRun during on-call triage.", "tags": ["splunk", "kb"], "date": tStr, "isKB": true },
+                        { "id": "kb-3", "type": "note", "title": "Go Helper: Safe Parse Int", "completed": false, "parentId": "", "createdAt": tStr, "description": "```go\nfunc parseInt(s string) (int, error) {\n    v, err := strconv.Atoi(strings.TrimSpace(s))\n    if err != nil {\n        return 0, fmt.Errorf(\"invalid int: %w\", err)\n    }\n    return v, nil\n}\n```", "tags": ["golang", "kb"], "date": tStr, "isKB": true },
+                        { "id": "kb-4", "type": "note", "title": "OAuth Error Mapping", "completed": false, "parentId": "", "createdAt": tStr, "description": "```json\n{\n  \"invalid_client\": 401,\n  \"invalid_grant\": 400,\n  \"invalid_scope\": 400\n}\n```", "tags": ["oauth", "kb"], "date": tStr, "isKB": true },
+                        { "id": "bit-id-1", "type": "note", "title": "User session trace ID", "completed": false, "parentId": "", "createdAt": tStr, "description": "trace-550e8400-e29b-41d4-a716-446655440000", "tags": ["debug"], "date": tStr, "isKB": false }
+                    ];
+
+                    this.goals = sample;
+                    this.goals.forEach(g => {
+                        if (typeof g.inProgress === 'undefined') g.inProgress = false;
+                        if (typeof g.statusTag === 'undefined') g.statusTag = '';
+                        if (typeof g.isNextAction === 'undefined') g.isNextAction = false;
+                    });
+                    this.selectedDate = tStr;
+                    this.checkRollover(); // Run rollover immediately on load
+                    alert("Sample data loaded! Past uncompleted tasks have been rolled over to today.");
+                },
+
+                exportCSV() {
+                    const headers = ['ID', 'Type', 'Title', 'Completed', 'Date', 'Tags', 'Description', 'ParentID'];
+                    const rows = this.goals.map(g => [
+                        g.id,
+                        g.type,
+                        `"${g.title.replace(/"/g, '""')}"`,
+                        g.completed,
+                        g.date,
+                        `"${(g.tags || []).join(',')}"`,
+                        `"${(g.description || '').replace(/"/g, '""')}"`,
+                        g.parentId
+                    ]);
+
+                    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", `mkTask_export_${new Date().toISOString().split('T')[0]}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                },
+
+                async openFile() {
+                    try {
+                        [this.fileHandle] = await window.showOpenFilePicker({
+                            types: [{ description: 'JSON Files', accept: { 'application/json': ['.json'] } }],
+                        });
+                        const file = await this.fileHandle.getFile();
+                        this.fileName = file.name;
+                        const text = await file.text();
+                        const data = JSON.parse(text);
+                        this.goals = data.goals || [];
+                        // Normalize legacy data on open
+                        this.goals.forEach(g => {
+                            if (!g.date && g.type === 'daily') g.date = g.createdAt.split('T')[0];
+                            if (!g.description) g.description = '';
+                            if (!g.tags) g.tags = [];
+                            if (typeof g.inProgress === 'undefined') g.inProgress = false;
+                            if (typeof g.statusTag === 'undefined') g.statusTag = '';
+                            if (typeof g.isNextAction === 'undefined') g.isNextAction = false;
+                            if (g.type === 'daily' && typeof g.quarterlyParentId === 'undefined') {
+                                g.quarterlyParentId = '';
+                            }
+                            delete g.time;
+                        });
+                        this.unsavedChanges = false;
+                    } catch (err) {
+                        if (err.name !== 'AbortError') console.error(err);
+                    }
+                },
+
+                async saveFile(silent = false) {
+                    if (!this.fileHandle) {
+                        if (silent) return; // Don't prompt save-as on auto-save
+                        return this.saveFileAs();
+                    }
+                    try {
+                        const writable = await this.fileHandle.createWritable();
+                        await writable.write(JSON.stringify({ goals: this.goals }, null, 2));
+                        await writable.close();
+                        this.unsavedChanges = false;
+                        if (!silent) alert('File saved!');
+                    } catch (err) {
+                        console.error(err);
+                        if (!silent) alert('Failed to save file');
+                    }
+                },
+
+                async saveFileAs() {
+                    try {
+                        this.fileHandle = await window.showSaveFilePicker({
+                            types: [{ description: 'JSON Files', accept: { 'application/json': ['.json'] } }],
+                        });
+                        const file = await this.fileHandle.getFile();
+                        this.fileName = file.name;
+                        await this.saveFile();
+                    } catch (err) {
+                        if (err.name !== 'AbortError') console.error(err);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
