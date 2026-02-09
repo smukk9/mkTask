@@ -126,6 +126,44 @@
         </button>
     </div>
 
+    <!-- Onboarding: Data File Setup -->
+    <div x-show="showOnboarding" x-cloak
+        class="fixed inset-0 z-[70] flex items-center justify-center bg-gray-950/80 backdrop-blur-sm"
+        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        <div class="w-[520px] max-w-[92vw] rounded-xl border shadow-2xl p-6"
+            :class="theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-slate-200'">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-bold"
+                        :class="theme === 'dark' ? 'text-gray-100' : 'text-slate-900'">Set Up Your Data File</h2>
+                    <p class="text-xs mt-1"
+                        :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'"
+                        x-text="onboardingMessage"></p>
+                </div>
+                <button @click="showOnboarding = false"
+                    class="text-gray-500 hover:text-gray-300 transition-colors">X</button>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2">
+                <button @click="startFileSetup()"
+                    class="px-3 py-2 rounded text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white">
+                    Create Data File
+                </button>
+                <button @click="openFile()"
+                    class="px-3 py-2 rounded text-xs font-semibold border"
+                    :class="theme === 'dark' ? 'border-gray-700 text-gray-300 hover:bg-gray-800' : 'border-slate-200 text-slate-700 hover:bg-slate-50'">
+                    Open Existing File
+                </button>
+                <button @click="showOnboarding = false"
+                    class="px-3 py-2 rounded text-xs font-semibold"
+                    :class="theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-slate-500 hover:text-slate-600'">
+                    Not Now
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Header / Toolbar -->
     <header class="h-12 border-b flex items-center justify-between px-4 shrink-0 transition-colors duration-300"
         :class="theme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-slate-200'">
@@ -462,7 +500,7 @@
             </div>
         </div>
 
-        <!-- Left Column: Strategy (Quarterly & Weekly Stacked) -->
+        <!-- Left Column: Strategy (Quarterly & Sprint Stacked) -->
         <div class="w-[320px] flex flex-col border-r shrink-0 transition-colors"
             :class="theme === 'dark' ? 'border-gray-800 bg-gray-950' : 'border-slate-200 bg-slate-50'">
 
@@ -572,13 +610,13 @@
                 </div>
             </section>
 
-            <!-- Weekly Section (Bottom Half) -->
+            <!-- Sprint Section (Bottom Half) -->
             <section class="flex-1 flex flex-col min-h-0" :class="theme === 'dark' ? 'bg-gray-900/20' : 'bg-slate-50'">
                 <div class="px-3 py-2 border-b flex justify-between items-center sticky top-0 z-10"
                     :class="theme === 'dark' ? 'border-gray-800 bg-gray-950/50' : 'border-slate-200 bg-slate-50/80'">
                     <h2 class="text-sm font-bold uppercase tracking-wider"
-                        :class="theme==='dark'?'text-gray-400':'text-slate-500'">Weekly</h2>
-                    <button @click="addGoal('weekly')" class="transition-colors"
+                        :class="theme==='dark'?'text-gray-400':'text-slate-500'">Sprint</h2>
+                    <button @click="addGoal('sprint')" class="transition-colors"
                         :class="theme==='dark'?'text-gray-600 hover:text-blue-400':'text-slate-400 hover:text-blue-500'">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
@@ -587,7 +625,7 @@
                     </button>
                 </div>
                 <div class="flex-1 overflow-y-auto p-2 space-y-2 scrollbar-thin">
-                    <template x-for="goal in getGoals('weekly')" :key="goal.id">
+                    <template x-for="goal in getGoals('sprint')" :key="goal.id">
                         <div class="group relative p-2 rounded border transition-all"
                             :class="theme === 'dark' ? 'bg-gray-900/30 border-gray-800/80 hover:border-blue-500/30' : 'bg-white border-slate-200 hover:border-blue-400'">
                             <div class="flex items-start gap-2">
@@ -606,7 +644,7 @@
                                     <input type="text" x-model="goal.title"
                                         class="bg-transparent w-full focus:outline-none text-sm font-medium placeholder-gray-700"
                                         :class="[theme === 'dark' ? 'text-gray-300' : 'text-slate-800', {'line-through text-gray-600': goal.completed, 'text-amber-400/90': goal.inProgress && !goal.completed}]"
-                                        placeholder="Weekly Goal...">
+                                        placeholder="Sprint Goal...">
 
                                     <div class="mt-1 flex items-center justify-between">
                                         <div class="flex items-center gap-2">
@@ -1104,11 +1142,11 @@
                                                 x-text="'Blocked ' + getBlockedAgeDays(goal) + 'd'"></span>
                                         </template>
 
-                                        <!-- Weekly / Quarterly Links -->
+                                        <!-- Sprint / Quarterly Links -->
                                         <template x-if="goal.parentId && getParentDetails(goal.parentId)">
                                             <div class="flex items-center gap-1 text-purple-500/60 pl-2 border-l border-gray-800"
-                                                title="Linked to weekly goal">
-                                                <span class="text-[10px]">W:</span>
+                                                title="Linked to sprint goal">
+                                                <span class="text-[10px]">S:</span>
                                                 <span class="truncate max-w-[100px] text-[10px]"
                                                     x-text="getParentDetails(goal.parentId).title"></span>
                                             </div>
@@ -1307,15 +1345,15 @@
                                     :style="`width: ${getCompletionStats('quarterly').percent}%`"></div>
                             </div>
                         </div>
-                        <!-- Weekly -->
+                        <!-- Sprint -->
                         <div>
                             <div class="flex justify-between text-xs mb-1">
-                                <span class="text-blue-400">Weekly Goals</span>
-                                <span class="text-gray-400" x-text="getCompletionStats('weekly').text"></span>
+                                <span class="text-blue-400">Sprint Goals</span>
+                                <span class="text-gray-400" x-text="getCompletionStats('sprint').text"></span>
                             </div>
                             <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
                                 <div class="h-full bg-blue-500 transition-all duration-1000"
-                                    :style="`width: ${getCompletionStats('weekly').percent}%`"></div>
+                                    :style="`width: ${getCompletionStats('sprint').percent}%`"></div>
                             </div>
                         </div>
                         <!-- Daily -->
@@ -1359,7 +1397,7 @@
     </div>
 
     <!-- App Logic -->
-    <!-- Weekly Review Wizard Modal -->
+    <!-- Sprint Review Wizard Modal -->
     <div x-show="reviewMode" x-cloak
         class="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/90 backdrop-blur-md"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95"
@@ -1372,7 +1410,7 @@
                 <div>
                     <h2
                         class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-                        Weekly Review</h2>
+                        Sprint Review</h2>
                     <p class="text-xs text-purple-400/60 mt-1">Reflect, Clean up, and Plan.</p>
                 </div>
                 <button @click="reviewMode = false" class="text-gray-500 hover:text-white transition-colors">
@@ -1391,9 +1429,9 @@
                         <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Completed Tasks</div>
                     </div>
                     <div class="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-                        <div class="text-2xl font-bold text-blue-400" x-text="getCompletionStats('weekly').text">0/0
+                        <div class="text-2xl font-bold text-blue-400" x-text="getCompletionStats('sprint').text">0/0
                         </div>
-                        <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Weekly Goals</div>
+                        <div class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Sprint Goals</div>
                     </div>
                     <div class="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
                         <div class="text-2xl font-bold text-amber-500" x-text="getOverdueGoals().length">0</div>
@@ -1544,12 +1582,12 @@
                         <div x-show="editingGoal.type === 'daily'" class="space-y-4">
                             <div>
                                 <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Linked
-                                    Weekly Goal</label>
+                                    Sprint Goal</label>
                                 <select x-model="editingGoal.parentId"
                                     class="w-full bg-transparent border rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
                                     :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'">
                                     <option value="">No Link</option>
-                                    <template x-for="p in goals.filter(g => g.type === 'weekly')" :key="p.id">
+                                    <template x-for="p in goals.filter(g => g.type === 'sprint')" :key="p.id">
                                         <option :value="p.id" x-text="p.title"></option>
                                     </template>
                                 </select>
@@ -1575,7 +1613,7 @@
                                 :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'">
                                 <option value="">No Link</option>
                                 <template
-                                    x-for="p in goals.filter(g => g.type === (editingGoal.type === 'weekly' ? 'quarterly' : 'yearly'))"
+                                    x-for="p in goals.filter(g => g.type === (editingGoal.type === 'sprint' ? 'quarterly' : 'yearly'))"
                                     :key="p.id">
                                     <option :value="p.id" x-text="p.title"></option>
                                 </template>
@@ -1653,6 +1691,9 @@
                 undoMessage: '',
                 showUndo: false,
                 undoTimeoutId: null,
+                showOnboarding: false,
+                onboardingMessage: 'Create a JSON file so your tasks can be saved and backed up.',
+                fileSetupRequired: false,
 
                 async init() {
                     // Theme Init
@@ -1663,12 +1704,19 @@
                     }
 
                     const saved = localStorage.getItem('mktask_backup');
+                    const fileRequired = localStorage.getItem('mktask_file_required');
+                    if (fileRequired === 'true') this.fileSetupRequired = true;
+                    if (fileRequired === null && !saved) {
+                        this.fileSetupRequired = true;
+                        localStorage.setItem('mktask_file_required', 'true');
+                    }
                     if (saved) {
                         try {
                             const data = JSON.parse(saved);
                             this.goals = data.goals || [];
                             // Migration
                             this.goals.forEach(g => {
+                                if (g.type === 'weekly') g.type = 'sprint';
                                 if (!g.date && g.type === 'daily') g.date = g.createdAt.split('T')[0];
                                 if (!g.description) g.description = "";
                                 if (!g.tags) g.tags = [];
@@ -1701,6 +1749,11 @@
                         localStorage.setItem('mktask_theme', val);
                         document.body.setAttribute('data-theme', val);
                     });
+
+                    if (this.fileSetupRequired && !this.fileHandle) {
+                        this.onboardingMessage = 'Create a JSON file so your tasks can be saved and backed up.';
+                        this.showOnboarding = true;
+                    }
 
                     this.checkRollover();
                 },
@@ -1980,6 +2033,10 @@
                 },
 
                 addGoal(type) {
+                    if (this.fileSetupRequired && !this.fileHandle) {
+                        this.requestFileSetup('Create a data file before adding tasks.');
+                        return;
+                    }
                     const emptyCount = this.goals.filter(g => g.type === type && !g.title.trim()).length;
                     if (emptyCount >= 3) return;
 
@@ -2296,6 +2353,52 @@
                     }, 1800);
                 },
 
+                requestFileSetup(message) {
+                    this.onboardingMessage = message || 'Create a JSON file so your tasks can be saved and backed up.';
+                    this.showOnboarding = true;
+                },
+
+                markFileSetupRequired(required, message, showNow = true) {
+                    this.fileSetupRequired = required;
+                    localStorage.setItem('mktask_file_required', required ? 'true' : 'false');
+                    if (required && showNow) {
+                        this.requestFileSetup(message);
+                    }
+                },
+
+                completeFileSetup() {
+                    this.fileSetupRequired = false;
+                    localStorage.setItem('mktask_file_required', 'false');
+                    this.showOnboarding = false;
+                },
+
+                async startFileSetup() {
+                    await this.saveFileAs();
+                    if (this.fileHandle) {
+                        this.completeFileSetup();
+                        this.showToastMessage('Data file ready. Auto-save enabled.');
+                    }
+                },
+
+                async backupDatabase() {
+                    if (this.goals.length === 0) return true;
+                    try {
+                        const suggestedName = `mkTask_backup_${new Date().toISOString().split('T')[0]}.json`;
+                        const backupHandle = await window.showSaveFilePicker({
+                            suggestedName,
+                            types: [{ description: 'JSON Files', accept: { 'application/json': ['.json'] } }],
+                        });
+                        const writable = await backupHandle.createWritable();
+                        await writable.write(JSON.stringify({ goals: this.goals }, null, 2));
+                        await writable.close();
+                        return true;
+                    } catch (err) {
+                        if (err.name === 'AbortError') return false;
+                        console.error(err);
+                        return false;
+                    }
+                },
+
                 handleBitDescriptionInput(bit, el) {
                     this.autoResizeTextarea(el);
                     if (bit.title && bit.title.trim()) return;
@@ -2343,6 +2446,10 @@
                 },
 
                 addBit() {
+                    if (this.fileSetupRequired && !this.fileHandle) {
+                        this.requestFileSetup('Create a data file before adding notes.');
+                        return;
+                    }
                     if (!this.newBitText.trim() && !this.newBitTitle.trim()) return;
                     const raw = this.newBitText.replace(/\r\n/g, '\n');
                     const titleFallback = raw.split('\n').find(line => line.trim());
@@ -2424,11 +2531,17 @@
                 async deleteDatabase() {
                     const confirmName = prompt("This will DELETE ALL DATA. Type 'delete' to confirm:");
                     if (confirmName === 'delete') {
+                        const didBackup = await this.backupDatabase();
+                        if (!didBackup) {
+                            this.showToastMessage('Delete canceled. Backup was not saved.');
+                            return;
+                        }
                         this.goals = [];
                         this.fileName = '';
                         this.fileHandle = null;
                         localStorage.removeItem('mktask_backup');
-                        alert("Database deleted.");
+                        this.markFileSetupRequired(true, 'Database cleared. Create a new data file before adding tasks.', false);
+                        alert("Database deleted. Create a new data file before adding tasks.");
                     }
                 },
 
@@ -2437,35 +2550,35 @@
 
                     const today = new Date();
                     const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
-                    const lastWeek = new Date(today); lastWeek.setDate(today.getDate() - 7);
+                    const pastDate = new Date(today); pastDate.setDate(today.getDate() - 7);
 
                     const tStr = today.toISOString().split('T')[0];
                     const yStr = yesterday.toISOString().split('T')[0];
-                    const lwStr = lastWeek.toISOString().split('T')[0];
+                    const pStr = pastDate.toISOString().split('T')[0];
 
                     // EMBEDDED SAMPLE DATA
                     const sample = [
                         { "id": "year-1", "type": "yearly", "title": "Build MVP Identity Provider in Golang", "completed": false, "parentId": "", "createdAt": "2026-01-01T10:00:00.000Z", "description": "Full-featured IDP with SAML, OIDC, OAuth support.", "tags": ["golang", "security", "backend"], "date": "2026-12-31" },
                         { "id": "q1-1", "type": "quarterly", "title": "Core Auth Protocols (OIDC & OAuth)", "completed": false, "parentId": "year-1", "createdAt": "2026-01-02T10:00:00.000Z", "description": "Implement standard flows: Authorization Code, Client Credentials.", "tags": ["protocol", "core"], "date": "2026-03-31" },
-                        { "id": "week-1", "type": "weekly", "title": "User API & Storage", "completed": true, "parentId": "q1-1", "createdAt": "2026-02-01T10:00:00.000Z", "description": "CRUDS for Users, Password Hashing (Argon2).", "tags": ["api", "db"], "date": lwStr },
+                        { "id": "sprint-1", "type": "sprint", "title": "User API & Storage", "completed": true, "parentId": "q1-1", "createdAt": "2026-02-01T10:00:00.000Z", "description": "CRUDS for Users, Password Hashing (Argon2).", "tags": ["api", "db"], "date": pStr },
 
                         // Overdue task (should rollover on next load/init)
-                        { "id": "day-overdue", "type": "daily", "title": "[ROLLOVER] Past Due Task", "completed": false, "parentId": "week-1", "quarterlyParentId": "q1-1", "createdAt": lwStr, "description": "This was supposed to be done last week.", "tags": ["urgent"], "date": lwStr },
+                        { "id": "day-overdue", "type": "daily", "title": "[ROLLOVER] Past Due Task", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": pStr, "description": "This was supposed to be done last sprint.", "tags": ["urgent"], "date": pStr },
 
                         // Historical tasks (to see dots)
-                        { "id": "day-hist-1", "type": "daily", "title": "Historical Research", "completed": true, "parentId": "week-1", "quarterlyParentId": "q1-1", "createdAt": lwStr, "description": "Checking logs.", "tags": ["research"], "date": lwStr },
-                        { "id": "day-hist-2", "type": "daily", "title": "Past Discussion", "completed": true, "parentId": "week-1", "quarterlyParentId": "q1-1", "createdAt": yStr, "description": "Met with team.", "tags": ["meeting"], "date": yStr },
+                        { "id": "day-hist-1", "type": "daily", "title": "Historical Research", "completed": true, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": pStr, "description": "Checking logs.", "tags": ["research"], "date": pStr },
+                        { "id": "day-hist-2", "type": "daily", "title": "Past Discussion", "completed": true, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": yStr, "description": "Met with team.", "tags": ["meeting"], "date": yStr },
 
                         // Today's tasks
-                        { "id": "day-1", "type": "daily", "title": "Design User Schema", "completed": true, "parentId": "week-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Postgres schema for users.", "tags": ["db", "design"], "date": tStr },
-                        { "id": "day-2", "type": "daily", "title": "Draft OIDC Discovery Doc", "completed": false, "parentId": "week-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Define /.well-known endpoints.", "tags": ["oidc"], "date": tStr },
-                        { "id": "day-3", "type": "daily", "title": "Client Credentials Flow", "completed": false, "parentId": "week-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Token endpoint validations.", "tags": ["oauth"], "date": tStr },
-                        { "id": "day-4", "type": "daily", "title": "Unit Tests for User Service", "completed": false, "parentId": "week-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Table-driven tests.", "tags": ["testing"], "date": tStr },
+                        { "id": "day-1", "type": "daily", "title": "Design User Schema", "completed": true, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Postgres schema for users.", "tags": ["db", "design"], "date": tStr },
+                        { "id": "day-2", "type": "daily", "title": "Draft OIDC Discovery Doc", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Define /.well-known endpoints.", "tags": ["oidc"], "date": tStr },
+                        { "id": "day-3", "type": "daily", "title": "Client Credentials Flow", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Token endpoint validations.", "tags": ["oauth"], "date": tStr },
+                        { "id": "day-4", "type": "daily", "title": "Unit Tests for User Service", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Table-driven tests.", "tags": ["testing"], "date": tStr },
 
                         // Daily Bits (Notes/KB)
                         { "id": "bit-1", "type": "note", "title": "Splunk Troubleshooting: auth-service", "completed": false, "parentId": "", "createdAt": tStr, "description": "index=prod service=auth_service level=error | stats count by errorCode", "tags": ["splunk", "ops"], "date": tStr, "isKB": false },
                         { "id": "bit-2", "type": "note", "title": "OIDC redirect edge cases", "completed": false, "parentId": "", "createdAt": tStr, "description": "Remember to enforce exact redirect URI match.", "tags": ["oidc"], "date": tStr, "isKB": false },
-                        { "id": "kb-1", "type": "note", "title": "Argon2 Configuration Best Practices", "completed": false, "parentId": "", "createdAt": lwStr, "description": "Memory: 64MB, Iterations: 3, Parallelism: 4\nUse crypto/rand for salt generation.", "tags": ["security", "kb"], "date": lwStr, "isKB": true },
+                        { "id": "kb-1", "type": "note", "title": "Argon2 Configuration Best Practices", "completed": false, "parentId": "", "createdAt": pStr, "description": "Memory: 64MB, Iterations: 3, Parallelism: 4\nUse crypto/rand for salt generation.", "tags": ["security", "kb"], "date": pStr, "isKB": true },
                         { "id": "kb-2", "type": "note", "title": "Splunk Auth Error Triage", "completed": false, "parentId": "", "createdAt": tStr, "description": "```spl\nindex=prod service=auth_service level=error\n| stats count by errorCode\n| sort -count\n```\nRun during on-call triage.", "tags": ["splunk", "kb"], "date": tStr, "isKB": true },
                         { "id": "kb-3", "type": "note", "title": "Go Helper: Safe Parse Int", "completed": false, "parentId": "", "createdAt": tStr, "description": "```go\nfunc parseInt(s string) (int, error) {\n    v, err := strconv.Atoi(strings.TrimSpace(s))\n    if err != nil {\n        return 0, fmt.Errorf(\"invalid int: %w\", err)\n    }\n    return v, nil\n}\n```", "tags": ["golang", "kb"], "date": tStr, "isKB": true },
                         { "id": "kb-4", "type": "note", "title": "OAuth Error Mapping", "completed": false, "parentId": "", "createdAt": tStr, "description": "```json\n{\n  \"invalid_client\": 401,\n  \"invalid_grant\": 400,\n  \"invalid_scope\": 400\n}\n```", "tags": ["oauth", "kb"], "date": tStr, "isKB": true },
@@ -2519,6 +2632,7 @@
                         this.goals = data.goals || [];
                         // Normalize legacy data on open
                         this.goals.forEach(g => {
+                            if (g.type === 'weekly') g.type = 'sprint';
                             if (!g.date && g.type === 'daily') g.date = g.createdAt.split('T')[0];
                             if (!g.description) g.description = '';
                             if (!g.tags) g.tags = [];
@@ -2530,6 +2644,7 @@
                             }
                             delete g.time;
                         });
+                        this.completeFileSetup();
                         this.unsavedChanges = false;
                     } catch (err) {
                         if (err.name !== 'AbortError') console.error(err);
@@ -2561,6 +2676,7 @@
                         const file = await this.fileHandle.getFile();
                         this.fileName = file.name;
                         await this.saveFile();
+                        this.completeFileSetup();
                     } catch (err) {
                         if (err.name !== 'AbortError') console.error(err);
                     }
