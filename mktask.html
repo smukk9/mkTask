@@ -165,48 +165,21 @@
     </div>
 
     <!-- Header / Toolbar -->
-    <header class="h-12 border-b flex items-center justify-between px-4 shrink-0 transition-colors duration-300"
+    <header class="h-12 border-b grid grid-cols-3 items-center px-4 shrink-0 transition-colors duration-300"
         :class="theme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-slate-200'">
+        <!-- Left Section -->
         <div class="flex items-center gap-4">
             <!-- Logo Icon -->
             <div class="flex items-center gap-2">
                 <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M5 13l4 4L19 7"></path>
                 </svg>
                 <h1 class="font-bold tracking-tight text-lg"
                     :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-800'">mkTask</h1>
             </div>
 
-            <!-- Yearly Toggle -->
-            <button @click="showYearly = !showYearly" class="px-2 py-1 text-xs rounded transition-all border shrink-0"
-                :class="showYearly 
-                    ? (theme === 'dark' ? 'bg-indigo-500/20 border-indigo-500 text-indigo-400' : 'bg-indigo-50 border-indigo-200 text-indigo-600')
-                    : (theme === 'dark' ? 'border-gray-800 text-gray-500 hover:border-gray-700' : 'border-slate-200 text-slate-400 hover:border-slate-300')">
-                Vision
-            </button>
-
             <div class="h-5 w-px theme-border border-l mx-1"></div>
-
-            <!-- Global Search -->
-            <div class="relative group">
-                <input type="text" x-model="searchQuery" x-ref="searchInput" placeholder="Search tasks... (Ctrl+F)"
-                    class="bg-transparent border theme-border rounded px-3 py-1.5 text-xs w-48 focus:w-64 focus:outline-none focus:border-indigo-500 transition-all placeholder-gray-500"
-                    :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-700'">
-                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                    <svg x-show="!searchQuery" class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                    <button x-show="searchQuery" @click="searchQuery = ''"
-                        class="pointer-events-auto text-gray-500 hover:text-gray-300"><svg class="w-3 h-3" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"></path>
-                        </svg></button>
-                </div>
-            </div>
 
             <!-- History Navigation -->
             <div class="flex items-center gap-2" title="Go to Date">
@@ -220,8 +193,7 @@
                         :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-700'">
                         <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                            </path>
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                         <span x-text="formatDate(selectedDate)"></span>
                     </button>
@@ -285,9 +257,10 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="h-5 w-px theme-border border-l mx-1"></div>
-
+        <!-- Center Section -->
+        <div class="flex items-center justify-center">
             <!-- View Mode Toggle -->
             <div class="flex items-center p-1 rounded-lg border"
                 :class="theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-white border-slate-200'">
@@ -309,9 +282,27 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-3">
-            <span x-show="fileName" x-text="fileName"
-                class="text-xs text-gray-500 opacity-70 hidden md:inline-block"></span>
+        <!-- Right Section -->
+        <div class="flex items-center gap-3 justify-end">
+            <!-- Global Search -->
+            <div class="relative group">
+                <input type="text" x-model="searchQuery" x-ref="searchInput" placeholder="Search..."
+                    class="bg-transparent border theme-border rounded px-3 py-1.5 text-xs w-32 focus:w-48 focus:outline-none focus:border-indigo-500 transition-all placeholder-gray-500"
+                    :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-700'">
+                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg x-show="!searchQuery" class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <button x-show="searchQuery" @click="searchQuery = ''"
+                        class="pointer-events-auto text-gray-500 hover:text-gray-300"><svg class="w-3 h-3" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg></button>
+                </div>
+            </div>
 
             <!-- Auto-Save Status -->
             <div class="flex items-center gap-1.5 text-[10px] min-w-[60px] justify-end">
@@ -327,69 +318,6 @@
                     Saved
                 </span>
             </div>
-
-            <!-- Attention Bell -->
-            <div class="relative" x-data="{ open: false }">
-                <button @click="open = !open" @click.outside="open = false"
-                    class="relative p-1.5 rounded-md transition-colors"
-                    :class="getOverdueGoals().length > 0
-                        ? (theme === 'dark' ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/40' : 'bg-amber-100 text-amber-600 ring-1 ring-amber-400')
-                        : (theme === 'dark' ? 'text-gray-500 hover:text-amber-400 hover:bg-gray-800/60' : 'text-slate-500 hover:text-amber-600 hover:bg-slate-100')"
-                    title="Attention Needed">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0a3 3 0 11-6 0h6z"></path>
-                    </svg>
-                    <span x-show="getOverdueGoals().length > 0"
-                        class="absolute -top-1 -right-1 min-w-[14px] h-[14px] px-1 rounded-full text-[9px] leading-[14px] text-center"
-                        :class="theme === 'dark' ? 'bg-amber-500 text-gray-900' : 'bg-amber-500 text-white'"
-                        x-text="getOverdueGoals().length"></span>
-                </button>
-
-                <div x-show="open" x-cloak
-                    class="absolute right-0 mt-2 w-64 theme-panel border theme-border rounded-lg shadow-2xl z-[60] p-3"
-                    x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
-                    x-transition:enter-end="opacity-100 scale-100">
-                    <div class="text-[10px] font-bold uppercase tracking-widest mb-2"
-                        :class="theme === 'dark' ? 'text-amber-400' : 'text-amber-600'">Attention Needed</div>
-                    <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
-                        <template x-for="goal in getOverdueGoals()" :key="goal.id">
-                            <div class="flex items-center justify-between text-[10px] p-2 rounded"
-                                :class="theme === 'dark' ? 'bg-amber-900/10 border border-amber-500/20 text-amber-400' : 'bg-amber-50 border border-amber-200 text-amber-700'">
-                                <span class="truncate" x-text="goal.title"></span>
-                                <span class="shrink-0 ml-2" x-text="formatDate(goal.date)"></span>
-                            </div>
-                        </template>
-                        <div x-show="getOverdueGoals().length === 0" class="text-[10px] italic"
-                            :class="theme === 'dark' ? 'text-gray-500' : 'text-slate-500'">
-                            No overdue tasks. You are on track!
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="h-5 w-px theme-border border-l mx-1"></div>
-
-            <!-- Review & Metrics -->
-            <button @click="reviewMode = true"
-                class="px-2 py-1.5 text-xs rounded transition-colors flex items-center gap-1 border theme-border hover:bg-gray-800/50"
-                :class="theme === 'dark' ? 'text-purple-400 bg-purple-900/20 border-purple-500/30' : 'text-purple-600 bg-purple-100 border-purple-200'">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
-                    </path>
-                </svg>
-                <span class="hidden sm:inline">Review</span>
-            </button>
-
-            <button @click="showMetrics = true"
-                class="px-2 py-1.5 text-xs rounded transition-colors flex items-center gap-1 border theme-border hover:opacity-80 theme-text-muted bg-opacity-10 bg-gray-500">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                    </path>
-                </svg>
-            </button>
 
             <!-- Theme Toggle -->
             <button @click="toggleTheme()"
@@ -407,25 +335,71 @@
                 </svg>
             </button>
 
-            <!-- Data Menu -->
+            <!-- Menu Dropdown -->
             <div class="relative" x-data="{ open: false }">
                 <button @click="open = !open" @click.outside="open = false"
-                    class="px-2 py-1.5 text-xs rounded border theme-border flex items-center gap-1 hover:bg-gray-500/10 theme-text-muted">
-                    Data
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    class="p-1.5 rounded-md hover:bg-gray-500/10 transition-colors"
+                    :class="theme === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-slate-500 hover:text-slate-700'"
+                    title="Menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
                     </svg>
                 </button>
+                
                 <div x-show="open" x-cloak
-                    class="absolute right-0 mt-1 w-40 theme-panel border theme-border rounded shadow-xl z-50 flex flex-col py-1">
-                    <button @click="exportCSV(); open=false"
-                        class="px-3 py-2 text-left text-xs hover:bg-gray-500/10 theme-text-muted">Export CSV</button>
-                    <button @click="loadSampleData(); open=false"
-                        class="px-3 py-2 text-left text-xs hover:bg-gray-500/10 theme-text-muted">Load Sample
-                        Data</button>
+                    class="absolute right-0 mt-2 w-48 theme-panel border theme-border rounded-lg shadow-2xl z-[60] py-2"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100">
+                    
+                    <button @click="showYearly = !showYearly; open = false" 
+                        class="w-full px-4 py-2 text-left text-sm hover:bg-gray-500/10 flex items-center justify-between"
+                        :class="showYearly ? 'text-indigo-400' : 'theme-text-muted'">
+                        <span>Vision</span>
+                        <svg x-show="showYearly" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </button>
+
                     <div class="border-t theme-border my-1"></div>
+
+                    <button @click="reviewMode = true; open = false"
+                        class="w-full px-4 py-2 text-left text-sm hover:bg-gray-500/10 flex items-center gap-2"
+                        :class="theme === 'dark' ? 'text-purple-400' : 'text-purple-600'">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                        <span>Review</span>
+                        <span x-show="getOverdueGoals().length > 0" 
+                            class="ml-auto px-1.5 py-0.5 rounded-full text-[10px]"
+                            :class="theme === 'dark' ? 'bg-amber-500 text-gray-900' : 'bg-amber-500 text-white'"
+                            x-text="getOverdueGoals().length"></span>
+                    </button>
+
+                    <button @click="showMetrics = true; open = false"
+                        class="w-full px-4 py-2 text-left text-sm hover:bg-gray-500/10 flex items-center gap-2 theme-text-muted">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <span>Metrics</span>
+                    </button>
+
+                    <div class="border-t theme-border my-1"></div>
+
+                    <button @click="exportCSV(); open=false"
+                        class="w-full px-4 py-2 text-left text-sm hover:bg-gray-500/10 theme-text-muted">
+                        Export CSV
+                    </button>
+                    <button @click="loadSampleData(); open=false"
+                        class="w-full px-4 py-2 text-left text-sm hover:bg-gray-500/10 theme-text-muted">
+                        Load Sample Data
+                    </button>
                     <button @click="deleteDatabase(); open=false"
-                        class="px-3 py-2 text-left text-xs hover:bg-red-900/30 text-red-500">Delete Database</button>
+                        class="w-full px-4 py-2 text-left text-sm hover:bg-red-900/30 text-red-500">
+                        Delete Database
+                    </button>
                 </div>
             </div>
 
@@ -471,7 +445,7 @@
                         <div class="flex items-start justify-between gap-2 mb-1">
                             <input type="text" x-model="goal.title"
                                 class="bg-transparent w-full focus:outline-none text-sm font-semibold placeholder-gray-700"
-                                :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-800'"
+                                :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-300' : 'text-slate-800'))"
                                 placeholder="Yearly Vision...">
 
                             <!-- Actions -->
@@ -555,20 +529,19 @@
                             :class="theme === 'dark' ? 'bg-gray-900/30 border-gray-800/80 hover:border-purple-500/30' : 'bg-white border-slate-200 hover:border-purple-400'">
                             <div class="flex items-start gap-2">
                                 <button @click="toggleComplete(goal)" class="mt-0.5 shrink-0 transition-colors"
-                                    :class="[goal.completed ? 'text-green-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-700 hover:text-purple-400' : 'text-slate-300 hover:text-purple-500'))]">
+                                    :class="[goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-400'))]">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path x-show="!goal.completed && !goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        <circle x-show="!goal.completed && !goal.inProgress" cx="12" cy="12" r="9" stroke-width="2"></circle>
                                         <path x-show="goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="M5 12h14"></path>
+                                            stroke-width="2.5" d="M12 6v12M6 12h12"></path>
                                         <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                                     </svg>
                                 </button>
                                 <div class="flex-1 min-w-0">
                                     <input type="text" x-model="goal.title"
                                         class="bg-transparent w-full focus:outline-none text-sm font-medium placeholder-gray-700"
-                                        :class="[theme === 'dark' ? 'text-gray-300' : 'text-slate-800', {'line-through text-gray-600': goal.completed, 'text-amber-400/90': goal.inProgress && !goal.completed}]"
+                                        :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-300' : 'text-slate-800'))"
                                         placeholder="Objective...">
 
                                     <div class="mt-1 flex items-center justify-between">
@@ -662,20 +635,19 @@
                             :class="theme === 'dark' ? 'bg-gray-900/30 border-gray-800/80 hover:border-blue-500/30' : 'bg-white border-slate-200 hover:border-blue-400'">
                             <div class="flex items-start gap-2">
                                 <button @click="toggleComplete(goal)" class="mt-0.5 shrink-0 transition-colors"
-                                    :class="[goal.completed ? 'text-green-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-700 hover:text-blue-400' : 'text-slate-300 hover:text-blue-500'))]">
+                                    :class="[goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-400'))]">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path x-show="!goal.completed && !goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        <circle x-show="!goal.completed && !goal.inProgress" cx="12" cy="12" r="9" stroke-width="2"></circle>
                                         <path x-show="goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="M5 12h14"></path>
+                                            stroke-width="2.5" d="M12 6v12M6 12h12"></path>
                                         <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                                     </svg>
                                 </button>
                                 <div class="flex-1 min-w-0">
                                     <input type="text" x-model="goal.title"
                                         class="bg-transparent w-full focus:outline-none text-sm font-medium placeholder-gray-700"
-                                        :class="[theme === 'dark' ? 'text-gray-300' : 'text-slate-800', {'line-through text-gray-600': goal.completed, 'text-amber-400/90': goal.inProgress && !goal.completed}]"
+                                        :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-300' : 'text-slate-800'))"
                                         placeholder="Sprint Goal...">
 
                                     <div class="mt-1 flex items-center justify-between">
@@ -772,8 +744,9 @@
                             </button>
                         </h2>
                         <div class="flex items-center gap-1 ml-4 border-l pl-4"
-                            :class="[theme === 'dark' ? 'border-gray-800' : 'border-slate-200', standupMode ? 'ml-0 pl-0 border-l-0 sm:ml-4 sm:pl-4 sm:border-l' : '']">
-                            <button x-show="isCompactLayout" @click="showStrategyPanel = !showStrategyPanel"
+                            :class="[theme === 'dark' ? 'border-gray-800' : 'border-slate-200', standupMode ? 'ml-0 pl-0 border-l-0 sm:ml-4 sm:pl-4 sm:border-l' : '']"
+                            x-show="isCompactLayout">
+                            <button @click="showStrategyPanel = !showStrategyPanel"
                                 class="px-2 py-0.5 text-[10px] rounded border transition-all"
                                 :class="showStrategyPanel
                                     ? (theme === 'dark'
@@ -784,17 +757,6 @@
                                         : 'border-slate-300 text-slate-500')">
                                 Strategy
                             </button>
-                            <button @click="showBits = !showBits"
-                                class="px-2 py-0.5 text-[10px] rounded border transition-all"
-                                :class="showBits
-                                    ? (theme === 'dark'
-                                        ? 'bg-indigo-500/10 border-indigo-500 text-indigo-400'
-                                        : 'bg-indigo-50 border-indigo-300 text-indigo-600')
-                                    : (theme === 'dark'
-                                        ? 'border-gray-800 text-gray-500'
-                                        : 'border-slate-300 text-slate-500')">
-                                Daily Bits
-                            </button>
                         </div>
                     </div>
 
@@ -803,6 +765,17 @@
                             class="px-3 py-1.5 rounded transition-colors border text-sm font-medium"
                             :class="theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 border-gray-700' : 'bg-white hover:bg-slate-100 text-slate-600 border-slate-200'">
                             Copy Report
+                        </button>
+                        <button @click="showBits = !showBits"
+                            class="px-2 py-1 text-[11px] rounded border transition-all"
+                            :class="showBits
+                                ? (theme === 'dark'
+                                    ? 'bg-indigo-500/10 border-indigo-500 text-indigo-400'
+                                    : 'bg-indigo-50 border-indigo-300 text-indigo-600')
+                                : (theme === 'dark'
+                                    ? 'border-gray-800 text-gray-500'
+                                    : 'border-slate-300 text-slate-500')">
+                            Daily Bits
                         </button>
                         <button @click="addGoal('daily')"
                             class="px-3 py-1.5 rounded bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-500 hover:text-emerald-400 transition-colors border border-emerald-500/20 flex items-center gap-2 text-sm font-medium">
@@ -840,12 +813,12 @@
                             <div class="flex-1 overflow-y-auto p-3 space-y-2">
                                 <template x-for="goal in getGoalsByDay(-1)" :key="goal.id">
                                     <div class="group p-2 rounded border"
-                                        :class="[theme === 'dark' ? 'border-gray-800' : 'border-slate-200', goal.completed ? (theme==='dark'?'bg-gray-900/20 opacity-75':'bg-slate-100/50 opacity-75') : (theme==='dark'?'bg-gray-900/50':'bg-white')]">
+                                        :class="[theme === 'dark' ? 'border-gray-800' : 'border-slate-200', goal.completed ? (theme==='dark'?'bg-gray-900/20 opacity-85':'bg-slate-100/50 opacity-85') : (theme==='dark'?'bg-gray-900/50':'bg-white')]">
                                         <div class="flex items-start justify-between gap-2 mb-1">
                                             <div class="flex items-center gap-2 min-w-0">
                                                 <div class="w-2 h-2 rounded-full" :class="getStandupDotClass(goal)"></div>
                                                 <span class="text-xs font-medium truncate"
-                                                    :class="theme==='dark'?'text-gray-300':'text-slate-700'"
+                                                    :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (theme==='dark'?'text-gray-300':'text-slate-700')"
                                                     x-text="goal.title"></span>
                                             </div>
                                             <button @click.stop="openDetail(goal)"
@@ -882,21 +855,20 @@
                                         :class=" theme === 'dark' ? 'border-gray-800 bg-gray-900/60 hover:border-emerald-500/30' : 'border-slate-200 bg-white hover:border-emerald-400'">
                                         <div class="flex items-start gap-2">
                                             <button @click="toggleComplete(goal)" class="mt-0.5"
-                                                :class="goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme==='dark' ? 'text-gray-600 hover:text-emerald-500' : 'text-slate-400 hover:text-emerald-500'))">
+                                                :class="goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme==='dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-400'))">
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
-                                                    <path x-show="!goal.completed && !goal.inProgress"
-                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    <circle x-show="!goal.completed && !goal.inProgress" cx="12" cy="12" r="9" stroke-width="2"></circle>
                                                     <path x-show="goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M5 12h14"></path>
-                                                    <path x-show="goal.completed" d="M5 13l4 4L19 7"></path>
+                                                        stroke-width="2.5" d="M12 6v12M6 12h12"></path>
+                                                    <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                                                 </svg>
                                             </button>
                                             <div class="w-2 h-2 rounded-full mt-1" :class="getStandupDotClass(goal)"></div>
                                             <div class="min-w-0 flex-1">
                                                 <div class="flex items-start justify-between gap-2">
                                                     <div class="text-xs font-medium"
-                                                        :class="[theme==='dark'?'text-gray-200':'text-slate-800', {'line-through text-gray-500': goal.completed, 'text-amber-400/90': goal.inProgress && !goal.completed}]"
+                                                        :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (theme==='dark'?'text-gray-200':'text-slate-800'))"
                                                         x-text="goal.title">
                                                     </div>
                                                     <button @click.stop="openDetail(goal)"
@@ -942,7 +914,9 @@
                                     <div class="group p-2 rounded border"
                                         :class="theme === 'dark' ? 'border-gray-800 bg-gray-900/30 text-gray-400' : 'border-slate-200 bg-white text-slate-600'">
                                         <div class="flex items-start justify-between gap-2">
-                                            <div class="text-xs" x-text="goal.title"></div>
+                                            <div class="text-xs"
+                                                :class="goal.completed ? 'line-through decoration-2 text-gray-500' : ''"
+                                                x-text="goal.title"></div>
                                             <button @click.stop="openDetail(goal)"
                                                 class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded"
                                                 :class="theme==='dark'?'text-gray-500 hover:text-blue-400':'text-slate-400 hover:text-blue-500'"
@@ -1096,6 +1070,15 @@
                                 :class="theme === 'dark' ? 'border-gray-700 text-gray-400' : 'border-slate-300 text-slate-500'"
                                 x-text="counts.all"></span>
                         </button>
+                        <button @click="statusFilter = 'waiting'" class="px-2 py-0.5 text-[10px] rounded border"
+                            :class="statusFilter === 'waiting'
+                                ? (theme === 'dark' ? 'bg-blue-500/15 text-blue-300 border-blue-500/30' : 'bg-blue-50 text-blue-700 border-blue-200')
+                                : (theme === 'dark' ? 'text-gray-400 border-gray-800 hover:border-gray-700' : 'text-slate-500 border-slate-200 hover:border-slate-300')">
+                            Waiting
+                            <span class="ml-1 px-1 rounded-full text-[9px] border"
+                                :class="theme === 'dark' ? 'border-blue-500/30 text-blue-300' : 'border-blue-200 text-blue-700'"
+                                x-text="counts.waiting"></span>
+                        </button>
                         <button @click="statusFilter = 'in-progress'" class="px-2 py-0.5 text-[10px] rounded border"
                             :class="statusFilter === 'in-progress'
                                 ? (theme === 'dark' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-amber-50 text-amber-700 border-amber-200')
@@ -1105,32 +1088,14 @@
                                 :class="theme === 'dark' ? 'border-amber-500/30 text-amber-300' : 'border-amber-200 text-amber-700'"
                                 x-text="counts.inProgress"></span>
                         </button>
-                        <button @click="statusFilter = 'blocked'" class="px-2 py-0.5 text-[10px] rounded border"
-                            :class="statusFilter === 'blocked'
-                                ? (theme === 'dark' ? 'bg-red-500/15 text-red-400 border-red-500/30' : 'bg-red-50 text-red-700 border-red-200')
+                        <button @click="statusFilter = 'done'" class="px-2 py-0.5 text-[10px] rounded border"
+                            :class="statusFilter === 'done'
+                                ? (theme === 'dark' ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' : 'bg-emerald-50 text-emerald-700 border-emerald-200')
                                 : (theme === 'dark' ? 'text-gray-400 border-gray-800 hover:border-gray-700' : 'text-slate-500 border-slate-200 hover:border-slate-300')">
-                            Blocked
+                            Done
                             <span class="ml-1 px-1 rounded-full text-[9px] border"
-                                :class="theme === 'dark' ? 'border-red-500/30 text-red-400' : 'border-red-200 text-red-700'"
-                                x-text="counts.blocked"></span>
-                        </button>
-                        <button @click="statusFilter = 'waiting'" class="px-2 py-0.5 text-[10px] rounded border"
-                            :class="statusFilter === 'waiting'
-                                ? (theme === 'dark' ? 'bg-amber-500/15 text-amber-300 border-amber-500/30' : 'bg-amber-50 text-amber-700 border-amber-200')
-                                : (theme === 'dark' ? 'text-gray-400 border-gray-800 hover:border-gray-700' : 'text-slate-500 border-slate-200 hover:border-slate-300')">
-                            Waiting
-                            <span class="ml-1 px-1 rounded-full text-[9px] border"
-                                :class="theme === 'dark' ? 'border-amber-500/30 text-amber-300' : 'border-amber-200 text-amber-700'"
-                                x-text="counts.waiting"></span>
-                        </button>
-                        <button @click="statusFilter = 'review'" class="px-2 py-0.5 text-[10px] rounded border"
-                            :class="statusFilter === 'review'
-                                ? (theme === 'dark' ? 'bg-blue-500/15 text-blue-300 border-blue-500/30' : 'bg-blue-50 text-blue-700 border-blue-200')
-                                : (theme === 'dark' ? 'text-gray-400 border-gray-800 hover:border-gray-700' : 'text-slate-500 border-slate-200 hover:border-slate-300')">
-                            Review
-                            <span class="ml-1 px-1 rounded-full text-[9px] border"
-                                :class="theme === 'dark' ? 'border-blue-500/30 text-blue-300' : 'border-blue-200 text-blue-700'"
-                                x-text="counts.review"></span>
+                                :class="theme === 'dark' ? 'border-emerald-500/30 text-emerald-300' : 'border-emerald-200 text-emerald-700'"
+                                x-text="counts.done"></span>
                         </button>
                     </div>
 
@@ -1156,19 +1121,18 @@
                     <template x-for="goal in getDailyFocusGoals()" :key="goal.id">
                         <div class="group p-3 rounded-lg border transition-all"
                             @click="selectedGoalId = goal.id"
-                            :class="[goal.completed ? 'opacity-50 hover:opacity-75' : '', theme === 'dark' ? 'bg-gray-900/40 border-gray-800 hover:border-emerald-500/30 hover:bg-gray-900/60' : 'bg-white border-slate-200 hover:border-emerald-400 hover:bg-slate-50', goal.id === selectedGoalId ? 'ring-1 ring-indigo-500/40' : '']">
+                            :class="[goal.completed ? 'opacity-70 hover:opacity-85' : '', theme === 'dark' ? 'bg-gray-900/40 border-gray-800 hover:border-emerald-500/30 hover:bg-gray-900/60' : 'bg-white border-slate-200 hover:border-emerald-400 hover:bg-slate-50', goal.id === selectedGoalId ? 'ring-1 ring-indigo-500/40' : '']">
 
                             <div class="flex items-start gap-4">
                                 <!-- Checkbox -->
                                 <button @click="toggleComplete(goal)" class="mt-1 shrink-0 transition-colors p-1"
-                                    :class="[goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme === 'dark' ? 'text-gray-600 hover:text-emerald-400' : 'text-slate-400 hover:text-emerald-500'))]">
+                                    :class="[goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-400'))]">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path x-show="!goal.completed && !goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        <circle x-show="!goal.completed && !goal.inProgress" cx="12" cy="12" r="9" stroke-width="2"></circle>
                                         <path x-show="goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="M5 12h14"></path>
+                                            stroke-width="2.5" d="M12 6v12M6 12h12"></path>
                                         <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                                     </svg>
                                 </button>
 
@@ -1177,7 +1141,7 @@
                                     <input type="text" x-model="goal.title" @keydown.enter="addGoal('daily')"
                                         @focus="selectedGoalId = goal.id"
                                         class="bg-transparent w-full focus:outline-none text-base font-medium placeholder-gray-600"
-                                        :class="[theme === 'dark' ? 'text-gray-200' : 'text-slate-800', {'line-through text-gray-500': goal.completed, 'text-amber-400/90': goal.inProgress && !goal.completed}]"
+                                        :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-200' : 'text-slate-800'))"
                                         placeholder="What needs to be done?">
 
                                     <!-- Meta Row (Date/Tags/Link) -->
@@ -1215,24 +1179,18 @@
                                             </span>
                                         </template>
 
-                                        <template x-if="goal.inProgress">
+                                        <template x-if="goal.completed">
+                                            <span
+                                                class="text-[10px] px-1.5 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-500">
+                                                Done
+                                            </span>
+                                        </template>
+
+                                        <template x-if="goal.inProgress && !goal.completed">
                                             <span
                                                 class="text-[10px] px-1.5 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-500">
                                                 In Progress
                                             </span>
-                                        </template>
-
-                                        <template x-if="goal.statusTag">
-                                            <span class="text-[10px] px-1.5 py-0.5 rounded border"
-                                                :class="getStatusBadgeClass(goal.statusTag)"
-                                                x-text="goal.statusTag"></span>
-                                        </template>
-
-                                        <template
-                                            x-if="goal.statusTag === 'blocked' && getBlockedAgeDays(goal) >= blockedNudgeDays">
-                                            <span class="text-[10px] px-1.5 py-0.5 rounded border"
-                                                :class="theme === 'dark' ? 'border-red-500/30 text-red-400 bg-red-500/10' : 'border-red-200 text-red-700 bg-red-50'"
-                                                x-text="'Blocked ' + getBlockedAgeDays(goal) + 'd'"></span>
                                         </template>
 
                                         <!-- Sprint / Quarterly Links -->
@@ -1613,14 +1571,13 @@
                         :class="theme==='dark'?'border-gray-800':'border-slate-200'">
                         <div class="flex items-center gap-3">
                             <button @click="toggleComplete(editingGoal)" class="transition-colors"
-                                :class="editingGoal.completed ? 'text-emerald-500' : (editingGoal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-600 hover:text-emerald-500' : 'text-slate-400 hover:text-emerald-500'))">
+                                :class="editingGoal.completed ? 'text-emerald-500' : (editingGoal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-400'))">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path x-show="!editingGoal.completed && !editingGoal.inProgress" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    <circle x-show="!editingGoal.completed && !editingGoal.inProgress" cx="12" cy="12" r="9" stroke-width="2"></circle>
                                     <path x-show="editingGoal.inProgress" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="M5 12h14"></path>
+                                        stroke-width="2.5" d="M12 6v12M6 12h12"></path>
                                     <path x-show="editingGoal.completed" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                                 </svg>
                             </button>
                             <span class="text-xs font-mono uppercase tracking-widest opacity-50"
@@ -1654,19 +1611,6 @@
                             <input type="date" x-model="editingGoal.date"
                                 class="w-full bg-transparent border rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                                 :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'">
-                        </div>
-
-                        <div x-show="editingGoal.type === 'daily'">
-                            <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Status</label>
-                            <select x-model="editingGoal.statusTag"
-                                @change="setStatusTag(editingGoal, editingGoal.statusTag)"
-                                class="w-full bg-transparent border rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
-                                :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'">
-                                <option value="">None</option>
-                                <option value="blocked">Blocked</option>
-                                <option value="waiting">Waiting</option>
-                                <option value="review">Review</option>
-                            </select>
                         </div>
 
                         <!-- Description -->
@@ -1844,14 +1788,7 @@
                                 if (!g.description) g.description = "";
                                 if (!g.tags) g.tags = [];
                                 if (typeof g.inProgress === 'undefined') g.inProgress = false;
-                                if (typeof g.statusTag === 'undefined') g.statusTag = '';
                                 if (typeof g.isNextAction === 'undefined') g.isNextAction = false;
-                                if (typeof g.blockedAt === 'undefined' || g.blockedAt === null) {
-                                    const createdDate = parseLocalDateKey(g.createdAt);
-                                    g.blockedAt = g.statusTag === 'blocked'
-                                        ? (g.date || (createdDate ? getLocalDateKey(createdDate) : ''))
-                                        : '';
-                                }
                                 if (g.type === 'daily' && typeof g.quarterlyParentId === 'undefined') {
                                     g.quarterlyParentId = '';
                                 }
@@ -1949,10 +1886,7 @@
                     const key = e.key.toLowerCase();
                     const selected = this.getSelectedGoal();
                     if (selected && selected.type === 'daily') {
-                        if (key === 'b') return this.toggleStatusTag(selected, 'blocked');
-                        if (key === 'w') return this.toggleStatusTag(selected, 'waiting');
-                        if (key === 'r') return this.toggleStatusTag(selected, 'review');
-                        if (key === 'p') return this.toggleInProgress(selected);
+                        if (key === 'p') return this.toggleComplete(selected);
                     }
                 },
 
@@ -2052,38 +1986,29 @@
 
                 getStatusCountsForSelectedDate() {
                     const list = this.goals.filter(g =>
-                        g.type === 'daily' && g.date === this.selectedDate && !g.completed
+                        g.type === 'daily' && g.date === this.selectedDate
                     );
                     return {
                         all: list.length,
-                        inProgress: list.filter(g => g.inProgress).length,
-                        blocked: list.filter(g => g.statusTag === 'blocked').length,
-                        waiting: list.filter(g => g.statusTag === 'waiting').length,
-                        review: list.filter(g => g.statusTag === 'review').length
+                        waiting: list.filter(g => !g.inProgress && !g.completed).length,
+                        inProgress: list.filter(g => g.inProgress && !g.completed).length,
+                        done: list.filter(g => g.completed).length
                     };
                 },
 
                 matchesStatusFilter(goal) {
                     if (!this.statusFilter || this.statusFilter === 'all') return true;
-                    if (this.statusFilter === 'in-progress') return !!goal.inProgress;
-                    return goal.statusTag === this.statusFilter;
-                },
-
-                getStatusBadgeClass(tag) {
-                    if (tag === 'blocked') return 'border-red-500/20 bg-red-500/10 text-red-500';
-                    if (tag === 'waiting') return 'border-amber-500/20 bg-amber-500/10 text-amber-500';
-                    if (tag === 'review') return 'border-blue-500/20 bg-blue-500/10 text-blue-500';
-                    return 'border-gray-500/20 bg-gray-500/10 text-gray-400';
+                    if (this.statusFilter === 'waiting') return !goal.inProgress && !goal.completed;
+                    if (this.statusFilter === 'in-progress') return goal.inProgress && !goal.completed;
+                    if (this.statusFilter === 'done') return goal.completed;
+                    return false;
                 },
 
                 getStandupDotClass(goal) {
                     if (!goal) return 'bg-gray-500';
-                    if (goal.completed) return 'bg-green-500';
-                    if (goal.statusTag === 'blocked') return 'bg-red-500';
-                    if (goal.statusTag === 'waiting') return 'bg-amber-500';
-                    if (goal.statusTag === 'review') return 'bg-blue-500';
+                    if (goal.completed) return 'bg-emerald-500';
                     if (goal.inProgress) return 'bg-amber-400';
-                    return 'bg-red-500';
+                    return 'bg-blue-400';
                 },
 
                 isSelectedDateToday() {
@@ -2109,14 +2034,6 @@
                 getSelectedGoal() {
                     if (!this.selectedGoalId) return null;
                     return this.goals.find(g => g.id === this.selectedGoalId) || null;
-                },
-
-                getBlockedAgeDays(goal) {
-                    if (!goal || !goal.blockedAt) return 0;
-                    const start = parseLocalDateKey(goal.blockedAt);
-                    if (!start || Number.isNaN(start.getTime())) return 0;
-                    const today = new Date();
-                    return Math.floor((today - start) / (1000 * 60 * 60 * 24));
                 },
 
                 // --- Helpers ---
@@ -2230,9 +2147,7 @@
                         title: '',
                         completed: false,
                         inProgress: false,
-                        statusTag: '',
                         isNextAction: false,
-                        blockedAt: '',
                         parentId: '',
                         createdAt: new Date().toISOString(),
                         description: '',
@@ -2345,39 +2260,28 @@
 
                 toggleComplete(goal) {
                     if (!goal) return;
+                    // Cycle: waiting (unchecked) -> in-progress -> done -> waiting
                     if (goal.completed) {
+                        // Reset to waiting
                         goal.completed = false;
                         goal.inProgress = false;
                         return;
                     }
                     if (goal.inProgress) {
+                        // Move to done
                         goal.inProgress = false;
                         goal.completed = true;
                         return;
                     }
+                    // Start as in-progress
                     goal.inProgress = true;
+                    goal.completed = false;
                 },
 
                 toggleInProgress(goal) {
                     if (!goal) return;
                     if (goal.completed) goal.completed = false;
                     goal.inProgress = !goal.inProgress;
-                },
-
-                setStatusTag(goal, tag) {
-                    if (!goal) return;
-                    goal.statusTag = tag || '';
-                    if (goal.statusTag === 'blocked') {
-                        goal.blockedAt = this.getTodayDate();
-                    } else {
-                        goal.blockedAt = '';
-                    }
-                },
-
-                toggleStatusTag(goal, tag) {
-                    if (!goal) return;
-                    const nextTag = goal.statusTag === tag ? '' : tag;
-                    this.setStatusTag(goal, nextTag);
                 },
 
                 setNextAction(goal) {
