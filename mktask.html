@@ -106,10 +106,10 @@
     <div x-show="showToast" x-cloak
         class="fixed top-3 left-1/2 -translate-x-1/2 z-[80] px-3 py-1.5 text-xs rounded border shadow-lg"
         :class="theme === 'dark' ? 'bg-gray-900 border-gray-700 text-gray-200' : 'bg-white border-slate-200 text-slate-700'"
-        x-text="toastMessage"
-        x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1"
-        x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150"
-        x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1"></div>
+        x-text="toastMessage" x-transition:enter="transition ease-out duration-150"
+        x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 -translate-y-1"></div>
 
     <!-- Undo Delete -->
     <div x-show="showUndo" x-cloak
@@ -119,8 +119,7 @@
         x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150"
         x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-2">
         <span x-text="undoMessage"></span>
-        <button @click="undoDelete()"
-            class="px-2 py-0.5 rounded border text-[10px] font-semibold"
+        <button @click="undoDelete()" class="px-2 py-0.5 rounded border text-[10px] font-semibold"
             :class="theme === 'dark' ? 'border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10' : 'border-emerald-400 text-emerald-600 hover:bg-emerald-50'">
             Undo
         </button>
@@ -136,10 +135,9 @@
             :class="theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-slate-200'">
             <div class="flex items-start justify-between gap-4">
                 <div>
-                    <h2 class="text-lg font-bold"
-                        :class="theme === 'dark' ? 'text-gray-100' : 'text-slate-900'">Set Up Your Data File</h2>
-                    <p class="text-xs mt-1"
-                        :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'"
+                    <h2 class="text-lg font-bold" :class="theme === 'dark' ? 'text-gray-100' : 'text-slate-900'">Set Up
+                        Your Data File</h2>
+                    <p class="text-xs mt-1" :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'"
                         x-text="onboardingMessage"></p>
                 </div>
                 <button @click="showOnboarding = false"
@@ -150,13 +148,11 @@
                     class="px-3 py-2 rounded text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white">
                     Create Data File
                 </button>
-                <button @click="openFile()"
-                    class="px-3 py-2 rounded text-xs font-semibold border"
+                <button @click="openFile()" class="px-3 py-2 rounded text-xs font-semibold border"
                     :class="theme === 'dark' ? 'border-gray-700 text-gray-300 hover:bg-gray-800' : 'border-slate-200 text-slate-700 hover:bg-slate-50'">
                     Open Existing File
                 </button>
-                <button @click="showOnboarding = false"
-                    class="px-3 py-2 rounded text-xs font-semibold"
+                <button @click="showOnboarding = false" class="px-3 py-2 rounded text-xs font-semibold"
                     :class="theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-slate-500 hover:text-slate-600'">
                     Not Now
                 </button>
@@ -172,8 +168,7 @@
             <!-- Logo Icon -->
             <div class="flex items-center gap-2">
                 <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                        d="M5 13l4 4L19 7"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                 </svg>
                 <h1 class="font-bold tracking-tight text-lg"
                     :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-800'">mkTask</h1>
@@ -193,7 +188,8 @@
                         :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-700'">
                         <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                            </path>
                         </svg>
                         <span x-text="formatDate(selectedDate)"></span>
                     </button>
@@ -342,22 +338,24 @@
                     :class="theme === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-slate-500 hover:text-slate-700'"
                     title="Menu">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
+                        </path>
                     </svg>
                 </button>
-                
+
                 <div x-show="open" x-cloak
                     class="absolute right-0 mt-2 w-48 theme-panel border theme-border rounded-lg shadow-2xl z-[60] py-2"
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
                     x-transition:enter-end="opacity-100 scale-100">
-                    
-                    <button @click="showYearly = !showYearly; open = false" 
+
+                    <button @click="showYearly = !showYearly; open = false"
                         class="w-full px-4 py-2 text-left text-sm hover:bg-gray-500/10 flex items-center justify-between"
                         :class="showYearly ? 'text-indigo-400' : 'theme-text-muted'">
                         <span>Vision</span>
                         <svg x-show="showYearly" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                            </path>
                         </svg>
                     </button>
 
@@ -368,10 +366,11 @@
                         :class="theme === 'dark' ? 'text-purple-400' : 'text-purple-600'">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
+                            </path>
                         </svg>
                         <span>Review</span>
-                        <span x-show="getOverdueGoals().length > 0" 
+                        <span x-show="getOverdueGoals().length > 0"
                             class="ml-auto px-1.5 py-0.5 rounded-full text-[10px]"
                             :class="theme === 'dark' ? 'bg-amber-500 text-gray-900' : 'bg-amber-500 text-white'"
                             x-text="getOverdueGoals().length"></span>
@@ -381,7 +380,8 @@
                         class="w-full px-4 py-2 text-left text-sm hover:bg-gray-500/10 flex items-center gap-2 theme-text-muted">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                            </path>
                         </svg>
                         <span>Metrics</span>
                     </button>
@@ -497,13 +497,10 @@
         </div>
 
         <!-- Left Column: Strategy (Quarterly & Sprint Stacked) -->
-        <div x-show="isCompactLayout && showStrategyPanel" x-cloak
-            class="fixed inset-0 z-30"
-            :class="theme === 'dark' ? 'bg-gray-950/60' : 'bg-slate-900/20'"
-            @click="showStrategyPanel = false"></div>
+        <div x-show="isCompactLayout && showStrategyPanel" x-cloak class="fixed inset-0 z-30"
+            :class="theme === 'dark' ? 'bg-gray-950/60' : 'bg-slate-900/20'" @click="showStrategyPanel = false"></div>
         <div x-show="!isCompactLayout || showStrategyPanel" x-cloak
-            class="w-[320px] flex flex-col border-r shrink-0 transition-colors"
-            :class="[
+            class="w-[320px] flex flex-col border-r shrink-0 transition-colors" :class="[
                 theme === 'dark' ? 'border-gray-800 bg-gray-950' : 'border-slate-200 bg-slate-50',
                 isCompactLayout ? 'fixed inset-y-0 left-0 z-40 w-[320px] shadow-2xl' : ''
             ]">
@@ -531,7 +528,8 @@
                                 <button @click="toggleComplete(goal)" class="mt-0.5 shrink-0 transition-colors"
                                     :class="[goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-400'))]">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <circle x-show="!goal.completed && !goal.inProgress" cx="12" cy="12" r="9" stroke-width="2"></circle>
+                                        <circle x-show="!goal.completed && !goal.inProgress" cx="12" cy="12" r="9"
+                                            stroke-width="2"></circle>
                                         <path x-show="goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
                                             stroke-width="2.5" d="M12 6v12M6 12h12"></path>
                                         <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round"
@@ -589,8 +587,8 @@
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"></path>
-                                            <circle cx="12" cy="12" r="3" stroke-linecap="round"
-                                                stroke-linejoin="round" stroke-width="2"></circle>
+                                            <circle cx="12" cy="12" r="3" stroke-linecap="round" stroke-linejoin="round"
+                                                stroke-width="2"></circle>
                                         </svg>
                                     </button>
 
@@ -637,7 +635,8 @@
                                 <button @click="toggleComplete(goal)" class="mt-0.5 shrink-0 transition-colors"
                                     :class="[goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-400'))]">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <circle x-show="!goal.completed && !goal.inProgress" cx="12" cy="12" r="9" stroke-width="2"></circle>
+                                        <circle x-show="!goal.completed && !goal.inProgress" cx="12" cy="12" r="9"
+                                            stroke-width="2"></circle>
                                         <path x-show="goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
                                             stroke-width="2.5" d="M12 6v12M6 12h12"></path>
                                         <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round"
@@ -692,8 +691,8 @@
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"></path>
-                                            <circle cx="12" cy="12" r="3" stroke-linecap="round"
-                                                stroke-linejoin="round" stroke-width="2"></circle>
+                                            <circle cx="12" cy="12" r="3" stroke-linecap="round" stroke-linejoin="round"
+                                                stroke-width="2"></circle>
                                         </svg>
                                     </button>
 
@@ -726,8 +725,7 @@
             <div class="flex-1 flex flex-col min-w-0 bg-gray-950 relative"
                 :class="theme === 'dark' ? 'bg-gray-950' : 'bg-slate-50'">
                 <!-- Header -->
-                <div class="px-6 py-4 border-b flex justify-between items-end z-10 transition-colors"
-                    :class="[
+                <div class="px-6 py-4 border-b flex justify-between items-end z-10 transition-colors" :class="[
                         theme === 'dark' ? 'border-gray-800 bg-gray-950' : 'border-slate-200 bg-slate-50',
                         standupMode ? 'flex-col gap-3 sm:flex-row sm:items-end' : ''
                     ]">
@@ -747,8 +745,7 @@
                             :class="[theme === 'dark' ? 'border-gray-800' : 'border-slate-200', standupMode ? 'ml-0 pl-0 border-l-0 sm:ml-4 sm:pl-4 sm:border-l' : '']"
                             x-show="isCompactLayout">
                             <button @click="showStrategyPanel = !showStrategyPanel"
-                                class="px-2 py-0.5 text-[10px] rounded border transition-all"
-                                :class="showStrategyPanel
+                                class="px-2 py-0.5 text-[10px] rounded border transition-all" :class="showStrategyPanel
                                     ? (theme === 'dark'
                                         ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
                                         : 'bg-emerald-50 border-emerald-300 text-emerald-600')
@@ -767,8 +764,7 @@
                             Copy Report
                         </button>
                         <button @click="showBits = !showBits"
-                            class="px-2 py-1 text-[11px] rounded border transition-all"
-                            :class="showBits
+                            class="px-2 py-1 text-[11px] rounded border transition-all" :class="showBits
                                 ? (theme === 'dark'
                                     ? 'bg-indigo-500/10 border-indigo-500 text-indigo-400'
                                     : 'bg-indigo-50 border-indigo-300 text-indigo-600')
@@ -798,15 +794,14 @@
                             <div class="p-3 border-b text-center font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2"
                                 :class="theme === 'dark' ? 'border-gray-800 bg-gray-900/30 text-gray-500' : 'border-slate-200 bg-slate-100 text-slate-500'">
                                 <span x-text="getStandupColumnLabel(-1)"></span>
-                                <button @click="openFirstDetailByDay(-1)"
-                                    class="p-0.5 rounded"
+                                <button @click="openFirstDetailByDay(-1)" class="p-0.5 rounded"
                                     :class="theme==='dark'?'text-gray-500 hover:text-emerald-400':'text-slate-400 hover:text-emerald-500'"
                                     title="View Details">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"></path>
-                                        <circle cx="12" cy="12" r="3" stroke-linecap="round"
-                                            stroke-linejoin="round" stroke-width="2"></circle>
+                                        <circle cx="12" cy="12" r="3" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"></circle>
                                     </svg>
                                 </button>
                             </div>
@@ -816,7 +811,8 @@
                                         :class="[theme === 'dark' ? 'border-gray-800' : 'border-slate-200', goal.completed ? (theme==='dark'?'bg-gray-900/20 opacity-85':'bg-slate-100/50 opacity-85') : (theme==='dark'?'bg-gray-900/50':'bg-white')]">
                                         <div class="flex items-start justify-between gap-2 mb-1">
                                             <div class="flex items-center gap-2 min-w-0">
-                                                <div class="w-2 h-2 rounded-full" :class="getStandupDotClass(goal)"></div>
+                                                <div class="w-2 h-2 rounded-full" :class="getStandupDotClass(goal)">
+                                                </div>
                                                 <span class="text-xs font-medium truncate"
                                                     :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (theme==='dark'?'text-gray-300':'text-slate-700')"
                                                     x-text="goal.title"></span>
@@ -825,9 +821,12 @@
                                                 class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded"
                                                 :class="theme==='dark'?'text-gray-500 hover:text-emerald-400':'text-slate-400 hover:text-emerald-500'"
                                                 title="View Details">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"></path>
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z">
+                                                    </path>
                                                     <circle cx="12" cy="12" r="3" stroke-linecap="round"
                                                         stroke-linejoin="round" stroke-width="2"></circle>
                                                 </svg>
@@ -851,20 +850,29 @@
                             </div>
                             <div class="flex-1 overflow-y-auto p-3 space-y-2">
                                 <template x-for="goal in getGoalsByDay(0)" :key="goal.id">
-                                    <div class="group p-2 rounded border transition-colors"
-                                        :class="[(isRolledOver(goal) && !goal.completed && !goal.cancelled) ? getRolledOverColor() : '', goal.cancelled ? 'opacity-40 line-through' : '', theme === 'dark' ? 'border-gray-800 bg-gray-900/60 hover:border-emerald-500/30' : 'border-slate-200 bg-white hover:border-emerald-400']">
+                                    <div class="group p-2 rounded border transition-colors" :class="[
+                                            goal.cancelled ? 'opacity-40 line-through' : '',
+                                            (isRolledOver(goal) && !goal.completed && !goal.cancelled) 
+                                                ? (theme === 'dark' ? 'bg-orange-500/15 border-orange-500/40 hover:border-orange-500/60' : 'bg-orange-50 border-orange-300 hover:border-orange-400')
+                                                : (theme === 'dark' ? 'border-gray-800 bg-gray-900/60 hover:border-emerald-500/30' : 'border-slate-200 bg-white hover:border-emerald-400')
+                                        ]">
                                         <div class="flex items-start gap-2">
                                             <button @click="toggleComplete(goal)" class="mt-0.5"
                                                 :class="goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme==='dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-400'))">
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
-                                                    <circle x-show="!goal.completed && !goal.inProgress" cx="12" cy="12" r="9" stroke-width="2"></circle>
-                                                    <path x-show="goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2.5" d="M12 6v12M6 12h12"></path>
-                                                    <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                                    <circle x-show="!goal.completed && !goal.inProgress" cx="12" cy="12"
+                                                        r="9" stroke-width="2"></circle>
+                                                    <path x-show="goal.inProgress" stroke-linecap="round"
+                                                        stroke-linejoin="round" stroke-width="2.5" d="M12 6v12M6 12h12">
+                                                    </path>
+                                                    <path x-show="goal.completed" stroke-linecap="round"
+                                                        stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7">
+                                                    </path>
                                                 </svg>
                                             </button>
-                                            <div class="w-2 h-2 rounded-full mt-1" :class="getStandupDotClass(goal)"></div>
+                                            <div class="w-2 h-2 rounded-full mt-1" :class="getStandupDotClass(goal)">
+                                            </div>
                                             <div class="min-w-0 flex-1">
                                                 <div class="flex items-start justify-between gap-2">
                                                     <div class="text-xs font-medium"
@@ -875,19 +883,23 @@
                                                         class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded"
                                                         :class="theme==='dark'?'text-gray-500 hover:text-emerald-400':'text-slate-400 hover:text-emerald-500'"
                                                         title="View Details">
-                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"></path>
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z">
+                                                            </path>
                                                             <circle cx="12" cy="12" r="3" stroke-linecap="round"
                                                                 stroke-linejoin="round" stroke-width="2"></circle>
                                                         </svg>
                                                     </button>
                                                 </div>
-                                                <template x-if="isRolledOver(goal) && !goal.completed && !goal.cancelled">
-                                                    <p class="text-[10px] mt-0.5 px-1.5 py-0.5 rounded border border-amber-500/40 bg-amber-500/10 text-amber-600 font-medium"
-                                                        :class="theme === 'dark' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-amber-100 text-amber-700 border-amber-300'"
+                                                <template
+                                                    x-if="isRolledOver(goal) && !goal.completed && !goal.cancelled">
+                                                    <p class="text-[10px] mt-0.5 px-1.5 py-0.5 rounded border font-medium inline-block"
+                                                        :class="theme === 'dark' ? 'bg-orange-500/20 text-orange-300 border-orange-500/40' : 'bg-orange-100 text-orange-700 border-orange-400'"
                                                         :title="'Rolled over from ' + goal.rolledOverFrom">
-                                                        ↻ from <span x-text="formatDate(goal.rolledOverFrom)"></span>
+                                                        ↻ Rollover
                                                     </p>
                                                 </template>
                                             </div>
@@ -904,15 +916,14 @@
                             <div class="p-3 border-b text-center font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2"
                                 :class="theme === 'dark' ? 'border-gray-800 bg-gray-900/30 text-blue-400' : 'border-slate-200 bg-slate-100 text-blue-500'">
                                 <span x-text="getStandupColumnLabel(1)"></span>
-                                <button @click="openFirstDetailByDay(1)"
-                                    class="p-0.5 rounded"
+                                <button @click="openFirstDetailByDay(1)" class="p-0.5 rounded"
                                     :class="theme==='dark'?'text-gray-500 hover:text-blue-400':'text-slate-400 hover:text-blue-500'"
                                     title="View Details">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"></path>
-                                        <circle cx="12" cy="12" r="3" stroke-linecap="round"
-                                            stroke-linejoin="round" stroke-width="2"></circle>
+                                        <circle cx="12" cy="12" r="3" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"></circle>
                                     </svg>
                                 </button>
                             </div>
@@ -928,9 +939,12 @@
                                                 class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded"
                                                 :class="theme==='dark'?'text-gray-500 hover:text-blue-400':'text-slate-400 hover:text-blue-500'"
                                                 title="View Details">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"></path>
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z">
+                                                    </path>
                                                     <circle cx="12" cy="12" r="3" stroke-linecap="round"
                                                         stroke-linejoin="round" stroke-width="2"></circle>
                                                 </svg>
@@ -981,27 +995,31 @@
                                                 class="text-amber-500/80 hover:text-amber-400" title="Copy KB">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2M8 7a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2h-2"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2M8 7a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2h-2">
+                                                    </path>
                                                 </svg>
                                             </button>
                                             <button @click.stop="toggleKBCollapse(bit)"
-                                                class="text-amber-500/80 hover:text-amber-400" title="Expand / Collapse">
+                                                class="text-amber-500/80 hover:text-amber-400"
+                                                title="Expand / Collapse">
                                                 <svg x-show="isKBCollapsed(bit)" class="w-3.5 h-3.5" fill="none"
                                                     stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M19 9l-7 7-7-7"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                                 </svg>
                                                 <svg x-show="!isKBCollapsed(bit)" class="w-3.5 h-3.5" fill="none"
                                                     stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M5 15l7-7 7 7"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M5 15l7-7 7 7"></path>
                                                 </svg>
                                             </button>
                                             <button x-show="!bit.kbPendingUnpin" @click.stop="requestUnpinKB(bit)"
                                                 class="text-amber-500 hover:text-amber-400" title="Unpin from KB">
                                                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3.5 7 3.5V5c0-1.1-.9-2-2-2z"></path>
+                                                    <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3.5 7 3.5V5c0-1.1-.9-2-2-2z">
+                                                    </path>
                                                 </svg>
                                             </button>
                                             <div x-show="bit.kbPendingUnpin" class="flex items-center gap-1">
@@ -1040,7 +1058,8 @@
                                             </template>
                                         </template>
                                     </div>
-                                    <div class="px-4 py-2 bg-gray-500/5 flex gap-2" x-show="bit.tags && bit.tags.length">
+                                    <div class="px-4 py-2 bg-gray-500/5 flex gap-2"
+                                        x-show="bit.tags && bit.tags.length">
                                         <template x-for="tag in (bit.tags || [])" :key="tag">
                                             <span
                                                 class="text-[9px] px-1.5 py-0.5 rounded border border-gray-500/20 theme-text-muted"
@@ -1065,7 +1084,8 @@
                 <!-- Standard List View (Focus Mode) -->
                 <div class="flex-1 overflow-y-auto p-6 space-y-2 scrollbar-thumb-gray-800 scrollbar-track-transparent"
                     x-show="!standupMode && viewMode === 'focus'">
-                    <div class="flex flex-wrap items-center gap-2 pb-2" x-data="{ counts: getStatusCountsForSelectedDate() }"
+                    <div class="flex flex-wrap items-center gap-2 pb-2"
+                        x-data="{ counts: getStatusCountsForSelectedDate() }"
                         x-effect="counts = getStatusCountsForSelectedDate()">
                         <span class="text-[10px] uppercase tracking-widest opacity-50">Status</span>
                         <button @click="statusFilter = 'all'" class="px-2 py-0.5 text-[10px] rounded border"
@@ -1107,8 +1127,7 @@
                     </div>
 
                     <template x-if="getNextAction()">
-                        <div x-data="{ next: getNextAction() }"
-                            class="p-3 rounded-lg border transition-all"
+                        <div x-data="{ next: getNextAction() }" class="p-3 rounded-lg border transition-all"
                             :class="theme === 'dark' ? 'bg-amber-500/10 border-amber-500/30' : 'bg-amber-50 border-amber-200'">
                             <div class="flex items-center justify-between gap-3">
                                 <div class="min-w-0">
@@ -1116,8 +1135,7 @@
                                     <div class="text-sm font-semibold truncate" x-text="next.title"></div>
                                     <div class="text-[11px] opacity-70 truncate" x-text="next.description"></div>
                                 </div>
-                                <button @click="setNextAction(next)"
-                                    class="px-2 py-1 text-[10px] rounded border"
+                                <button @click="setNextAction(next)" class="px-2 py-1 text-[10px] rounded border"
                                     :class="theme === 'dark' ? 'border-amber-500/30 text-amber-300 hover:bg-amber-500/10' : 'border-amber-300 text-amber-700 hover:bg-amber-100'">
                                     Clear
                                 </button>
@@ -1126,16 +1144,23 @@
                     </template>
 
                     <template x-for="goal in getDailyFocusGoals()" :key="goal.id">
-                        <div class="group p-3 rounded-lg border transition-all"
-                            @click="selectedGoalId = goal.id"
-                            :class="[goal.completed ? 'opacity-70 hover:opacity-85' : '', goal.cancelled ? 'opacity-40 line-through' : '', (isRolledOver(goal) && !goal.completed && !goal.cancelled) ? getRolledOverColor() : '', theme === 'dark' ? 'bg-gray-900/40 border-gray-800 hover:border-emerald-500/30 hover:bg-gray-900/60' : 'bg-white border-slate-200 hover:border-emerald-400 hover:bg-slate-50', goal.id === selectedGoalId ? 'ring-1 ring-indigo-500/40' : '']">
+                        <!-- Task Card -->
+                        <div class="group p-3 rounded-lg border transition-all cursor-pointer" @click="openDetail(goal)"
+                            :class="[
+                                goal.id === selectedGoalId ? 'ring-1 ring-indigo-500/40' : '',
+                                (isRolledOver(goal) && !goal.completed && !goal.cancelled) 
+                                    ? (theme === 'dark' ? 'bg-orange-500/15 border-orange-500/50 hover:bg-orange-500/20 hover:border-orange-500/60' : 'bg-orange-50 border-orange-300 hover:bg-orange-100 hover:border-orange-400')
+                                    : (theme === 'dark' ? 'bg-gray-900/30 border-gray-800 hover:border-indigo-500/30' : 'bg-white border-slate-200 hover:border-indigo-400')
+                            ]">
 
                             <div class="flex items-start gap-4">
                                 <!-- Checkbox -->
-                                <button @click="toggleComplete(goal)" class="mt-1 shrink-0 transition-colors p-1"
-                                    :class="[goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-400'))]">
+                                <button @click.stop="toggleComplete(goal)"
+                                    :class="[goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-400'))]"
+                                    class="mt-1 shrink-0 transition-colors p-1">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <circle x-show="!goal.completed && !goal.inProgress" cx="12" cy="12" r="9" stroke-width="2"></circle>
+                                        <circle x-show="!goal.completed && !goal.inProgress" cx="12" cy="12" r="9"
+                                            stroke-width="2"></circle>
                                         <path x-show="goal.inProgress" stroke-linecap="round" stroke-linejoin="round"
                                             stroke-width="2.5" d="M12 6v12M6 12h12"></path>
                                         <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round"
@@ -1144,18 +1169,19 @@
                                 </button>
 
                                 <!-- Content -->
-                                <div class="flex-1 min-w-0 space-y-1">
+                                <div class="flex-1 min-w-0 space-y-1" @click.stop>
                                     <div class="flex items-center gap-2">
                                         <input type="text" x-model="goal.title" @keydown.enter="addGoal('daily')"
                                             @focus="selectedGoalId = goal.id"
                                             class="bg-transparent w-full focus:outline-none text-base font-medium placeholder-gray-600"
-                                            :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-200' : 'text-slate-800'))"
+                                            :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (isRolledOver(goal) && !goal.completed && !goal.cancelled ? (theme === 'dark' ? 'text-orange-200 font-semibold' : 'text-orange-800 font-semibold') : (theme === 'dark' ? 'text-gray-200' : 'text-slate-800')))"
                                             placeholder="What needs to be done?">
-                                        
+
                                         <!-- Rolled Over Badge -->
                                         <template x-if="isRolledOver(goal) && !goal.completed && !goal.cancelled">
-                                            <span class="text-[10px] px-2 py-1 rounded border border-amber-500/40 bg-amber-500/10 text-amber-600 font-medium whitespace-nowrap"
-                                                :class="theme === 'dark' ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'"
+                                            <span
+                                                class="text-[10px] px-2.5 py-1.5 rounded border font-bold whitespace-nowrap"
+                                                :class="theme === 'dark' ? 'border-orange-500/60 bg-orange-500/25 text-orange-200' : 'border-orange-500/60 bg-orange-100 text-orange-700'"
                                                 :title="'Rolled over from ' + goal.rolledOverFrom">
                                                 ↻ Rollover
                                             </span>
@@ -1164,10 +1190,11 @@
 
                                     <!-- Meta Row (Date/Tags/Link) -->
                                     <div class="flex flex-wrap items-center gap-3 text-xs mt-1"
-                                        :class="theme === 'dark' ? 'text-gray-500' : 'text-slate-400'">
+                                        :class="(isRolledOver(goal) && !goal.completed && !goal.cancelled) ? (theme === 'dark' ? 'text-orange-400/70' : 'text-orange-600/70') : (theme === 'dark' ? 'text-gray-500' : 'text-slate-400')">
 
                                         <!-- Created Date Badge -->
-                                        <div class="flex items-center gap-1" :title="'Created: ' + goal.createdDate">
+                                        <div class="flex items-center gap-1" :title="'Created: ' + goal.createdDate"
+                                            :class="isRolledOver(goal) && !goal.completed && !goal.cancelled ? (theme === 'dark' ? 'opacity-70' : 'opacity-80') : ''">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
@@ -1179,8 +1206,10 @@
                                         <!-- Current Date Badge -->
                                         <template x-if="goal.date !== goal.createdDate">
                                             <div class="flex items-center gap-1" :title="'Active on: ' + goal.date">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
                                                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                                                     </path>
                                                 </svg>
@@ -1239,7 +1268,8 @@
                                                     x-text="getParentDetails(goal.parentId).title"></span>
                                             </div>
                                         </template>
-                                        <template x-if="goal.quarterlyParentId && getParentDetails(goal.quarterlyParentId)">
+                                        <template
+                                            x-if="goal.quarterlyParentId && getParentDetails(goal.quarterlyParentId)">
                                             <div class="flex items-center gap-1 text-amber-500/70 pl-2 border-l border-gray-800"
                                                 title="Linked to quarterly goal">
                                                 <span class="text-[10px]">Q:</span>
@@ -1256,58 +1286,51 @@
 
                                 <!-- Actions -->
                                 <div class="flex items-center gap-1 p-1 shrink-0">
-                                    <button @click="setNextAction(goal)"
+                                    <button @click.stop="setNextAction(goal)"
                                         class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded"
                                         :class="goal.isNextAction
                                             ? 'text-amber-500'
-                                            : (theme === 'dark' ? 'text-gray-600 hover:text-amber-400' : 'text-slate-400 hover:text-amber-500')"
-                                        title="Set as Next Action">
+                                            : (theme === 'dark' ? 'text-gray-600 hover:text-amber-400' : 'text-slate-400 hover:text-amber-500')" title="Set as Next Action">
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                                            <path
+                                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                                            </path>
                                         </svg>
                                     </button>
-                                    <button @click="openDetail(goal)"
-                                        class="p-0.5 rounded hover:bg-emerald-500/10"
+                                    <button @click.stop="openDetail(goal)" class="p-0.5 rounded hover:bg-emerald-500/10"
                                         :class="theme==='dark'?'text-gray-500 hover:text-emerald-400':'text-slate-400 hover:text-emerald-500'"
                                         title="View Details">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"></path>
-                                            <circle cx="12" cy="12" r="3" stroke-linecap="round"
-                                                stroke-linejoin="round" stroke-width="2"></circle>
+                                            <circle cx="12" cy="12" r="3" stroke-linecap="round" stroke-linejoin="round"
+                                                stroke-width="2"></circle>
                                         </svg>
                                     </button>
                                     <!-- Cancel/Reopen Button -->
-                                    <button x-show="!goal.cancelled && !goal.completed" @click="cancelTask(goal.id)" 
+                                    <button x-show="!goal.cancelled && !goal.completed"
+                                        @click.stop="cancelTask(goal.id)"
                                         class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded"
                                         :class="theme === 'dark' ? 'text-gray-600 hover:text-red-400' : 'text-slate-400 hover:text-red-500'"
                                         title="Cancel this task">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                    <button x-show="goal.cancelled" @click="reopenTask(goal.id)"
-                                        class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded text-amber-500 hover:text-amber-400"
-                                        title="Reopen this task">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                        </svg>
-                                    </button>
-                                    <button x-show="deletingId !== goal.id" @click="deletingId = goal.id"
-                                        class="text-gray-700 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
                                     </button>
-                                    <button x-show="deletingId === goal.id" @click="deleteGoal(goal.id)"
-                                        class="text-xs bg-red-900/50 text-red-200 px-2 py-0.5 rounded hover:bg-red-800 border border-red-700 whitespace-nowrap">
-                                        Confirm
+                                    <button x-show="goal.cancelled" @click.stop="reopenTask(goal.id)"
+                                        class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded text-amber-500 hover:text-amber-400"
+                                        title="Reopen this task">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                            </path>
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
-                        </div>
                     </template>
+
                     <div x-show="getDailyFocusGoals().length === 0" class="text-center py-12 text-gray-700 opacity-50">
                         <p class="text-sm">No tasks for today. Press 'Enter' or click Add Task.</p>
                     </div>
@@ -1316,109 +1339,110 @@
                 <!-- Focus / Notification Panel (moved to header bell) -->
             </div>
         </div>
-<!-- Daily Bits Sidebar -->
-<div x-show="isCompactLayout && showBits" x-cloak
-    class="fixed inset-0 z-30"
-    :class="theme === 'dark' ? 'bg-gray-950/60' : 'bg-slate-900/20'"
-    @click="showBits = false"></div>
-<div x-show="showBits" x-cloak class="w-80 border-l flex flex-col transition-all shrink-0"
-    :class="[
+        <!-- Daily Bits Sidebar -->
+        <div x-show="isCompactLayout && showBits" x-cloak class="fixed inset-0 z-30"
+            :class="theme === 'dark' ? 'bg-gray-950/60' : 'bg-slate-900/20'" @click="showBits = false"></div>
+        <div x-show="showBits" x-cloak class="w-80 border-l flex flex-col transition-all shrink-0" :class="[
         theme === 'dark' ? 'bg-gray-900/20 border-gray-800' : 'bg-slate-50 border-slate-200',
         isCompactLayout ? 'fixed inset-y-0 right-0 z-40 w-80 max-w-[85vw] shadow-2xl' : ''
     ]">
-    <!-- Bits Header -->
-    <div class="px-4 py-3 border-b flex items-center justify-between shrink-0"
-        :class="theme === 'dark' ? 'border-gray-800 bg-gray-900/40' : 'border-slate-200 bg-white'">
-        <div class="flex items-center gap-2">
-            <span class="text-[10px] font-bold uppercase tracking-widest opacity-50">Daily Bits</span>
-            <span class="px-1.5 py-0.5 rounded-full text-[9px]"
-                :class="theme === 'dark' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-100 text-indigo-700'"
-                x-text="getBitsByDay().length"></span>
-        </div>
-        <button @click="showBits = false"
-            :class="theme === 'dark' ? 'text-gray-500 hover:text-gray-300' : 'text-slate-500 hover:text-slate-700'">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-        </button>
-    </div>
+            <!-- Bits Header -->
+            <div class="px-4 py-3 border-b flex items-center justify-between shrink-0"
+                :class="theme === 'dark' ? 'border-gray-800 bg-gray-900/40' : 'border-slate-200 bg-white'">
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-50">Daily Bits</span>
+                    <span class="px-1.5 py-0.5 rounded-full text-[9px]"
+                        :class="theme === 'dark' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-100 text-indigo-700'"
+                        x-text="getBitsByDay().length"></span>
+                </div>
+                <button @click="showBits = false"
+                    :class="theme === 'dark' ? 'text-gray-500 hover:text-gray-300' : 'text-slate-500 hover:text-slate-700'">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
 
-    <!-- Quick Entry -->
-    <div class="px-4 py-2 border-b space-y-2" :class="theme === 'dark' ? 'border-gray-800' : 'border-slate-200'">
-        <input type="text" x-model="newBitTitle"
-            placeholder="Title (optional)"
-            class="w-full text-[11px] border rounded px-2 py-1.5 focus:ring-1 focus:ring-indigo-500 placeholder-gray-600"
-            :class="theme === 'dark' ? 'bg-transparent text-gray-300 border-gray-700' : 'bg-white text-slate-800 border-slate-300 placeholder-slate-400'">
-        <textarea x-model="newBitText" rows="3" @keydown="handleQuickBitKeydown($event, $el)"
-            @input="autoResizeTextarea($el)"
-            placeholder="Markdown / code (Enter for new lines, Ctrl+Enter to add)"
-            class="w-full text-[11px] border rounded px-2 py-1.5 focus:ring-1 focus:ring-indigo-500 placeholder-gray-600 resize-none overflow-hidden"
-            :class="theme === 'dark' ? 'bg-transparent text-gray-300 border-gray-700' : 'bg-white text-slate-800 border-slate-300 placeholder-slate-400'"></textarea>
-    </div>
+            <!-- Quick Entry -->
+            <div class="px-4 py-2 border-b space-y-2"
+                :class="theme === 'dark' ? 'border-gray-800' : 'border-slate-200'">
+                <input type="text" x-model="newBitTitle" placeholder="Title (optional)"
+                    class="w-full text-[11px] border rounded px-2 py-1.5 focus:ring-1 focus:ring-indigo-500 placeholder-gray-600"
+                    :class="theme === 'dark' ? 'bg-transparent text-gray-300 border-gray-700' : 'bg-white text-slate-800 border-slate-300 placeholder-slate-400'">
+                <textarea x-model="newBitText" rows="3" @keydown="handleQuickBitKeydown($event, $el)"
+                    @input="autoResizeTextarea($el)"
+                    placeholder="Markdown / code (Enter for new lines, Ctrl+Enter to add)"
+                    class="w-full text-[11px] border rounded px-2 py-1.5 focus:ring-1 focus:ring-indigo-500 placeholder-gray-600 resize-none overflow-hidden"
+                    :class="theme === 'dark' ? 'bg-transparent text-gray-300 border-gray-700' : 'bg-white text-slate-800 border-slate-300 placeholder-slate-400'"></textarea>
+            </div>
 
-    <!-- Bits List (Jupyter Style) -->
-    <div class="flex-1 overflow-y-auto px-4 py-3 space-y-2 scrollbar-thin">
-        <template x-for="bit in getBitsByDay()" :key="bit.id">
-            <div class="group relative">
-                <!-- Cell Index/Line -->
-                <div class="absolute -left-6 top-2 w-5 text-[9px] font-mono opacity-20 text-right"
-                    x-text="'[' + ($index + 1) + ']'"></div>
+            <!-- Bits List (Jupyter Style) -->
+            <div class="flex-1 overflow-y-auto px-4 py-3 space-y-2 scrollbar-thin">
+                <template x-for="bit in getBitsByDay()" :key="bit.id">
+                    <div class="group relative">
+                        <!-- Cell Index/Line -->
+                        <div class="absolute -left-6 top-2 w-5 text-[9px] font-mono opacity-20 text-right"
+                            x-text="'[' + ($index + 1) + ']'"></div>
 
-                <!-- Bit Content -->
-                <div class="rounded border transition-all relative" :class="[
+                        <!-- Bit Content -->
+                        <div class="rounded border transition-all relative" :class="[
                                 bit.isKB ? (theme === 'dark' ? 'border-amber-500/30 bg-amber-500/5' : 'border-amber-500/20 bg-amber-50') : (theme === 'dark' ? 'border-gray-800 bg-gray-950/50' : 'border-slate-200 bg-white'),
                                 'hover:border-indigo-500/30'
                             ]">
-                    <div class="p-2">
-                        <input type="text" x-model="bit.title"
-                            class="w-full bg-transparent border-none p-0 focus:ring-0 text-[11px] font-medium"
-                            :class="theme === 'dark' ? 'text-gray-200' : 'text-slate-800'" placeholder="Title...">
+                            <div class="p-2">
+                                <input type="text" x-model="bit.title"
+                                    class="w-full bg-transparent border-none p-0 focus:ring-0 text-[11px] font-medium"
+                                    :class="theme === 'dark' ? 'text-gray-200' : 'text-slate-800'"
+                                    placeholder="Title...">
 
-                        <textarea x-model="bit.description" rows="1"
-                            @input="handleBitDescriptionInput(bit, $el)"
-                            class="w-full bg-transparent border-none p-0 focus:ring-0 text-[10px] font-mono mt-1 opacity-70 resize-none overflow-hidden"
-                            :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'"
-                            placeholder="Code, query, or details..."></textarea>
+                                <textarea x-model="bit.description" rows="1"
+                                    @input="handleBitDescriptionInput(bit, $el)"
+                                    class="w-full bg-transparent border-none p-0 focus:ring-0 text-[10px] font-mono mt-1 opacity-70 resize-none overflow-hidden"
+                                    :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'"
+                                    placeholder="Code, query, or details..."></textarea>
+                            </div>
+
+                            <!-- Actions floating on hover -->
+                            <div
+                                class="absolute right-1 top-1 opacity-0 group-hover:opacity-100 flex items-center gap-0.5 transition-opacity">
+                                <button @click="toggleBitKB(bit)" class="p-0.5 rounded hover:bg-amber-500/10"
+                                    :title="bit.isKB ? 'Remove from KB' : 'Pin to KB'"
+                                    :class="bit.isKB ? 'text-amber-500' : 'text-gray-500'">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3.5 7 3.5V5c0-1.1-.9-2-2-2z"></path>
+                                    </svg>
+                                </button>
+                                <button @click="convertBitToTask(bit)"
+                                    class="p-0.5 rounded hover:bg-emerald-500/10 text-gray-500 hover:text-emerald-500"
+                                    title="Convert to Task">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                </button>
+                                <button @click="deleteGoal(bit.id)"
+                                    class="p-0.5 rounded hover:bg-red-500/10 text-gray-500 hover:text-red-500"
+                                    title="Delete">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- KB Indicator -->
+                            <div x-show="bit.isKB"
+                                class="absolute left-0 top-0 bottom-0 w-0.5 bg-amber-500/50 rounded-l"></div>
+                        </div>
                     </div>
-
-                    <!-- Actions floating on hover -->
-                    <div
-                        class="absolute right-1 top-1 opacity-0 group-hover:opacity-100 flex items-center gap-0.5 transition-opacity">
-                        <button @click="toggleBitKB(bit)" class="p-0.5 rounded hover:bg-amber-500/10"
-                            :title="bit.isKB ? 'Remove from KB' : 'Pin to KB'"
-                            :class="bit.isKB ? 'text-amber-500' : 'text-gray-500'">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3.5 7 3.5V5c0-1.1-.9-2-2-2z"></path>
-                            </svg>
-                        </button>
-                        <button @click="convertBitToTask(bit)"
-                            class="p-0.5 rounded hover:bg-emerald-500/10 text-gray-500 hover:text-emerald-500"
-                            title="Convert to Task">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4"></path>
-                            </svg>
-                        </button>
-                        <button @click="deleteGoal(bit.id)"
-                            class="p-0.5 rounded hover:bg-red-500/10 text-gray-500 hover:text-red-500" title="Delete">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- KB Indicator -->
-                    <div x-show="bit.isKB" class="absolute left-0 top-0 bottom-0 w-0.5 bg-amber-500/50 rounded-l"></div>
+                </template>
+                <div x-show="getBitsByDay().length === 0" class="text-center py-12 opacity-20">
+                    <p class="text-[9px] uppercase tracking-widest italic">Bits appear here</p>
                 </div>
             </div>
-        </template>
-        <div x-show="getBitsByDay().length === 0" class="text-center py-12 opacity-20">
-            <p class="text-[9px] uppercase tracking-widest italic">Bits appear here</p>
         </div>
-    </div>
-</div>
-</div>
+        </div>
     </main>
 
     <!-- Metrics Modal -->
@@ -1626,7 +1650,8 @@
                             <button @click="toggleComplete(editingGoal)" class="transition-colors"
                                 :class="editingGoal.completed ? 'text-emerald-500' : (editingGoal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-400'))">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <circle x-show="!editingGoal.completed && !editingGoal.inProgress" cx="12" cy="12" r="9" stroke-width="2"></circle>
+                                    <circle x-show="!editingGoal.completed && !editingGoal.inProgress" cx="12" cy="12"
+                                        r="9" stroke-width="2"></circle>
                                     <path x-show="editingGoal.inProgress" stroke-linecap="round" stroke-linejoin="round"
                                         stroke-width="2.5" d="M12 6v12M6 12h12"></path>
                                     <path x-show="editingGoal.completed" stroke-linecap="round" stroke-linejoin="round"
@@ -1916,8 +1941,9 @@
 
                         // Daily rollover: uncompleted tasks from previous days
                         if (g.type === 'daily' && g.date < today) {
+                            const originalDate = g.date; // Save original date before changing
                             g.date = today;
-                            g.rolledOverFrom = g.date < today ? g.activeDates[g.activeDates.length - 1] : null;
+                            g.rolledOverFrom = originalDate; // Use the saved original date
                             if (!g.activeDates.includes(today)) {
                                 g.activeDates.push(today);
                             }
@@ -1949,7 +1975,11 @@
 
                 isRolledOver(goal) {
                     // A task is rolled over if its rolledOverFrom is set
-                    return goal.rolledOverFrom !== null && goal.rolledOverFrom !== undefined;
+                    const result = goal.rolledOverFrom !== null && goal.rolledOverFrom !== undefined;
+                    if (result) {
+                        console.log(`Task "${goal.title}" is rolled over from ${goal.rolledOverFrom}`);
+                    }
+                    return result;
                 },
 
                 isCurrentDay(goal) {
@@ -1959,15 +1989,16 @@
 
                 getRolledOverColor() {
                     // Different visual color for rolled-over tasks
-                    return this.theme === 'dark' 
-                        ? 'opacity-60 border-amber-500/40 bg-amber-500/5' 
-                        : 'opacity-75 border-amber-300/60 bg-amber-50';
+                    // Note: This function is deprecated - use inline class bindings instead
+                    return this.theme === 'dark'
+                        ? 'bg-orange-500/15 border-orange-500/40'
+                        : 'bg-orange-50 border-orange-300';
                 },
 
                 cancelTask(goalId) {
                     const goal = this.goals.find(g => g.id === goalId);
                     if (!goal) return;
-                    
+
                     goal.cancelled = true;
                     goal.completed = false;
                     goal.inProgress = false;
@@ -1977,7 +2008,7 @@
                 reopenTask(goalId) {
                     const goal = this.goals.find(g => g.id === goalId);
                     if (!goal) return;
-                    
+
                     goal.cancelled = false;
                 },
 
@@ -2821,9 +2852,9 @@
 
                         // Today's tasks
                         { "id": "day-1", "type": "daily", "title": "Design User Schema", "completed": true, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Postgres schema for users.", "tags": ["db", "design"], "date": tStr },
-                        { "id": "day-2", "type": "daily", "title": "Draft OIDC Discovery Doc", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Define /.well-known endpoints.", "tags": ["oidc"], "date": tStr },
-                        { "id": "day-3", "type": "daily", "title": "Client Credentials Flow", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Token endpoint validations.", "tags": ["oauth"], "date": tStr },
-                        { "id": "day-4", "type": "daily", "title": "Unit Tests for User Service", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Table-driven tests.", "tags": ["testing"], "date": tStr },
+                        { "id": "day-2", "type": "daily", "title": "Draft OIDC Discovery Doc", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": yStr, "description": "Define /.well-known endpoints.", "tags": ["oidc"], "date": yStr },
+                        { "id": "day-3", "type": "daily", "title": "Client Credentials Flow", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": pStr, "description": "Token endpoint validations.", "tags": ["oauth"], "date": pStr },
+                        { "id": "day-4", "type": "daily", "title": "Unit Tests for User Service", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": yStr, "description": "Table-driven tests.", "tags": ["testing"], "date": yStr },
                         { "id": "day-5", "type": "daily", "title": "Define JWT Claims", "completed": false, "parentId": "sprint-2", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Identify standard and custom claims for access and ID tokens.", "tags": ["oidc", "design"], "date": tStr },
                         { "id": "day-6", "type": "daily", "title": "Rotate Signing Keys", "completed": false, "parentId": "sprint-2", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Implement JWKS rotation and update discovery endpoints.", "tags": ["crypto", "keys"], "date": tStr },
                         { "id": "day-7", "type": "daily", "title": "Audit Event Schema", "completed": false, "parentId": "sprint-3", "quarterlyParentId": "q1-2", "createdAt": tStr, "description": "Define event payloads for login, token issuance, and admin actions.", "tags": ["audit", "schema"], "date": tStr },
@@ -2844,6 +2875,8 @@
                         if (typeof g.inProgress === 'undefined') g.inProgress = false;
                         if (typeof g.statusTag === 'undefined') g.statusTag = '';
                         if (typeof g.isNextAction === 'undefined') g.isNextAction = false;
+                        if (typeof g.activeDates === 'undefined') g.activeDates = [g.date || getLocalDateKey()];
+                        if (typeof g.rolledOverFrom === 'undefined') g.rolledOverFrom = null;
                     });
                     this.selectedDate = tStr;
                     this.checkRollover(); // Run rollover immediately on load
