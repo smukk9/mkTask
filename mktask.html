@@ -285,6 +285,28 @@
                     </div>
                 </div>
             </div>
+
+            <div class="h-5 w-px theme-border border-l mx-1"></div>
+
+            <!-- View Mode Toggle -->
+            <div class="flex items-center p-1 rounded-lg border"
+                :class="theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-white border-slate-200'">
+                <button @click="standupMode = false; viewMode = 'focus'"
+                    class="px-3 py-1 text-xs rounded-md transition-all"
+                    :class="!standupMode && viewMode === 'focus' ? (theme === 'dark' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-indigo-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
+                    Focus
+                </button>
+                <button @click="standupMode = true; viewMode = 'focus'"
+                    class="px-3 py-1 text-xs rounded-md transition-all"
+                    :class="standupMode ? (theme === 'dark' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-indigo-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
+                    Standup
+                </button>
+                <button @click="viewMode = 'kb'; standupMode = false"
+                    class="px-3 py-1 text-xs rounded-md transition-all"
+                    :class="viewMode === 'kb' ? (theme === 'dark' ? 'bg-amber-600 text-white shadow-lg' : 'bg-amber-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
+                    KB
+                </button>
+            </div>
         </div>
 
         <div class="flex items-center gap-3">
@@ -501,8 +523,16 @@
         </div>
 
         <!-- Left Column: Strategy (Quarterly & Sprint Stacked) -->
-        <div class="w-[320px] flex flex-col border-r shrink-0 transition-colors"
-            :class="theme === 'dark' ? 'border-gray-800 bg-gray-950' : 'border-slate-200 bg-slate-50'">
+        <div x-show="isCompactLayout && showStrategyPanel" x-cloak
+            class="fixed inset-0 z-30"
+            :class="theme === 'dark' ? 'bg-gray-950/60' : 'bg-slate-900/20'"
+            @click="showStrategyPanel = false"></div>
+        <div x-show="!isCompactLayout || showStrategyPanel" x-cloak
+            class="w-[320px] flex flex-col border-r shrink-0 transition-colors"
+            :class="[
+                theme === 'dark' ? 'border-gray-800 bg-gray-950' : 'border-slate-200 bg-slate-50',
+                isCompactLayout ? 'fixed inset-y-0 left-0 z-40 w-[320px] shadow-2xl' : ''
+            ]">
 
             <!-- Quarterly Section (Top Half) -->
             <section class="flex-1 flex flex-col min-h-0 border-b"
@@ -743,6 +773,17 @@
                         </h2>
                         <div class="flex items-center gap-1 ml-4 border-l pl-4"
                             :class="[theme === 'dark' ? 'border-gray-800' : 'border-slate-200', standupMode ? 'ml-0 pl-0 border-l-0 sm:ml-4 sm:pl-4 sm:border-l' : '']">
+                            <button x-show="isCompactLayout" @click="showStrategyPanel = !showStrategyPanel"
+                                class="px-2 py-0.5 text-[10px] rounded border transition-all"
+                                :class="showStrategyPanel
+                                    ? (theme === 'dark'
+                                        ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
+                                        : 'bg-emerald-50 border-emerald-300 text-emerald-600')
+                                    : (theme === 'dark'
+                                        ? 'border-gray-800 text-gray-500'
+                                        : 'border-slate-300 text-slate-500')">
+                                Strategy
+                            </button>
                             <button @click="showBits = !showBits"
                                 class="px-2 py-0.5 text-[10px] rounded border transition-all"
                                 :class="showBits
@@ -758,25 +799,6 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
-                        <div class="flex items-center p-1 rounded-lg border mr-2"
-                            :class="[theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-white border-slate-200', standupMode ? 'mr-0 sm:mr-2' : '']">
-                            <button @click="standupMode = false; viewMode = 'focus'"
-                                class="px-3 py-1 text-xs rounded-md transition-all"
-                                :class="!standupMode && viewMode === 'focus' ? (theme === 'dark' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-indigo-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
-                                Focus
-                            </button>
-                            <button @click="standupMode = true; viewMode = 'focus'"
-                                class="px-3 py-1 text-xs rounded-md transition-all"
-                                :class="standupMode ? (theme === 'dark' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-indigo-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
-                                Standup
-                            </button>
-                            <button @click="viewMode = 'kb'; standupMode = false"
-                                class="px-3 py-1 text-xs rounded-md transition-all"
-                                :class="viewMode === 'kb' ? (theme === 'dark' ? 'bg-amber-600 text-white shadow-lg' : 'bg-amber-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
-                                KB
-                            </button>
-                        </div>
-
                         <button x-show="standupMode" @click="generateStandup()"
                             class="px-3 py-1.5 rounded transition-colors border text-sm font-medium"
                             :class="theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 border-gray-700' : 'bg-white hover:bg-slate-100 text-slate-600 border-slate-200'">
@@ -1284,8 +1306,15 @@
             </div>
         </div>
 <!-- Daily Bits Sidebar -->
-<div x-show="showBits" class="w-80 border-l flex flex-col transition-all shrink-0"
-    :class="theme === 'dark' ? 'bg-gray-900/20 border-gray-800' : 'bg-slate-50 border-slate-200'">
+<div x-show="isCompactLayout && showBits" x-cloak
+    class="fixed inset-0 z-30"
+    :class="theme === 'dark' ? 'bg-gray-950/60' : 'bg-slate-900/20'"
+    @click="showBits = false"></div>
+<div x-show="showBits" x-cloak class="w-80 border-l flex flex-col transition-all shrink-0"
+    :class="[
+        theme === 'dark' ? 'bg-gray-900/20 border-gray-800' : 'bg-slate-50 border-slate-200',
+        isCompactLayout ? 'fixed inset-y-0 right-0 z-40 w-80 max-w-[85vw] shadow-2xl' : ''
+    ]">
     <!-- Bits Header -->
     <div class="px-4 py-3 border-b flex items-center justify-between shrink-0"
         :class="theme === 'dark' ? 'border-gray-800 bg-gray-900/40' : 'border-slate-200 bg-white'">
@@ -1768,6 +1797,9 @@
                 showCalendar: false,
                 calendarDate: new Date(), // Month being viewed
                 showBits: true, // Show Daily Bits by default
+                isCompactLayout: false,
+                showStrategyPanel: false,
+                previousShowBits: true,
                 newBitText: '', // For quick entry
                 newBitTitle: '', // Quick entry title
                 viewMode: 'focus', // 'focus', 'kb'
@@ -1847,7 +1879,28 @@
                         this.showOnboarding = true;
                     }
 
+                    this.updateLayoutMode();
+                    window.addEventListener('resize', () => this.updateLayoutMode());
+
                     this.checkRollover();
+                },
+
+                updateLayoutMode() {
+                    const compact = window.innerWidth < 1200;
+                    if (compact === this.isCompactLayout) return;
+                    this.isCompactLayout = compact;
+
+                    if (compact) {
+                        this.previousShowBits = this.showBits;
+                        this.showBits = false;
+                        this.showStrategyPanel = false;
+                        return;
+                    }
+
+                    if (typeof this.previousShowBits === 'boolean') {
+                        this.showBits = this.previousShowBits;
+                    }
+                    this.showStrategyPanel = false;
                 },
 
                 checkRollover() {
