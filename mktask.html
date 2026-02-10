@@ -852,7 +852,7 @@
                             <div class="flex-1 overflow-y-auto p-3 space-y-2">
                                 <template x-for="goal in getGoalsByDay(0)" :key="goal.id">
                                     <div class="group p-2 rounded border transition-colors"
-                                        :class=" theme === 'dark' ? 'border-gray-800 bg-gray-900/60 hover:border-emerald-500/30' : 'border-slate-200 bg-white hover:border-emerald-400'">
+                                        :class="[(isRolledOver(goal) && !goal.completed && !goal.cancelled) ? getRolledOverColor() : '', goal.cancelled ? 'opacity-40 line-through' : '', theme === 'dark' ? 'border-gray-800 bg-gray-900/60 hover:border-emerald-500/30' : 'border-slate-200 bg-white hover:border-emerald-400']">
                                         <div class="flex items-start gap-2">
                                             <button @click="toggleComplete(goal)" class="mt-0.5"
                                                 :class="goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme==='dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-500 hover:text-blue-400'))">
@@ -883,6 +883,13 @@
                                                         </svg>
                                                     </button>
                                                 </div>
+                                                <template x-if="isRolledOver(goal) && !goal.completed && !goal.cancelled">
+                                                    <p class="text-[10px] mt-0.5 px-1.5 py-0.5 rounded border border-amber-500/40 bg-amber-500/10 text-amber-600 font-medium"
+                                                        :class="theme === 'dark' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-amber-100 text-amber-700 border-amber-300'"
+                                                        :title="'Rolled over from ' + goal.rolledOverFrom">
+                                                        ↻ from <span x-text="formatDate(goal.rolledOverFrom)"></span>
+                                                    </p>
+                                                </template>
                                             </div>
                                         </div>
                                     </div>
@@ -1121,7 +1128,7 @@
                     <template x-for="goal in getDailyFocusGoals()" :key="goal.id">
                         <div class="group p-3 rounded-lg border transition-all"
                             @click="selectedGoalId = goal.id"
-                            :class="[goal.completed ? 'opacity-70 hover:opacity-85' : '', theme === 'dark' ? 'bg-gray-900/40 border-gray-800 hover:border-emerald-500/30 hover:bg-gray-900/60' : 'bg-white border-slate-200 hover:border-emerald-400 hover:bg-slate-50', goal.id === selectedGoalId ? 'ring-1 ring-indigo-500/40' : '']">
+                            :class="[goal.completed ? 'opacity-70 hover:opacity-85' : '', goal.cancelled ? 'opacity-40 line-through' : '', (isRolledOver(goal) && !goal.completed && !goal.cancelled) ? getRolledOverColor() : '', theme === 'dark' ? 'bg-gray-900/40 border-gray-800 hover:border-emerald-500/30 hover:bg-gray-900/60' : 'bg-white border-slate-200 hover:border-emerald-400 hover:bg-slate-50', goal.id === selectedGoalId ? 'ring-1 ring-indigo-500/40' : '']">
 
                             <div class="flex items-start gap-4">
                                 <!-- Checkbox -->
@@ -1138,25 +1145,48 @@
 
                                 <!-- Content -->
                                 <div class="flex-1 min-w-0 space-y-1">
-                                    <input type="text" x-model="goal.title" @keydown.enter="addGoal('daily')"
-                                        @focus="selectedGoalId = goal.id"
-                                        class="bg-transparent w-full focus:outline-none text-base font-medium placeholder-gray-600"
-                                        :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-200' : 'text-slate-800'))"
-                                        placeholder="What needs to be done?">
+                                    <div class="flex items-center gap-2">
+                                        <input type="text" x-model="goal.title" @keydown.enter="addGoal('daily')"
+                                            @focus="selectedGoalId = goal.id"
+                                            class="bg-transparent w-full focus:outline-none text-base font-medium placeholder-gray-600"
+                                            :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-200' : 'text-slate-800'))"
+                                            placeholder="What needs to be done?">
+                                        
+                                        <!-- Rolled Over Badge -->
+                                        <template x-if="isRolledOver(goal) && !goal.completed && !goal.cancelled">
+                                            <span class="text-[10px] px-2 py-1 rounded border border-amber-500/40 bg-amber-500/10 text-amber-600 font-medium whitespace-nowrap"
+                                                :class="theme === 'dark' ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'"
+                                                :title="'Rolled over from ' + goal.rolledOverFrom">
+                                                ↻ Rollover
+                                            </span>
+                                        </template>
+                                    </div>
 
                                     <!-- Meta Row (Date/Tags/Link) -->
                                     <div class="flex flex-wrap items-center gap-3 text-xs mt-1"
                                         :class="theme === 'dark' ? 'text-gray-500' : 'text-slate-400'">
 
-                                        <!-- Date Badge -->
-                                        <div class="flex items-center gap-1" title="Due Date">
+                                        <!-- Created Date Badge -->
+                                        <div class="flex items-center gap-1" :title="'Created: ' + goal.createdDate">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
                                                 </path>
                                             </svg>
-                                            <span x-text="formatDate(goal.date) || 'Today'"></span>
+                                            <span x-text="formatDate(goal.createdDate) || 'Today'"></span>
                                         </div>
+
+                                        <!-- Current Date Badge -->
+                                        <template x-if="goal.date !== goal.createdDate">
+                                            <div class="flex items-center gap-1" :title="'Active on: ' + goal.date">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                    </path>
+                                                </svg>
+                                                <span x-text="formatDate(goal.date) || 'Today'"></span>
+                                            </div>
+                                        </template>
 
                                         <!-- Tags Badge -->
                                         <template x-if="goal.tags && goal.tags.length > 0">
@@ -1186,7 +1216,14 @@
                                             </span>
                                         </template>
 
-                                        <template x-if="goal.inProgress && !goal.completed">
+                                        <template x-if="goal.cancelled">
+                                            <span
+                                                class="text-[10px] px-1.5 py-0.5 rounded border border-red-500/30 bg-red-500/10 text-red-500">
+                                                Cancelled
+                                            </span>
+                                        </template>
+
+                                        <template x-if="goal.inProgress && !goal.completed && !goal.cancelled">
                                             <span
                                                 class="text-[10px] px-1.5 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-500">
                                                 In Progress
@@ -1238,6 +1275,22 @@
                                                 d="M1.5 12s4-7 10.5-7 10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"></path>
                                             <circle cx="12" cy="12" r="3" stroke-linecap="round"
                                                 stroke-linejoin="round" stroke-width="2"></circle>
+                                        </svg>
+                                    </button>
+                                    <!-- Cancel/Reopen Button -->
+                                    <button x-show="!goal.cancelled && !goal.completed" @click="cancelTask(goal.id)" 
+                                        class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded"
+                                        :class="theme === 'dark' ? 'text-gray-600 hover:text-red-400' : 'text-slate-400 hover:text-red-500'"
+                                        title="Cancel this task">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                    <button x-show="goal.cancelled" @click="reopenTask(goal.id)"
+                                        class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded text-amber-500 hover:text-amber-400"
+                                        title="Reopen this task">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                         </svg>
                                     </button>
                                     <button x-show="deletingId !== goal.id" @click="deletingId = goal.id"
@@ -1778,7 +1831,7 @@
                         try {
                             const data = JSON.parse(saved);
                             this.goals = data.goals || [];
-                            // Migration
+                            // Migration and initialization
                             this.goals.forEach(g => {
                                 if (g.type === 'weekly') g.type = 'sprint';
                                 if (!g.date && g.type === 'daily') {
@@ -1789,8 +1842,20 @@
                                 if (!g.tags) g.tags = [];
                                 if (typeof g.inProgress === 'undefined') g.inProgress = false;
                                 if (typeof g.isNextAction === 'undefined') g.isNextAction = false;
+                                if (typeof g.cancelled === 'undefined') g.cancelled = false;
                                 if (g.type === 'daily' && typeof g.quarterlyParentId === 'undefined') {
                                     g.quarterlyParentId = '';
+                                }
+                                // Initialize rollover tracking
+                                if (!g.createdDate) {
+                                    const createdDate = parseLocalDateKey(g.createdAt);
+                                    g.createdDate = createdDate ? getLocalDateKey(createdDate) : getLocalDateKey();
+                                }
+                                if (!g.activeDates) {
+                                    g.activeDates = [g.createdDate || getLocalDateKey()];
+                                }
+                                if (typeof g.rolledOverFrom === 'undefined') {
+                                    g.rolledOverFrom = null;
                                 }
                                 delete g.time;
                             });
@@ -1842,16 +1907,78 @@
 
                 checkRollover() {
                     const today = this.getTodayDate();
-                    let count = 0;
+                    let dailyCount = 0;
+                    let weeklyCount = 0;
+
                     this.goals.forEach(g => {
-                        if (g.type === 'daily' && !g.completed && g.date && g.date < today) {
+                        // Skip completed, cancelled, or tasks without dates
+                        if (g.completed || g.cancelled || !g.date) return;
+
+                        // Daily rollover: uncompleted tasks from previous days
+                        if (g.type === 'daily' && g.date < today) {
                             g.date = today;
-                            count++;
+                            g.rolledOverFrom = g.date < today ? g.activeDates[g.activeDates.length - 1] : null;
+                            if (!g.activeDates.includes(today)) {
+                                g.activeDates.push(today);
+                            }
+                            dailyCount++;
+                        }
+
+                        // Weekly rollover: uncompleted sprint tasks from previous weeks
+                        if (g.type === 'sprint' && g.date < today) {
+                            // Check if it should roll over to next week
+                            const weekStart = this.getWeekStart(today);
+                            if (g.date < weekStart) {
+                                // Roll over to next week
+                                const nextWeekDate = new Date(today);
+                                nextWeekDate.setDate(nextWeekDate.getDate() + 7 - nextWeekDate.getDay());
+                                g.date = getLocalDateKey(nextWeekDate);
+                                g.rolledOverFrom = g.activeDates[g.activeDates.length - 1];
+                                if (!g.activeDates.includes(g.date)) {
+                                    g.activeDates.push(g.date);
+                                }
+                                weeklyCount++;
+                            }
                         }
                     });
-                    if (count > 0) {
-                        console.log(`Rolled over ${count} uncompleted tasks to today.`);
+
+                    if (dailyCount > 0 || weeklyCount > 0) {
+                        console.log(`Rolled over ${dailyCount} daily + ${weeklyCount} weekly tasks.`);
                     }
+                },
+
+                isRolledOver(goal) {
+                    // A task is rolled over if its rolledOverFrom is set
+                    return goal.rolledOverFrom !== null && goal.rolledOverFrom !== undefined;
+                },
+
+                isCurrentDay(goal) {
+                    // Check if this task is on today's date
+                    return goal.date === this.getTodayDate();
+                },
+
+                getRolledOverColor() {
+                    // Different visual color for rolled-over tasks
+                    return this.theme === 'dark' 
+                        ? 'opacity-60 border-amber-500/40 bg-amber-500/5' 
+                        : 'opacity-75 border-amber-300/60 bg-amber-50';
+                },
+
+                cancelTask(goalId) {
+                    const goal = this.goals.find(g => g.id === goalId);
+                    if (!goal) return;
+                    
+                    goal.cancelled = true;
+                    goal.completed = false;
+                    goal.inProgress = false;
+                    // Keep the creation info for historical reference
+                },
+
+                reopenTask(goalId) {
+                    const goal = this.goals.find(g => g.id === goalId);
+                    if (!goal) return;
+                    
+                    goal.cancelled = false;
                 },
 
                 // Debounced Auto-Save
@@ -2049,6 +2176,14 @@
                     return getLocalDateKey();
                 },
 
+                getWeekStart(dateStr) {
+                    const date = typeof dateStr === 'string' ? parseLocalDateKey(dateStr) : dateStr;
+                    if (!date) return null;
+                    const day = date.getDay();
+                    const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+                    return getLocalDateKey(new Date(date.setDate(diff)));
+                },
+
                 isToday(dateStr) {
                     return dateStr === this.getTodayDate();
                 },
@@ -2147,18 +2282,32 @@
                         title: '',
                         completed: false,
                         inProgress: false,
+                        cancelled: false,
                         isNextAction: false,
                         parentId: '',
                         createdAt: new Date().toISOString(),
                         description: '',
                         tags: [],
-                        date: ''
+                        date: '',
+                        // Rollover tracking
+                        createdDate: getLocalDateKey(),
+                        // Array of dates this task has been active on (for tracking rollovers)
+                        activeDates: [getLocalDateKey()],
+                        // Which date did this task get rolled over from
+                        rolledOverFrom: null
                     };
 
                     if (type === 'daily') {
                         // Default to SELECTED date, not just today
                         goal.date = this.selectedDate;
+                        goal.createdDate = this.selectedDate;
+                        goal.activeDates = [this.selectedDate];
                         goal.quarterlyParentId = '';
+                    }
+
+                    if (type === 'sprint') {
+                        goal.createdDate = getLocalDateKey();
+                        goal.activeDates = [getLocalDateKey()];
                     }
 
                     this.goals.unshift(goal);
