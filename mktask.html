@@ -39,16 +39,16 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: #1f2937;
+            background: var(--scrollbar-track);
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #4b5563;
+            background: var(--scrollbar-thumb);
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #6b7280;
+            background: var(--scrollbar-thumb-hover);
         }
 
         /* Auto-resize textarea */
@@ -65,23 +65,29 @@
             --border-color: #1f2937;
             --accent-color: #6366f1;
             /* Indigo */
+            --scrollbar-track: #111827;
+            --scrollbar-thumb: #4b5563;
+            --scrollbar-thumb-hover: #6b7280;
         }
 
         [data-theme="light"] {
-            --bg-main: #f0f9ff;
-            /* Slate/Cyan tint */
-            --bg-panel: #ffffff;
-            --text-main: #334155;
-            --text-muted: #64748b;
-            --border-color: #cbd5e1;
-            --accent-color: #0ea5e9;
-            /* Sky Blue */
+            --bg-main: #eef2f7;
+            --bg-panel: #f8fafc;
+            --text-main: #1f2937;
+            --text-muted: #5b677a;
+            --border-color: #d4dbe6;
+            --accent-color: #2563eb;
+            --scrollbar-track: #e2e8f0;
+            --scrollbar-thumb: #94a3b8;
+            --scrollbar-thumb-hover: #64748b;
         }
 
         body {
             background-color: var(--bg-main);
             color: var(--text-main);
             transition: background-color 0.3s, color 0.3s;
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+            scrollbar-width: thin;
         }
 
         .theme-panel {
@@ -99,7 +105,7 @@
     </style>
 </head>
 
-<body class="bg-gray-950 text-gray-200 font-sans h-screen flex flex-col overflow-hidden text-sm" x-data="taskApp()"
+<body class="font-sans h-screen flex flex-col overflow-hidden text-sm" x-data="taskApp()"
     @keydown.window="handleKeydown($event)">
 
     <!-- Toast -->
@@ -1205,11 +1211,13 @@
 
                                         <!-- Current Date Badge -->
                                         <template x-if="goal.date !== goal.createdDate">
-                                            <div class="flex items-center gap-1" :title="'Active on: ' + goal.date">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                            <div class="flex items-center gap-1 text-sm"
+                                                :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-700'"
+                                                :title="'Active on: ' + goal.date">
+                                                <svg class="w-4 h-4" fill="none" stroke-width="2"
+                                                    :class="theme === 'dark' ? 'stroke-gray-400' : 'stroke-slate-700'"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
                                                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                                                     </path>
                                                 </svg>
@@ -1219,11 +1227,12 @@
 
                                         <!-- Tags Badge -->
                                         <template x-if="goal.tags && goal.tags.length > 0">
-                                            <div class="flex items-center gap-1">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                            <div class="flex items-center gap-1 text-sm"
+                                                :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-700'">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke-width="2"
+                                                    :class="theme === 'dark' ? 'stroke-gray-400' : 'stroke-slate-700'"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
                                                         d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
                                                     </path>
                                                 </svg>
@@ -1280,7 +1289,8 @@
                                     </div>
 
                                     <textarea x-model="goal.description"
-                                        class="w-full bg-transparent focus:outline-none text-xs text-gray-500 focus:text-gray-400 placeholder-gray-800/50 italic auto-expand resize-none overflow-hidden mt-1"
+                                        class="w-full bg-transparent focus:outline-none text-xs italic auto-expand resize-none overflow-hidden mt-1"
+                                        :class="theme === 'dark' ? 'text-gray-500 focus:text-gray-400 placeholder-gray-800/50' : 'text-slate-600 focus:text-slate-700 placeholder-slate-400'"
                                         rows="1" placeholder="Add details or notes..."></textarea>
                                 </div>
 
@@ -1331,7 +1341,8 @@
                             </div>
                     </template>
 
-                    <div x-show="getDailyFocusGoals().length === 0" class="text-center py-12 text-gray-700 opacity-50">
+                    <div x-show="getDailyFocusGoals().length === 0" class="text-center py-12"
+                        :class="theme === 'dark' ? 'text-gray-700 opacity-50' : 'text-slate-500 opacity-70'">
                         <p class="text-sm">No tasks for today. Press 'Enter' or click Add Task.</p>
                     </div>
                 </div>
@@ -1350,7 +1361,8 @@
             <div class="px-4 py-3 border-b flex items-center justify-between shrink-0"
                 :class="theme === 'dark' ? 'border-gray-800 bg-gray-900/40' : 'border-slate-200 bg-white'">
                 <div class="flex items-center gap-2">
-                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-50">Daily Bits</span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest"
+                        :class="theme === 'dark' ? 'opacity-50' : 'text-slate-500'">Daily Bits</span>
                     <span class="px-1.5 py-0.5 rounded-full text-[9px]"
                         :class="theme === 'dark' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-100 text-indigo-700'"
                         x-text="getBitsByDay().length"></span>
@@ -1382,7 +1394,8 @@
                 <template x-for="bit in getBitsByDay()" :key="bit.id">
                     <div class="group relative">
                         <!-- Cell Index/Line -->
-                        <div class="absolute -left-6 top-2 w-5 text-[9px] font-mono opacity-20 text-right"
+                        <div class="absolute -left-6 top-2 w-5 text-[9px] font-mono text-right"
+                            :class="theme === 'dark' ? 'opacity-20' : 'text-slate-400'"
                             x-text="'[' + ($index + 1) + ']'"></div>
 
                         <!-- Bit Content -->
@@ -1807,16 +1820,13 @@
                 deletingId: null,
                 // New States
                 showYearly: false,
-                filterTag: '',
                 statusFilter: 'all',
                 selectedGoalId: null,
-                blockedNudgeDays: 3,
                 searchQuery: '', // Global Search
                 selectedDate: getLocalDateKey(), // History Navigation
                 theme: 'dark', // 'dark' or 'light'
                 showDetailPanel: false,
                 editingGoal: null,
-                showCalendar: false,
                 calendarDate: new Date(), // Month being viewed
                 showBits: true, // Show Daily Bits by default
                 isCompactLayout: false,
@@ -1989,14 +1999,6 @@
                     return goal.date === this.getTodayDate();
                 },
 
-                getRolledOverColor() {
-                    // Different visual color for rolled-over tasks
-                    // Note: This function is deprecated - use inline class bindings instead
-                    return this.theme === 'dark'
-                        ? 'bg-orange-500/15 border-orange-500/40'
-                        : 'bg-orange-50 border-orange-300';
-                },
-
                 cancelTask(goalId) {
                     const goal = this.goals.find(g => g.id === goalId);
                     if (!goal) return;
@@ -2064,11 +2066,6 @@
                             (g.description && g.description.toLowerCase().includes(q)) ||
                             (g.tags && g.tags.some(t => t.toLowerCase().includes(q)))
                         );
-                    }
-
-                    // Tag Filter
-                    if (this.filterTag) {
-                        list = list.filter(g => g.tags && g.tags.includes(this.filterTag));
                     }
 
                     if (type === 'daily') {
@@ -2277,7 +2274,6 @@
                 selectCalendarDate(dateStr) {
                     if (!dateStr) return;
                     this.selectedDate = dateStr;
-                    this.showCalendar = false;
                 },
 
                 openFirstDetailByDay(offset) {
@@ -2460,12 +2456,6 @@
                     goal.completed = false;
                 },
 
-                toggleInProgress(goal) {
-                    if (!goal) return;
-                    if (goal.completed) goal.completed = false;
-                    goal.inProgress = !goal.inProgress;
-                },
-
                 setNextAction(goal) {
                     if (!goal) return;
                     const wasNext = !!goal.isNextAction;
@@ -2589,12 +2579,6 @@
                         return;
                     }
                     bit.kbCollapsed = !bit.kbCollapsed;
-                },
-
-                getKBPreview(text) {
-                    if (!text) return '';
-                    const firstLine = text.split('\n').find(line => line.trim());
-                    return firstLine ? firstLine.trim() : '';
                 },
 
                 getDescriptionPreview(text, maxLen = 120) {
