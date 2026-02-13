@@ -192,12 +192,16 @@
                         File Path
                     </label>
                     <input type="text" x-model="fileLocationInput"
-                        placeholder="e.g., ~/Documents/mktask-data.json or /Users/username/tasks.json"
+                        placeholder="Windows: C:\\Users\\name\\tasks.json | Mac/Linux: /Users/name/tasks.json"
                         class="w-full px-3 py-2 rounded border text-sm transition-colors focus:outline-none"
                         :class="theme === 'dark' 
                             ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-600 focus:border-indigo-500' 
                             : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400 focus:border-indigo-500'"
                         @keydown.enter="setFileLocation()">
+                    <p class="text-[10px] mt-1 opacity-70"
+                        :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-500'">
+                        💡 Windows: Use backslashes with double escaping (\\) or forward slashes (/)
+                    </p>
                 </div>
 
                 <div class="flex gap-2 justify-end pt-2">
@@ -1862,14 +1866,14 @@
         // If empty/null, the app will prompt you to provide a file location.
         //
         // EXAMPLES:
-        //   Windows: 'C://Users/john-doe/Documents/tasks.json'
+        //   Windows: 'C:\\Users\\john-doe\\Documents\\tasks.json' OR 'C:/Users/john-doe/Documents/tasks.json'
         //   Mac:     '/Users/jane-smith/Documents/my-tasks.json'
         //   Linux:   '/home/alex/tasks/tasks.json'
         //
-        // IMPORTANT: This works best with:
-        // - Electron apps (desktop wrapper)
-        // - Node.js backend with file system access
-        // - NOT with regular browser (browser can't access file system directly)
+        // IMPORTANT: 
+        // - For Windows: Use backslashes with double escaping (\\) OR forward slashes (/)
+        // - This works best with Electron apps or Node.js backend
+        // - Requires file system access (not available in regular browser)
         //
         const CONFIG_TASK_FILE_PATH = ''; // Set your file path here, leave empty to prompt user
         
@@ -1943,9 +1947,25 @@
                         document.body.setAttribute('data-theme', this.theme);
                     }
 
+                    // Normalize file paths (handle both Windows and Unix paths)
+                    const normalizePath = (path) => {
+                        if (!path) return '';
+                        // Replace backslashes with forward slashes for consistency
+                        let normalized = path.replace(/\\/g, '/');
+                        // Clean up double slashes (except in protocol like C:/)
+                        normalized = normalized.replace(/([a-zA-Z]:\/)?\/+/g, '$1/');
+                        return normalized;
+                    };
+
                     // Check for file location: CONFIG → localStorage → prompt user
-                    let fileLocation = CONFIG_TASK_FILE_PATH.trim();
+                    let fileLocation = normalizePath(CONFIG_TASK_FILE_PATH.trim());
                     let isFromConfig = false;
+                    
+                    // Log config path for debugging Windows issues
+                    if (CONFIG_TASK_FILE_PATH.trim()) {
+                        console.log('📝 CONFIG_TASK_FILE_PATH (raw):', CONFIG_TASK_FILE_PATH);
+                        console.log('📝 CONFIG_TASK_FILE_PATH (normalized):', fileLocation);
+                    }
                     
                     if (!fileLocation) {
                         // If config is empty, check localStorage
@@ -1967,15 +1987,22 @@
                         
                         // Show indicator if loaded from CONFIG
                         if (isFromConfig) {
-                            console.log('✓ Tasks loaded from CONFIG_TASK_FILE_PATH:', fileLocation);
+                            console.log('📂 CONFIG_TASK_FILE_PATH detected:', fileLocation);
+                            console.log('⏳ Attempting to load tasks from file...');
+                            
                             // Show visual notification for 5 seconds
                             setTimeout(() => {
-                                this.showToastMessage('✓ Tasks loading from CONFIG file path: ' + fileLocation);
+                                this.showToastMessage('📂 Loading tasks from: ' + fileLocation);
                             }, 100);
                             // Auto-hide after 5 seconds
                             setTimeout(() => {
                                 this.showToast = false;
                             }, 5100);
+                        }
+                        
+                        // Attempt to load from file (for Electron/Node.js backends)
+                        if (typeof window.electron !== 'undefined' || CONFIG_TASK_FILE_PATH.trim()) {
+                            await this.loadFromFileLocation();
                         }
                     } else {
                         // No file location set - prompt user
@@ -1993,6 +2020,7 @@
                         try {
                             const data = JSON.parse(saved);
                             this.goals = data.goals || [];
+                            console.log('💾 Loaded from localStorage backup:', this.goals.length, 'tasks');
                             // Migration and initialization
                             this.goals.forEach(g => {
                                 if (g.type === 'weekly') g.type = 'sprint';
@@ -2024,6 +2052,20 @@
                         } catch (e) {
                             console.error("Failed to load backup", e);
                         }
+                    }
+
+                    // Show final task load summary
+                    if (this.goals.length > 0) {
+                        console.log(`%c✓ Ready with ${this.goals.length} tasks loaded`, 'color: #10b981; font-weight: bold');
+                        if (fileLocation && isFromConfig) {
+                            console.log('  📂 Source: CONFIG_TASK_FILE_PATH -', fileLocation);
+                        } else if (fileLocation) {
+                            console.log('  💾 Source: localStorage (file location configured:', fileLocation + ')');
+                        } else {
+                            console.log('  💾 Source: localStorage');
+                        }
+                    } else {
+                        console.log(`%c⚠ No tasks loaded yet`, 'color: #f59e0b; font-weight: bold');
                     }
 
                     // Auto-Save Watcher
@@ -2770,17 +2812,21 @@
 
                 // --- File Location Management ---
                 setFileLocation() {
-                    const location = this.fileLocationInput.trim();
+                    let location = this.fileLocationInput.trim();
                     if (!location) {
                         this.showToastMessage('Please enter a file location.');
                         return;
                     }
                     
+                    // Normalize path (handle both Windows and Unix)
+                    location = location.replace(/\\/g, '/').replace(/([a-zA-Z]:\/)?\/+/g, '$1/');
+                    
                     this.fileLocation = location;
                     localStorage.setItem('mktask_file_location', location);
                     this.showFileLocationModal = false;
                     
-                    console.log('✓ File location set:', location);
+                    console.log('📝 Raw input:', this.fileLocationInput);
+                    console.log('✓ File location normalized:', location);
                     this.showToastMessage(`✓ File location set to: ${location}`);
                 },
 
@@ -2796,18 +2842,20 @@
 
                 async loadFromFileLocation() {
                     if (!this.fileLocation) {
-                        this.showToastMessage('No file location configured.');
+                        console.log('ℹ No file location configured, using localStorage');
                         return false;
                     }
                     try {
-                        console.log('→ Loading tasks from:', this.fileLocation);
+                        console.log('→ Attempting to load tasks from file:', this.fileLocation);
                         // Load from configured file path
                         // This works with Electron or Node.js backend
                         //
                         // For Electron:
                         //   const data = JSON.parse(await window.electron.ipcRenderer.invoke('read-file', this.fileLocation));
                         //   this.goals = data.goals || [];
-                        //   console.log('✓ Tasks loaded:', this.goals.length, 'items');
+                        //   console.log('✓ Successfully loaded', this.goals.length, 'tasks from file');
+                        //   this.showToastMessage('✓ Loaded ' + this.goals.length + ' tasks from file');
+                        //   return true;
                         //
                         // For Node.js backend:
                         //   const response = await fetch('/api/load-file', {
@@ -2815,12 +2863,17 @@
                         //     body: JSON.stringify({ path: this.fileLocation })
                         //   });
                         //   const data = await response.json();
-                        //   this.goals = data.goals || [];
+                        //   if (data.success) {
+                        //     this.goals = data.goals || [];
+                        //     console.log('✓ Successfully loaded', this.goals.length, 'tasks from file');
+                        //     this.showToastMessage('✓ Loaded ' + this.goals.length + ' tasks from file');
+                        //     return true;
+                        //   }
                         
-                        return true;
+                        console.log('ℹ File reading not implemented (requires Electron or Node.js backend)');
+                        return false;
                     } catch (err) {
-                        console.error('✗ Failed to load:', err);
-                        this.showToastMessage('Error loading: ' + err.message);
+                        console.error('✗ Failed to load from file:', err);
                         return false;
                     }
                 },
@@ -2831,7 +2884,7 @@
                         return false;
                     }
                     try {
-                        console.log('↓ Saving tasks to:', this.fileLocation, `(${this.goals.length} items)`);
+                        console.log('↓ Saving', this.goals.length, 'tasks to:', this.fileLocation);
                         // Save to configured file path
                         // This works with Electron or Node.js backend
                         //
@@ -2840,23 +2893,29 @@
                         //     this.fileLocation, 
                         //     JSON.stringify({ goals: this.goals }, null, 2)
                         //   );
-                        //   console.log('✓ Tasks saved successfully');
+                        //   console.log('✓ Successfully saved', this.goals.length, 'tasks to file');
+                        //   this.showToastMessage('✓ Saved ' + this.goals.length + ' tasks to file');
+                        //   return true;
                         //
                         // For Node.js backend:
-                        //   await fetch('/api/save-file', {
+                        //   const response = await fetch('/api/save-file', {
                         //     method: 'POST',
                         //     body: JSON.stringify({ 
                         //       path: this.fileLocation,
-                        //       data: { goals: this.goals }
+                        //       goals: this.goals
                         //     })
                         //   });
-                        //   console.log('✓ Tasks saved successfully');
+                        //   const result = await response.json();
+                        //   if (result.success) {
+                        //     console.log('✓ Successfully saved', this.goals.length, 'tasks to file');
+                        //     this.showToastMessage('✓ Saved ' + this.goals.length + ' tasks to file');
+                        //     return true;
+                        //   }
                         
-                        // Silently save (don't show message every 2 seconds)
-                        return true;
+                        console.log('ℹ File writing not implemented (requires Electron or Node.js backend)');
+                        return false;
                     } catch (err) {
-                        console.error('✗ Failed to save:', err);
-                        this.showToastMessage('Error saving: ' + err.message);
+                        console.error('✗ Failed to save to file:', err);
                         return false;
                     }
                 },
