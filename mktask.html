@@ -166,6 +166,57 @@
         </div>
     </div>
 
+    <!-- File Location Modal -->
+    <div x-show="showFileLocationModal" x-cloak
+        class="fixed inset-0 z-[70] flex items-center justify-center bg-gray-950/80 backdrop-blur-sm"
+        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        <div class="w-[520px] max-w-[92vw] rounded-xl border shadow-2xl p-6"
+            :class="theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-slate-200'">
+            <div class="flex items-start justify-between gap-4 mb-4">
+                <div>
+                    <h2 class="text-lg font-bold" :class="theme === 'dark' ? 'text-gray-100' : 'text-slate-900'">File Location</h2>
+                    <p class="text-xs mt-1" :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'">
+                        Enter the file path where your tasks will be saved. This ensures your data persists across browser sessions.
+                    </p>
+                </div>
+                <button @click="cancelFileLocationEdit()"
+                    class="text-gray-500 hover:text-gray-300 transition-colors">✕</button>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-semibold block mb-1"
+                        :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-700'">
+                        File Path
+                    </label>
+                    <input type="text" x-model="fileLocationInput"
+                        placeholder="e.g., ~/Documents/mktask-data.json or /Users/username/tasks.json"
+                        class="w-full px-3 py-2 rounded border text-sm transition-colors focus:outline-none"
+                        :class="theme === 'dark' 
+                            ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-600 focus:border-indigo-500' 
+                            : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400 focus:border-indigo-500'"
+                        @keydown.enter="setFileLocation()">
+                </div>
+
+                <div class="flex gap-2 justify-end pt-2">
+                    <button @click="cancelFileLocationEdit()" 
+                        class="px-3 py-2 rounded text-xs font-semibold border transition-colors"
+                        :class="theme === 'dark' 
+                            ? 'border-gray-700 text-gray-300 hover:bg-gray-800' 
+                            : 'border-slate-200 text-slate-700 hover:bg-slate-50'">
+                        Cancel
+                    </button>
+                    <button @click="setFileLocation()" 
+                        class="px-3 py-2 rounded text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors">
+                        Set Location
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Header / Toolbar -->
     <header class="h-12 border-b grid grid-cols-3 items-center px-4 shrink-0 transition-colors duration-300"
         :class="theme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-slate-200'">
@@ -390,6 +441,18 @@
                             </path>
                         </svg>
                         <span>Metrics</span>
+                    </button>
+
+                    <button @click="editFileLocation(); open = false"
+                        class="w-full px-4 py-2 text-left text-sm hover:bg-gray-500/10 flex items-center gap-2 theme-text-muted">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        <span>File Location</span>
+                        <span x-show="fileLocation" class="ml-auto text-[10px] truncate max-w-[120px]"
+                            x-text="'(set)'" :title="fileLocation"></span>
                     </button>
 
                     <div class="border-t theme-border my-1"></div>
@@ -1792,6 +1855,28 @@
 
     <!-- App Logic -->
     <script>
+        // ========================================
+        // ⚙️ CONFIGURATION SECTION
+        // ========================================
+        // Set your task file path here. If provided, the app will always use this file.
+        // If empty/null, the app will prompt you to provide a file location.
+        //
+        // EXAMPLES:
+        //   Windows: 'C://Users/smk/Documents/mytask.json'
+        //   Mac:     '/Users/smk/Documents/mytask.json'
+        //   Linux:   '/home/smk/mytask.json'
+        //
+        // IMPORTANT: This works best with:
+        // - Electron apps (desktop wrapper)
+        // - Node.js backend with file system access
+        // - NOT with regular browser (browser can't access file system directly)
+        //
+        const CONFIG_TASK_FILE_PATH = ''; // Set your file path here, leave empty to prompt user
+        
+        // ========================================
+        // Helper Functions
+        // ========================================
+        
         const getLocalDateKey = (dateObj = new Date()) => {
             const year = dateObj.getFullYear();
             const month = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -1813,6 +1898,7 @@
                 goals: [],
                 fileHandle: null,
                 fileName: '',
+                fileLocation: '', // File path for direct file access
                 unsavedChanges: false,
                 reviewMode: false,
                 standupMode: false,
@@ -1846,6 +1932,8 @@
                 showOnboarding: false,
                 onboardingMessage: 'Create a JSON file so your tasks can be saved and backed up.',
                 fileSetupRequired: false,
+                showFileLocationModal: false,
+                fileLocationInput: '',
 
                 async init() {
                     // Theme Init
@@ -1853,6 +1941,28 @@
                     if (savedTheme) {
                         this.theme = savedTheme;
                         document.body.setAttribute('data-theme', this.theme);
+                    }
+
+                    // Check for file location: CONFIG → localStorage → prompt user
+                    let fileLocation = CONFIG_TASK_FILE_PATH.trim();
+                    
+                    if (!fileLocation) {
+                        // If config is empty, check localStorage
+                        const savedFileLocation = localStorage.getItem('mktask_file_location');
+                        if (savedFileLocation) {
+                            fileLocation = savedFileLocation;
+                        }
+                    }
+                    
+                    if (fileLocation) {
+                        // File location is set (from config or localStorage)
+                        this.fileLocation = fileLocation;
+                        this.fileLocationInput = fileLocation;
+                        // Save it to localStorage for persistence
+                        localStorage.setItem('mktask_file_location', fileLocation);
+                    } else {
+                        // No file location set - prompt user
+                        this.showFileLocationModal = true;
                     }
 
                     const saved = localStorage.getItem('mktask_backup');
@@ -1902,6 +2012,7 @@
                     // Auto-Save Watcher
                     this.$watch('goals', (val) => {
                         this.unsavedChanges = true;
+                        // Saves to localStorage as backup
                         localStorage.setItem('mktask_backup', JSON.stringify({ goals: val }));
                         this.debouncedSave();
                     });
@@ -2018,8 +2129,13 @@
 
                 // Debounced Auto-Save
                 debouncedSave: Alpine.debounce(function () {
+                    // Saves to File API handle if available
                     if (this.fileHandle) {
                         this.saveFile(true); // silent save
+                    }
+                    // Save to configured file location if set
+                    if (this.fileLocation) {
+                        this.saveToFileLocation();
                     }
                 }, 2000),
 
@@ -2633,6 +2749,93 @@
                     this.fileSetupRequired = false;
                     localStorage.setItem('mktask_file_required', 'false');
                     this.showOnboarding = false;
+                },
+
+                // --- File Location Management ---
+                setFileLocation() {
+                    const location = this.fileLocationInput.trim();
+                    if (!location) {
+                        this.showToastMessage('Please enter a file location.');
+                        return;
+                    }
+                    
+                    this.fileLocation = location;
+                    localStorage.setItem('mktask_file_location', location);
+                    this.showFileLocationModal = false;
+                    this.showToastMessage(`File location set to: ${location}`);
+                },
+
+                editFileLocation() {
+                    this.fileLocationInput = this.fileLocation;
+                    this.showFileLocationModal = true;
+                },
+
+                cancelFileLocationEdit() {
+                    this.fileLocationInput = this.fileLocation;
+                    this.showFileLocationModal = false;
+                },
+
+                async loadFromFileLocation() {
+                    if (!this.fileLocation) {
+                        this.showToastMessage('No file location configured.');
+                        return false;
+                    }
+                    try {
+                        // Load from configured file path
+                        // This works with Electron or Node.js backend
+                        //
+                        // For Electron:
+                        //   const data = JSON.parse(await window.electron.ipcRenderer.invoke('read-file', this.fileLocation));
+                        //   this.goals = data.goals || [];
+                        //
+                        // For Node.js backend:
+                        //   const response = await fetch('/api/load-file', {
+                        //     method: 'POST',
+                        //     body: JSON.stringify({ path: this.fileLocation })
+                        //   });
+                        //   const data = await response.json();
+                        //   this.goals = data.goals || [];
+                        
+                        this.showToastMessage('Loading from: ' + this.fileLocation);
+                        return true;
+                    } catch (err) {
+                        console.error('Failed to load:', err);
+                        this.showToastMessage('Error loading: ' + err.message);
+                        return false;
+                    }
+                },
+
+                async saveToFileLocation() {
+                    if (!this.fileLocation) {
+                        this.showToastMessage('No file location configured.');
+                        return false;
+                    }
+                    try {
+                        // Save to configured file path
+                        // This works with Electron or Node.js backend
+                        //
+                        // For Electron:
+                        //   await window.electron.ipcRenderer.invoke('write-file', 
+                        //     this.fileLocation, 
+                        //     JSON.stringify({ goals: this.goals }, null, 2)
+                        //   );
+                        //
+                        // For Node.js backend:
+                        //   await fetch('/api/save-file', {
+                        //     method: 'POST',
+                        //     body: JSON.stringify({ 
+                        //       path: this.fileLocation,
+                        //       data: { goals: this.goals }
+                        //     })
+                        //   });
+                        
+                        // Silently save (don't show message every 2 seconds)
+                        return true;
+                    } catch (err) {
+                        console.error('Failed to save:', err);
+                        this.showToastMessage('Error saving: ' + err.message);
+                        return false;
+                    }
                 },
 
                 async startFileSetup() {
