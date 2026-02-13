@@ -166,60 +166,6 @@
         </div>
     </div>
 
-    <!-- File Location Modal -->
-    <div x-show="showFileLocationModal" x-cloak
-        class="fixed inset-0 z-[70] flex items-center justify-center bg-gray-950/80 backdrop-blur-sm"
-        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150"
-        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
-        <div class="w-[520px] max-w-[92vw] rounded-xl border shadow-2xl p-6"
-            :class="theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-slate-200'">
-            <div class="flex items-start justify-between gap-4 mb-4">
-                <div>
-                    <h2 class="text-lg font-bold" :class="theme === 'dark' ? 'text-gray-100' : 'text-slate-900'">File Location</h2>
-                    <p class="text-xs mt-1" :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'">
-                        Enter the file path where your tasks will be saved. This ensures your data persists across browser sessions.
-                    </p>
-                </div>
-                <button @click="cancelFileLocationEdit()"
-                    class="text-gray-500 hover:text-gray-300 transition-colors">✕</button>
-            </div>
-            
-            <div class="space-y-3">
-                <div>
-                    <label class="text-xs font-semibold block mb-1"
-                        :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-700'">
-                        File Path
-                    </label>
-                    <input type="text" x-model="fileLocationInput"
-                        placeholder="Windows: C:\\Users\\name\\tasks.json | Mac/Linux: /Users/name/tasks.json"
-                        class="w-full px-3 py-2 rounded border text-sm transition-colors focus:outline-none"
-                        :class="theme === 'dark' 
-                            ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-600 focus:border-indigo-500' 
-                            : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400 focus:border-indigo-500'"
-                        @keydown.enter="setFileLocation()">
-                    <p class="text-[10px] mt-1 opacity-70"
-                        :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-500'">
-                        💡 Windows: Use backslashes with double escaping (\\) or forward slashes (/)
-                    </p>
-                </div>
-
-                <div class="flex gap-2 justify-end pt-2">
-                    <button @click="cancelFileLocationEdit()" 
-                        class="px-3 py-2 rounded text-xs font-semibold border transition-colors"
-                        :class="theme === 'dark' 
-                            ? 'border-gray-700 text-gray-300 hover:bg-gray-800' 
-                            : 'border-slate-200 text-slate-700 hover:bg-slate-50'">
-                        Cancel
-                    </button>
-                    <button @click="setFileLocation()" 
-                        class="px-3 py-2 rounded text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors">
-                        Set Location
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Header / Toolbar -->
     <header class="h-12 border-b grid grid-cols-3 items-center px-4 shrink-0 transition-colors duration-300"
@@ -445,18 +391,6 @@
                             </path>
                         </svg>
                         <span>Metrics</span>
-                    </button>
-
-                    <button @click="editFileLocation(); open = false"
-                        class="w-full px-4 py-2 text-left text-sm hover:bg-gray-500/10 flex items-center gap-2 theme-text-muted">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                            </path>
-                        </svg>
-                        <span>File Location</span>
-                        <span x-show="fileLocation" class="ml-auto text-[10px] truncate max-w-[120px]"
-                            x-text="'(set)'" :title="fileLocation"></span>
                     </button>
 
                     <div class="border-t theme-border my-1"></div>
@@ -1860,24 +1794,6 @@
     <!-- App Logic -->
     <script>
         // ========================================
-        // ⚙️ CONFIGURATION SECTION
-        // ========================================
-        // Set your task file path here. If provided, the app will always use this file.
-        // If empty/null, the app will prompt you to provide a file location.
-        //
-        // EXAMPLES:
-        //   Windows: 'C:\\Users\\john-doe\\Documents\\tasks.json' OR 'C:/Users/john-doe/Documents/tasks.json'
-        //   Mac:     '/Users/jane-smith/Documents/my-tasks.json'
-        //   Linux:   '/home/alex/tasks/tasks.json'
-        //
-        // IMPORTANT: 
-        // - For Windows: Use backslashes with double escaping (\\) OR forward slashes (/)
-        // - This works best with Electron apps or Node.js backend
-        // - Requires file system access (not available in regular browser)
-        //
-        const CONFIG_TASK_FILE_PATH = ''; // Set your file path here, leave empty to prompt user
-        
-        // ========================================
         // Helper Functions
         // ========================================
         
@@ -1902,7 +1818,6 @@
                 goals: [],
                 fileHandle: null,
                 fileName: '',
-                fileLocation: '', // File path for direct file access
                 unsavedChanges: false,
                 reviewMode: false,
                 standupMode: false,
@@ -1936,8 +1851,6 @@
                 showOnboarding: false,
                 onboardingMessage: 'Create a JSON file so your tasks can be saved and backed up.',
                 fileSetupRequired: false,
-                showFileLocationModal: false,
-                fileLocationInput: '',
 
                 async init() {
                     // Theme Init
@@ -1947,131 +1860,66 @@
                         document.body.setAttribute('data-theme', this.theme);
                     }
 
-                    // Normalize file paths (handle both Windows and Unix paths)
-                    const normalizePath = (path) => {
-                        if (!path) return '';
-                        // Replace backslashes with forward slashes for consistency
-                        let normalized = path.replace(/\\/g, '/');
-                        // Clean up double slashes (except in protocol like C:/)
-                        normalized = normalized.replace(/([a-zA-Z]:\/)?\/+/g, '$1/');
-                        return normalized;
-                    };
-
-                    // Check for file location: CONFIG → localStorage → prompt user
-                    let fileLocation = normalizePath(CONFIG_TASK_FILE_PATH.trim());
-                    let isFromConfig = false;
-                    
-                    // Log config path for debugging Windows issues
-                    if (CONFIG_TASK_FILE_PATH.trim()) {
-                        console.log('📝 CONFIG_TASK_FILE_PATH (raw):', CONFIG_TASK_FILE_PATH);
-                        console.log('📝 CONFIG_TASK_FILE_PATH (normalized):', fileLocation);
-                    }
-                    
-                    if (!fileLocation) {
-                        // If config is empty, check localStorage
-                        const savedFileLocation = localStorage.getItem('mktask_file_location');
-                        if (savedFileLocation) {
-                            fileLocation = savedFileLocation;
-                        }
-                    } else {
-                        // File location is from CONFIG
-                        isFromConfig = true;
-                    }
-                    
-                    if (fileLocation) {
-                        // File location is set (from config or localStorage)
-                        this.fileLocation = fileLocation;
-                        this.fileLocationInput = fileLocation;
-                        // Save it to localStorage for persistence
-                        localStorage.setItem('mktask_file_location', fileLocation);
-                        
-                        // Show indicator if loaded from CONFIG
-                        if (isFromConfig) {
-                            console.log('📂 CONFIG_TASK_FILE_PATH detected:', fileLocation);
-                            console.log('⏳ Attempting to load tasks from file...');
-                            
-                            // Show visual notification for 5 seconds
-                            setTimeout(() => {
-                                this.showToastMessage('📂 Loading tasks from: ' + fileLocation);
-                            }, 100);
-                            // Auto-hide after 5 seconds
-                            setTimeout(() => {
-                                this.showToast = false;
-                            }, 5100);
-                        }
-                        
-                        // Attempt to load from file (for Electron/Node.js backends)
-                        if (typeof window.electron !== 'undefined' || CONFIG_TASK_FILE_PATH.trim()) {
-                            await this.loadFromFileLocation();
-                        }
-                    } else {
-                        // No file location set - prompt user
-                        this.showFileLocationModal = true;
+                    // If no file is loaded yet, prompt user to pick one
+                    if (!this.fileHandle) {
+                        console.log('📁 Please select a task file to continue...');
+                        await this.selectFileLocation();
                     }
 
-                    const saved = localStorage.getItem('mktask_backup');
-                    const fileRequired = localStorage.getItem('mktask_file_required');
-                    if (fileRequired === 'true') this.fileSetupRequired = true;
-                    if (fileRequired === null && !saved) {
-                        this.fileSetupRequired = true;
-                        localStorage.setItem('mktask_file_required', 'true');
-                    }
-                    if (saved) {
-                        try {
-                            const data = JSON.parse(saved);
-                            this.goals = data.goals || [];
-                            console.log('💾 Loaded from localStorage backup:', this.goals.length, 'tasks');
-                            // Migration and initialization
-                            this.goals.forEach(g => {
-                                if (g.type === 'weekly') g.type = 'sprint';
-                                if (!g.date && g.type === 'daily') {
-                                    const createdDate = parseLocalDateKey(g.createdAt);
-                                    g.date = createdDate ? getLocalDateKey(createdDate) : getLocalDateKey();
-                                }
-                                if (!g.description) g.description = "";
-                                if (!g.tags) g.tags = [];
-                                if (typeof g.inProgress === 'undefined') g.inProgress = false;
-                                if (typeof g.isNextAction === 'undefined') g.isNextAction = false;
-                                if (typeof g.cancelled === 'undefined') g.cancelled = false;
-                                if (g.type === 'daily' && typeof g.quarterlyParentId === 'undefined') {
-                                    g.quarterlyParentId = '';
-                                }
-                                // Initialize rollover tracking
-                                if (!g.createdDate) {
-                                    const createdDate = parseLocalDateKey(g.createdAt);
-                                    g.createdDate = createdDate ? getLocalDateKey(createdDate) : getLocalDateKey();
-                                }
-                                if (!g.activeDates) {
-                                    g.activeDates = [g.createdDate || getLocalDateKey()];
-                                }
-                                if (typeof g.rolledOverFrom === 'undefined') {
-                                    g.rolledOverFrom = null;
-                                }
-                                delete g.time;
-                            });
-                        } catch (e) {
-                            console.error("Failed to load backup", e);
+                    // If file was successfully loaded, goals will already be populated
+                    // If not, fall back to localStorage
+                    if (this.goals.length === 0) {
+                        const saved = localStorage.getItem('mktask_backup');
+                        if (saved) {
+                            try {
+                                const data = JSON.parse(saved);
+                                this.goals = data.goals || [];
+                                console.log('💾 Using localStorage backup:', this.goals.length, 'tasks');
+                            } catch (e) {
+                                console.error("Failed to load backup", e);
+                            }
                         }
                     }
 
-                    // Show final task load summary
+                    // Run migrations on all loaded data
+                    this.goals.forEach(g => {
+                        if (g.type === 'weekly') g.type = 'sprint';
+                        if (!g.date && g.type === 'daily') {
+                            const createdDate = parseLocalDateKey(g.createdAt);
+                            g.date = createdDate ? getLocalDateKey(createdDate) : getLocalDateKey();
+                        }
+                        if (!g.description) g.description = "";
+                        if (!g.tags) g.tags = [];
+                        if (typeof g.inProgress === 'undefined') g.inProgress = false;
+                        if (typeof g.isNextAction === 'undefined') g.isNextAction = false;
+                        if (typeof g.cancelled === 'undefined') g.cancelled = false;
+                        if (g.type === 'daily' && typeof g.quarterlyParentId === 'undefined') {
+                            g.quarterlyParentId = '';
+                        }
+                        if (!g.createdDate) {
+                            const createdDate = parseLocalDateKey(g.createdAt);
+                            g.createdDate = createdDate ? getLocalDateKey(createdDate) : getLocalDateKey();
+                        }
+                        if (!g.activeDates) {
+                            g.activeDates = [g.createdDate || getLocalDateKey()];
+                        }
+                        if (typeof g.rolledOverFrom === 'undefined') {
+                            g.rolledOverFrom = null;
+                        }
+                        delete g.time;
+                    });
+
+                    // Show ready status
                     if (this.goals.length > 0) {
-                        console.log(`%c✓ Ready with ${this.goals.length} tasks loaded`, 'color: #10b981; font-weight: bold');
-                        if (fileLocation && isFromConfig) {
-                            console.log('  📂 Source: CONFIG_TASK_FILE_PATH -', fileLocation);
-                        } else if (fileLocation) {
-                            console.log('  💾 Source: localStorage (file location configured:', fileLocation + ')');
-                        } else {
-                            console.log('  💾 Source: localStorage');
-                        }
+                        console.log(`%c✓ Ready with ${this.goals.length} tasks`, 'color: #10b981; font-weight: bold');
                     } else {
-                        console.log(`%c⚠ No tasks loaded yet`, 'color: #f59e0b; font-weight: bold');
+                        console.log(`%cℹ No tasks loaded yet`, 'color: #6366f1;');
                     }
 
                     // Auto-Save Watcher
                     this.$watch('goals', (val) => {
                         this.unsavedChanges = true;
-                        // Saves to localStorage as backup
+                        // Save to localStorage as backup
                         localStorage.setItem('mktask_backup', JSON.stringify({ goals: val }));
                         this.debouncedSave();
                     });
@@ -2081,14 +1929,11 @@
                         document.body.setAttribute('data-theme', val);
                     });
 
-                    if (this.fileSetupRequired && !this.fileHandle) {
-                        this.onboardingMessage = 'Create a JSON file so your tasks can be saved and backed up.';
-                        this.showOnboarding = true;
-                    }
-
                     this.updateLayoutMode();
                     window.addEventListener('resize', () => this.updateLayoutMode());
 
+                    // CRITICAL: Run rollover after all data is loaded and migrations complete
+                    // This ensures tasks roll over to current date regardless of when file was last opened
                     this.checkRollover();
                 },
 
@@ -2191,10 +2036,6 @@
                     // Saves to File API handle if available
                     if (this.fileHandle) {
                         this.saveFile(true); // silent save
-                    }
-                    // Save to configured file location if set
-                    if (this.fileLocation) {
-                        this.saveToFileLocation();
                     }
                 }, 2000),
 
@@ -2810,112 +2651,76 @@
                     this.showOnboarding = false;
                 },
 
-                // --- File Location Management ---
-                setFileLocation() {
-                    let location = this.fileLocationInput.trim();
-                    if (!location) {
-                        this.showToastMessage('Please enter a file location.');
-                        return;
+                async selectFileLocation() {
+                    try {
+                        // Open file picker
+                        const [fileHandle] = await window.showOpenFilePicker({
+                            types: [
+                                { description: 'JSON Files', accept: { 'application/json': ['.json'] } },
+                                { description: 'All Files', accept: { '*/*': ['*'] } }
+                            ]
+                        });
+                        this.fileHandle = fileHandle;
+                        console.log('📂 File selected:', fileHandle.name);
+                        await this.loadFromFileLocation();
+                    } catch (err) {
+                        if (err.name !== 'AbortError') {
+                            console.error('✗ File selection error:', err);
+                        }
                     }
-                    
-                    // Normalize path (handle both Windows and Unix)
-                    location = location.replace(/\\/g, '/').replace(/([a-zA-Z]:\/)?\/+/g, '$1/');
-                    
-                    this.fileLocation = location;
-                    localStorage.setItem('mktask_file_location', location);
-                    this.showFileLocationModal = false;
-                    
-                    console.log('📝 Raw input:', this.fileLocationInput);
-                    console.log('✓ File location normalized:', location);
-                    this.showToastMessage(`✓ File location set to: ${location}`);
-                },
-
-                editFileLocation() {
-                    this.fileLocationInput = this.fileLocation;
-                    this.showFileLocationModal = true;
-                },
-
-                cancelFileLocationEdit() {
-                    this.fileLocationInput = this.fileLocation;
-                    this.showFileLocationModal = false;
                 },
 
                 async loadFromFileLocation() {
-                    if (!this.fileLocation) {
-                        console.log('ℹ No file location configured, using localStorage');
+                    if (!this.fileHandle) {
+                        console.log('ℹ No file selected');
                         return false;
                     }
                     try {
-                        console.log('→ Attempting to load tasks from file:', this.fileLocation);
-                        // Load from configured file path
-                        // This works with Electron or Node.js backend
-                        //
-                        // For Electron:
-                        //   const data = JSON.parse(await window.electron.ipcRenderer.invoke('read-file', this.fileLocation));
-                        //   this.goals = data.goals || [];
-                        //   console.log('✓ Successfully loaded', this.goals.length, 'tasks from file');
-                        //   this.showToastMessage('✓ Loaded ' + this.goals.length + ' tasks from file');
-                        //   return true;
-                        //
-                        // For Node.js backend:
-                        //   const response = await fetch('/api/load-file', {
-                        //     method: 'POST',
-                        //     body: JSON.stringify({ path: this.fileLocation })
-                        //   });
-                        //   const data = await response.json();
-                        //   if (data.success) {
-                        //     this.goals = data.goals || [];
-                        //     console.log('✓ Successfully loaded', this.goals.length, 'tasks from file');
-                        //     this.showToastMessage('✓ Loaded ' + this.goals.length + ' tasks from file');
-                        //     return true;
-                        //   }
-                        
-                        console.log('ℹ File reading not implemented (requires Electron or Node.js backend)');
-                        return false;
+                        console.log('→ Loading tasks from file:', this.fileHandle.name);
+                        const file = await this.fileHandle.getFile();
+                        const text = await file.text();
+                        const data = JSON.parse(text);
+                        this.goals = data.goals || data || [];
+                        console.log('✓ Loaded', this.goals.length, 'tasks from file');
+                        return true;
                     } catch (err) {
                         console.error('✗ Failed to load from file:', err);
+                        this.showToastMessage('Error loading file: ' + err.message);
                         return false;
                     }
                 },
 
                 async saveToFileLocation() {
-                    if (!this.fileLocation) {
-                        this.showToastMessage('No file location configured.');
-                        return false;
+                    if (!this.fileHandle) {
+                        // Fall back to download if no file handle
+                        return this.downloadTasksAsJson();
                     }
                     try {
-                        console.log('↓ Saving', this.goals.length, 'tasks to:', this.fileLocation);
-                        // Save to configured file path
-                        // This works with Electron or Node.js backend
-                        //
-                        // For Electron:
-                        //   await window.electron.ipcRenderer.invoke('write-file', 
-                        //     this.fileLocation, 
-                        //     JSON.stringify({ goals: this.goals }, null, 2)
-                        //   );
-                        //   console.log('✓ Successfully saved', this.goals.length, 'tasks to file');
-                        //   this.showToastMessage('✓ Saved ' + this.goals.length + ' tasks to file');
-                        //   return true;
-                        //
-                        // For Node.js backend:
-                        //   const response = await fetch('/api/save-file', {
-                        //     method: 'POST',
-                        //     body: JSON.stringify({ 
-                        //       path: this.fileLocation,
-                        //       goals: this.goals
-                        //     })
-                        //   });
-                        //   const result = await response.json();
-                        //   if (result.success) {
-                        //     console.log('✓ Successfully saved', this.goals.length, 'tasks to file');
-                        //     this.showToastMessage('✓ Saved ' + this.goals.length + ' tasks to file');
-                        //     return true;
-                        //   }
-                        
-                        console.log('ℹ File writing not implemented (requires Electron or Node.js backend)');
-                        return false;
+                        console.log('↓ Saving', this.goals.length, 'tasks to file');
+                        const writable = await this.fileHandle.createWritable();
+                        await writable.write(JSON.stringify({ goals: this.goals }, null, 2));
+                        await writable.close();
+                        console.log('✓ Successfully saved', this.goals.length, 'tasks to file');
+                        return true;
                     } catch (err) {
                         console.error('✗ Failed to save to file:', err);
+                        return false;
+                    }
+                },
+
+                async downloadTasksAsJson() {
+                    try {
+                        const dataStr = JSON.stringify({ goals: this.goals }, null, 2);
+                        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                        const url = URL.createObjectURL(dataBlob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `mktask_${getLocalDateKey()}.json`;
+                        link.click();
+                        URL.revokeObjectURL(url);
+                        return true;
+                    } catch (err) {
+                        console.error('✗ Failed to download:', err);
                         return false;
                     }
                 },
