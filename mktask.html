@@ -757,7 +757,7 @@
             <div class="flex-1 flex flex-col min-w-0 bg-gray-950 relative"
                 :class="theme === 'dark' ? 'bg-gray-950' : 'bg-slate-50'">
                 <!-- Header -->
-                <div x-show="viewMode !== 'em' && viewMode !== 'etf'" class="px-6 py-4 border-b flex justify-between items-end z-10 transition-colors" :class="[
+                <div x-show="viewMode !== 'em' && viewMode !== 'etf' && viewMode !== 'focus'" class="px-6 py-4 border-b flex justify-between items-end z-10 transition-colors" :class="[
                         theme === 'dark' ? 'border-gray-800 bg-gray-950' : 'border-slate-200 bg-slate-50',
                         viewMode === 'standup' ? 'flex-col gap-3 sm:flex-row sm:items-end' : ''
                     ]">
@@ -1577,13 +1577,19 @@
                 </div>
 
                 <!-- Standard List View (Dashboard Mode) -->
-                <div class="flex-1 overflow-y-auto p-6 space-y-2 scrollbar-thumb-gray-800 scrollbar-track-transparent"
+                <div class="flex-1 flex flex-col overflow-hidden"
                     x-show="viewMode === 'focus'">
-                    <div class="flex flex-wrap items-center gap-2 pb-2"
+                    <!-- Dashboard Header with Filters -->
+                    <div class="px-6 pt-4 pb-4 flex flex-wrap items-center justify-between gap-3"
                         x-data="{ counts: getStatusCountsForSelectedDate() }"
-                        x-effect="counts = getStatusCountsForSelectedDate()">
-                        <span class="text-[10px] uppercase tracking-widest opacity-50">Status</span>
-                        <button @click="statusFilter = 'all'" class="px-2 py-0.5 text-[10px] rounded border"
+                        x-effect="counts = getStatusCountsForSelectedDate()"
+                        :class="theme === 'dark' ? 'bg-gray-950' : 'bg-slate-50'">
+                        <h2 class="text-sm font-bold uppercase tracking-wider shrink-0"
+                            :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-700'">
+                            Dashboard
+                        </h2>
+                        <div class="flex flex-wrap items-center gap-2 flex-1">
+                        <button @click="statusFilter = 'all'; showAllOpenTasks = false" class="px-2 py-0.5 text-[10px] rounded border"
                             :class="statusFilter === 'all'
                                 ? (theme === 'dark' ? 'bg-gray-800 text-gray-200 border-gray-700' : 'bg-white text-slate-700 border-slate-300')
                                 : (theme === 'dark' ? 'text-gray-400 border-gray-800 hover:border-gray-700' : 'text-slate-500 border-slate-200 hover:border-slate-300')">
@@ -1592,7 +1598,16 @@
                                 :class="theme === 'dark' ? 'border-gray-700 text-gray-400' : 'border-slate-300 text-slate-500'"
                                 x-text="counts.all"></span>
                         </button>
-                        <button @click="statusFilter = 'waiting'" class="px-2 py-0.5 text-[10px] rounded border"
+                        <button @click="statusFilter = 'all-open'; showAllOpenTasks = true" class="px-2 py-0.5 text-[10px] rounded border"
+                            :class="statusFilter === 'all-open'
+                                ? (theme === 'dark' ? 'bg-indigo-600/30 text-indigo-300 border-indigo-500/50' : 'bg-indigo-50 text-indigo-700 border-indigo-300')
+                                : (theme === 'dark' ? 'text-gray-400 border-gray-800 hover:border-gray-700' : 'text-slate-500 border-slate-200 hover:border-slate-300')">
+                            All Open
+                            <span class="ml-1 px-1 rounded-full text-[9px] border"
+                                :class="statusFilter === 'all-open' ? (theme === 'dark' ? 'border-indigo-500/50 text-indigo-300' : 'border-indigo-300 text-indigo-700') : (theme === 'dark' ? 'border-gray-700 text-gray-400' : 'border-slate-300 text-slate-500')"
+                                x-text="counts.allOpen"></span>
+                        </button>
+                        <button @click="statusFilter = 'waiting'; showAllOpenTasks = false" class="px-2 py-0.5 text-[10px] rounded border"
                             :class="statusFilter === 'waiting'
                                 ? (theme === 'dark' ? 'bg-blue-500/15 text-blue-300 border-blue-500/30' : 'bg-blue-50 text-blue-700 border-blue-200')
                                 : (theme === 'dark' ? 'text-gray-400 border-gray-800 hover:border-gray-700' : 'text-slate-500 border-slate-200 hover:border-slate-300')">
@@ -1601,7 +1616,7 @@
                                 :class="theme === 'dark' ? 'border-blue-500/30 text-blue-300' : 'border-blue-200 text-blue-700'"
                                 x-text="counts.waiting"></span>
                         </button>
-                        <button @click="statusFilter = 'in-progress'" class="px-2 py-0.5 text-[10px] rounded border"
+                        <button @click="statusFilter = 'in-progress'; showAllOpenTasks = false" class="px-2 py-0.5 text-[10px] rounded border"
                             :class="statusFilter === 'in-progress'
                                 ? (theme === 'dark' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-amber-50 text-amber-700 border-amber-200')
                                 : (theme === 'dark' ? 'text-gray-400 border-gray-800 hover:border-gray-700' : 'text-slate-500 border-slate-200 hover:border-slate-300')">
@@ -1610,7 +1625,7 @@
                                 :class="theme === 'dark' ? 'border-amber-500/30 text-amber-300' : 'border-amber-200 text-amber-700'"
                                 x-text="counts.inProgress"></span>
                         </button>
-                        <button @click="statusFilter = 'done'" class="px-2 py-0.5 text-[10px] rounded border"
+                        <button @click="statusFilter = 'done'; showAllOpenTasks = false" class="px-2 py-0.5 text-[10px] rounded border"
                             :class="statusFilter === 'done'
                                 ? (theme === 'dark' ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' : 'bg-emerald-50 text-emerald-700 border-emerald-200')
                                 : (theme === 'dark' ? 'text-gray-400 border-gray-800 hover:border-gray-700' : 'text-slate-500 border-slate-200 hover:border-slate-300')">
@@ -1619,7 +1634,19 @@
                                 :class="theme === 'dark' ? 'border-emerald-500/30 text-emerald-300' : 'border-emerald-200 text-emerald-700'"
                                 x-text="counts.done"></span>
                         </button>
+                        </div>
+                        <button @click="addGoal('daily')"
+                            class="px-3 py-1 text-xs rounded bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-500 hover:text-emerald-400 transition-colors border border-emerald-500/20 flex items-center gap-1.5 font-medium whitespace-nowrap shrink-0">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Add Task
+                        </button>
                     </div>
+
+                    <!-- Scrollable Content Area -->
+                    <div class="flex-1 overflow-y-auto p-6 space-y-2 scrollbar-thumb-gray-800 scrollbar-track-transparent">
 
                     <!-- Follow-ups Section (Always Visible) -->
                     <template x-if="getFollowupGoals().length > 0">
@@ -2385,6 +2412,7 @@
                 undoMessage: '',
                 showUndo: false,
                 undoTimeoutId: null,
+                showAllOpenTasks: false,
                 showOnboarding: false,
                 onboardingMessage: 'Create a JSON file so your tasks can be saved and backed up.',
                 fileSetupRequired: false,
@@ -2704,8 +2732,20 @@
                 },
 
                 getDailyFocusGoals() {
-                    const yyyyMmDd = this.selectedDate;
-                    let list = this.goals.filter(g => g.type === 'daily' && g.date === yyyyMmDd);
+                    let list;
+                    
+                    // If showing all open tasks across all dates
+                    if (this.showAllOpenTasks) {
+                        list = this.goals.filter(g => 
+                            g.type === 'daily' && 
+                            !g.completed && 
+                            !g.cancelled
+                        );
+                    } else {
+                        // Show tasks for selected date
+                        const yyyyMmDd = this.selectedDate;
+                        list = this.goals.filter(g => g.type === 'daily' && g.date === yyyyMmDd);
+                    }
 
                     if (this.searchQuery) {
                         const q = this.searchQuery.toLowerCase();
@@ -2934,23 +2974,40 @@
                     return 0;
                 },
 
+                getAllOpenTasksCount() {
+                    return this.goals.filter(g => 
+                        g.type === 'daily' && 
+                        !g.completed && 
+                        !g.cancelled
+                    ).length;
+                },
+
                 getStatusCountsForSelectedDate() {
                     const list = this.goals.filter(g =>
                         g.type === 'daily' && g.date === this.selectedDate
+                    );
+                    const allOpen = this.goals.filter(g => 
+                        g.type === 'daily' && !g.completed && !g.cancelled
                     );
                     return {
                         all: list.length,
                         waiting: list.filter(g => !g.inProgress && !g.completed).length,
                         inProgress: list.filter(g => g.inProgress && !g.completed).length,
-                        done: list.filter(g => g.completed).length
+                        done: list.filter(g => g.completed).length,
+                        allOpen: allOpen.length
                     };
                 },
 
                 matchesStatusFilter(goal) {
-                    if (!this.statusFilter || this.statusFilter === 'all') return true;
-                    if (this.statusFilter === 'waiting') return !goal.inProgress && !goal.completed;
-                    if (this.statusFilter === 'in-progress') return goal.inProgress && !goal.completed;
-                    if (this.statusFilter === 'done') return goal.completed;
+                    if (!this.statusFilter || this.statusFilter === 'all') {
+                        return goal.type === 'daily' && goal.date === this.selectedDate;
+                    }
+                    if (this.statusFilter === 'all-open') {
+                        return goal.type === 'daily' && !goal.completed && !goal.cancelled;
+                    }
+                    if (this.statusFilter === 'waiting') return !goal.inProgress && !goal.completed && goal.date === this.selectedDate;
+                    if (this.statusFilter === 'in-progress') return goal.inProgress && !goal.completed && goal.date === this.selectedDate;
+                    if (this.statusFilter === 'done') return goal.completed && goal.date === this.selectedDate;
                     return false;
                 },
 
@@ -3555,8 +3612,15 @@
                         const file = await this.fileHandle.getFile();
                         this.fileName = file.name;
                         const text = await file.text();
-                        const data = JSON.parse(text);
-                        this.goals = data.goals || [];
+                        try {
+                            const data = JSON.parse(text);
+                            this.goals = data.goals || [];
+                        } catch (parseErr) {
+                            console.error('Failed to parse file:', parseErr);
+                            this.showToastMessage('Invalid file format. Starting fresh.');
+                            this.goals = [];
+                            return;
+                        }
                         // Normalize legacy data on open
                         this.goals.forEach(g => {
                             if (g.type === 'weekly') g.type = 'sprint';
