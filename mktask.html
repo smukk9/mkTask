@@ -138,13 +138,11 @@
         x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150"
         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
         <div class="w-[520px] max-w-[92vw] rounded-xl border shadow-2xl p-6"
-            :class="theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-slate-200'">
-            <div class="flex items-start justify-between gap-4">
+            :class="theme === 'dark' ? 'bg-gray-900 border-gray-800 text-gray-200' : 'bg-white border-slate-200 text-slate-700'">
+            <div class="flex items-start justify-between">
                 <div>
-                    <h2 class="text-lg font-bold" :class="theme === 'dark' ? 'text-gray-100' : 'text-slate-900'">Set Up
-                        Your Data File</h2>
-                    <p class="text-xs mt-1" :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'"
-                        x-text="onboardingMessage"></p>
+                    <h2 class="text-lg font-bold" :class="theme === 'dark' ? 'text-gray-100' : 'text-slate-900'">Set up your data file</h2>
+                    <p class="text-xs mt-2" :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-500'" x-text="onboardingMessage"></p>
                 </div>
                 <button @click="showOnboarding = false"
                     class="text-gray-500 hover:text-gray-300 transition-colors">X</button>
@@ -165,7 +163,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- Header / Toolbar -->
     <header class="h-12 border-b grid grid-cols-3 items-center px-4 shrink-0 transition-colors duration-300"
@@ -270,26 +267,51 @@
             <!-- View Mode Toggle -->
             <div class="flex items-center p-1 rounded-lg border"
                 :class="theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-white border-slate-200'">
-                <button @click="standupMode = false; viewMode = 'focus'"
+                <button @click="viewMode = 'focus'"
                     class="px-3 py-1 text-xs rounded-md transition-all"
-                    :class="!standupMode && viewMode === 'focus' ? (theme === 'dark' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-indigo-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
-                    Focus
+                    :class="viewMode === 'focus' ? (theme === 'dark' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-indigo-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
+                    Dashboard
                 </button>
-                <button @click="standupMode = true; viewMode = 'focus'"
+                <button @click="viewMode = 'standup'"
                     class="px-3 py-1 text-xs rounded-md transition-all"
-                    :class="standupMode ? (theme === 'dark' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-indigo-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
+                    :class="viewMode === 'standup' ? (theme === 'dark' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-indigo-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
                     Standup
                 </button>
-                <button @click="viewMode = 'kb'; standupMode = false"
-                    class="px-3 py-1 text-xs rounded-md transition-all"
-                    :class="viewMode === 'kb' ? (theme === 'dark' ? 'bg-amber-600 text-white shadow-lg' : 'bg-amber-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
-                    KB
-                </button>
+                <div class="relative group">
+                    <button @click="viewMode = 'em'"
+                        class="px-3 py-1 text-xs rounded-md transition-all"
+                        :class="viewMode === 'em' ? (theme === 'dark' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-indigo-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
+                        EM
+                    </button>
+                    <div class="pointer-events-none absolute left-1/2 -translate-x-1/2 top-full mt-2 px-2 py-1 text-[10px] rounded border opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[100]"
+                        :class="theme === 'dark' ? 'bg-gray-900 border-gray-700 text-gray-200' : 'bg-white border-slate-200 text-slate-700'">
+                        Eisenhower Matrix
+                    </div>
+                </div>
+                <div class="relative group">
+                    <button @click="viewMode = 'etf'"
+                        class="px-3 py-1 text-xs rounded-md transition-all"
+                        :class="viewMode === 'etf' ? (theme === 'dark' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-indigo-500 text-white shadow') : 'text-gray-500 hover:text-gray-300'">
+                        ETF
+                    </button>
+                    <div class="pointer-events-none absolute left-1/2 -translate-x-1/2 top-full mt-2 px-2 py-1 text-[10px] rounded border opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[100]"
+                        :class="theme === 'dark' ? 'bg-gray-900 border-gray-700 text-gray-200' : 'bg-white border-slate-200 text-slate-700'">
+                        Eat That Frog
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Right Section -->
         <div class="flex items-center gap-3 justify-end">
+            <button x-show="viewMode === 'em' || viewMode === 'etf' || viewMode === 'standup'" @click="addGoal('daily')"
+                class="px-3 py-1.5 text-xs rounded bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-500 hover:text-emerald-400 transition-colors border border-emerald-500/20 flex items-center gap-2 font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4v16m8-8H4"></path>
+                </svg>
+                Add Task
+            </button>
             <!-- Global Search -->
             <div class="relative group">
                 <input type="text" x-model="searchQuery" x-ref="searchInput" placeholder="Search..."
@@ -507,9 +529,9 @@
         </div>
 
         <!-- Left Column: Strategy (Quarterly & Sprint Stacked) -->
-        <div x-show="isCompactLayout && showStrategyPanel" x-cloak class="fixed inset-0 z-30"
+        <div x-show="viewMode !== 'em' && viewMode !== 'etf' && isCompactLayout && showStrategyPanel" x-cloak class="fixed inset-0 z-30"
             :class="theme === 'dark' ? 'bg-gray-950/60' : 'bg-slate-900/20'" @click="showStrategyPanel = false"></div>
-        <div x-show="!isCompactLayout || showStrategyPanel" x-cloak
+        <div x-show="viewMode !== 'em' && viewMode !== 'etf' && (!isCompactLayout || showStrategyPanel)" x-cloak
             class="w-[320px] flex flex-col border-r shrink-0 transition-colors" :class="[
                 theme === 'dark' ? 'border-gray-800 bg-gray-950' : 'border-slate-200 bg-slate-50',
                 isCompactLayout ? 'fixed inset-y-0 left-0 z-40 w-[320px] shadow-2xl' : ''
@@ -729,30 +751,34 @@
 
         </div>
 
-        <!-- Right Column: Daily Execution + Daily Bits Sidebar -->
+        <!-- Right Column: Daily Execution -->
         <div class="flex-1 flex min-w-0">
             <!-- Daily Execution -->
             <div class="flex-1 flex flex-col min-w-0 bg-gray-950 relative"
                 :class="theme === 'dark' ? 'bg-gray-950' : 'bg-slate-50'">
                 <!-- Header -->
-                <div class="px-6 py-4 border-b flex justify-between items-end z-10 transition-colors" :class="[
+                <div x-show="viewMode !== 'em' && viewMode !== 'etf'" class="px-6 py-4 border-b flex justify-between items-end z-10 transition-colors" :class="[
                         theme === 'dark' ? 'border-gray-800 bg-gray-950' : 'border-slate-200 bg-slate-50',
-                        standupMode ? 'flex-col gap-3 sm:flex-row sm:items-end' : ''
+                        viewMode === 'standup' ? 'flex-col gap-3 sm:flex-row sm:items-end' : ''
                     ]">
                     <!-- Standup View Toggle -->
                     <div class="flex flex-wrap items-center gap-2 mb-1">
-                        <h2 class="text-xl font-bold flex items-center gap-2">
-                            <span :class="theme === 'dark' ? 'text-white' : 'text-slate-900'">Daily Focus</span>
-                            <span class="text-sm font-normal px-2 py-0.5 rounded-full border"
-                                :class="theme === 'dark' ? 'text-gray-400 bg-gray-900 border-gray-800' : 'text-slate-500 bg-white border-slate-200'"
-                                x-text="formatDate(selectedDate)"></span>
-                            <button @click="goToday()" x-show="selectedDate !== getTodayDate()"
-                                class="text-xs text-indigo-500 hover:text-indigo-400 underline ml-2">
-                                Back to Today
-                            </button>
-                        </h2>
+                        <div>
+                            <h2 class="text-xl font-bold flex items-center gap-2">
+                                <span :class="theme === 'dark' ? 'text-white' : 'text-slate-900'"
+                                    x-text="viewMode === 'em' ? 'EM' : 'Dashboard'"></span>
+                                <span x-show="viewMode !== 'eh'" class="text-sm font-normal px-2 py-0.5 rounded-full border"
+                                    :class="theme === 'dark' ? 'text-gray-400 bg-gray-900 border-gray-800' : 'text-slate-500 bg-white border-slate-200'"
+                                    x-text="formatDate(selectedDate)"></span>
+                                <button @click="goToday()" x-show="selectedDate !== getTodayDate()"
+                                    class="text-xs text-indigo-500 hover:text-indigo-400 underline ml-2">
+                                    Back to Today
+                                </button>
+                            </h2>
+                            <div x-show="viewMode === 'eh'" class="hidden"></div>
+                        </div>
                         <div class="flex items-center gap-1 ml-4 border-l pl-4"
-                            :class="[theme === 'dark' ? 'border-gray-800' : 'border-slate-200', standupMode ? 'ml-0 pl-0 border-l-0 sm:ml-4 sm:pl-4 sm:border-l' : '']"
+                            :class="[theme === 'dark' ? 'border-gray-800' : 'border-slate-200', viewMode === 'standup' ? 'ml-0 pl-0 border-l-0 sm:ml-4 sm:pl-4 sm:border-l' : '']"
                             x-show="isCompactLayout">
                             <button @click="showStrategyPanel = !showStrategyPanel"
                                 class="px-2 py-0.5 text-[10px] rounded border transition-all" :class="showStrategyPanel
@@ -768,22 +794,12 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
-                        <button x-show="standupMode" @click="generateStandup()"
+                        <button x-show="viewMode === 'standup'" @click="generateStandup()"
                             class="px-3 py-1.5 rounded transition-colors border text-sm font-medium"
                             :class="theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 border-gray-700' : 'bg-white hover:bg-slate-100 text-slate-600 border-slate-200'">
                             Copy Report
                         </button>
-                        <button @click="showBits = !showBits"
-                            class="px-2 py-1 text-[11px] rounded border transition-all" :class="showBits
-                                ? (theme === 'dark'
-                                    ? 'bg-indigo-500/10 border-indigo-500 text-indigo-400'
-                                    : 'bg-indigo-50 border-indigo-300 text-indigo-600')
-                                : (theme === 'dark'
-                                    ? 'border-gray-800 text-gray-500'
-                                    : 'border-slate-300 text-slate-500')">
-                            Daily Bits
-                        </button>
-                        <button @click="addGoal('daily')"
+                        <button x-show="viewMode !== 'em' && viewMode !== 'etf' && viewMode !== 'standup'" @click="addGoal('daily')"
                             class="px-3 py-1.5 rounded bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-500 hover:text-emerald-400 transition-colors border border-emerald-500/20 flex items-center gap-2 text-sm font-medium">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -796,7 +812,7 @@
                 </div>
 
                 <!-- Standup/Grid View -->
-                <div class="flex-1 overflow-hidden" x-show="standupMode">
+                <div class="flex-1 overflow-hidden" x-show="viewMode === 'standup'">
                     <div class="h-full grid grid-cols-3 divide-x"
                         :class="theme === 'dark' ? 'divide-gray-800' : 'divide-slate-200'">
                         <!-- Yesterday -->
@@ -919,11 +935,23 @@
                                                 </div>
                                                 <template
                                                     x-if="isRolledOver(goal) && !goal.completed && !goal.cancelled">
-                                                    <p class="text-[10px] mt-0.5 px-1.5 py-0.5 rounded border font-medium inline-block"
-                                                        :class="theme === 'dark' ? 'bg-orange-500/20 text-orange-300 border-orange-500/40' : 'bg-orange-100 text-orange-700 border-orange-400'"
-                                                        :title="'Rolled over from ' + goal.rolledOverFrom">
-                                                        ↻ Rollover
-                                                    </p>
+                                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                                        <p class="text-[10px] px-1.5 py-0.5 rounded border font-medium inline-flex items-center gap-1"
+                                                            :class="theme === 'dark' ? 'bg-orange-500/20 text-orange-300 border-orange-500/40' : 'bg-orange-100 text-orange-700 border-orange-400'"
+                                                            :title="'Rolled over from ' + goal.rolledOverFrom">
+                                                            ↻ Rollover
+                                                            <span x-show="goal.rolloverCount > 0" 
+                                                                class="px-1 rounded-full font-bold text-[9px]"
+                                                                :class="theme === 'dark' ? 'bg-orange-600 text-white' : 'bg-orange-600 text-white'"
+                                                                x-text="'+' + goal.rolloverCount + 'd'"></span>
+                                                        </p>
+                                                        <button @click.stop="acceptToToday(goal)"
+                                                            class="text-[9px] px-1.5 py-0.5 rounded border font-medium transition-all"
+                                                            :class="theme === 'dark' ? 'border-green-700 text-green-400 hover:bg-green-900/30' : 'border-green-600 text-green-700 hover:bg-green-50'"
+                                                            title="Accept to today">
+                                                            Accept
+                                                        </button>
+                                                    </div>
                                                 </template>
                                             </div>
                                         </div>
@@ -988,132 +1016,569 @@
                     </div>
                 </div>
 
-                <!-- Knowledge Base View -->
-                <div class="flex-1 flex flex-col min-w-0 min-h-0" x-show="viewMode === 'kb' && !standupMode">
-                    <div class="p-6 border-b flex items-center justify-between gap-4"
-                        :class="theme === 'dark' ? 'border-gray-800' : 'border-slate-200'">
-                        <div class="flex items-center gap-3">
-                            <h3 class="text-sm font-bold uppercase tracking-widest text-amber-500">Pinned Knowledge Base
-                            </h3>
-                            <div class="text-[10px] theme-text-muted transition-colors"
-                                x-text="getKBItems().length + ' pinned items'"></div>
-                        </div>
-                    </div>
-                    <div class="flex-1 overflow-y-auto p-6 space-y-4 min-h-0">
-                        <template x-for="(bit, idx) in getKBItems()" :key="bit.id">
-                            <div class="space-y-3">
-                                <template x-if="idx === 0 || getKBItems()[idx - 1]?.date !== bit.date">
-                                    <div class="flex items-center gap-3">
-                                        <span class="text-[9px] uppercase tracking-widest text-amber-500/70"
-                                            x-text="formatDate(bit.date)"></span>
-                                        <div class="flex-1 h-px"
-                                            :class="theme === 'dark' ? 'bg-gray-800' : 'bg-slate-200'"></div>
+                <!-- EM Matrix View -->
+                <div class="flex-1 overflow-hidden p-6" x-show="viewMode === 'em'">
+                    <div class="h-full grid grid-cols-2 grid-rows-2 gap-4">
+                        <!-- Q1: Do Now -->
+                        <div class="rounded-xl border flex flex-col min-h-0"
+                            :class="theme === 'dark' ? 'bg-gray-950/60 border-red-500/30' : 'bg-white border-red-200'">
+                            <div class="px-4 py-3 border-b flex items-center justify-between gap-3"
+                                :class="theme === 'dark' ? 'border-red-500/20 bg-red-500/10 text-red-300' : 'border-red-200 bg-red-50 text-red-700'">
+                                <div class="text-sm font-semibold flex items-center gap-2">
+                                    <span>Do Now</span>
+                                    <span class="text-[10px] uppercase tracking-widest opacity-80">(Urgent + Important)</span>
+                                </div>
+                                <div class="text-[10px] px-2 py-0.5 rounded-full border"
+                                    :class="theme === 'dark' ? 'border-red-500/30 text-red-300' : 'border-red-200 text-red-700'">P1</div>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-3 space-y-2" x-data="{ items: [] }"
+                                x-effect="items = getEisenhowerGoalsByPriority([1])" @dragover.prevent
+                                @drop="onDropEisenhower(1)">
+                                <template x-for="goal in items" :key="goal.id">
+                                    <div class="group p-2 rounded-lg border cursor-pointer" draggable="true"
+                                        @dragstart="startEisenhowerDrag(goal)" @dragend="clearEisenhowerDrag()"
+                                        @click="openDetail(goal)"
+                                        :class="[
+                                            theme === 'dark' ? 'bg-gray-900/60 border-gray-800 hover:border-red-500/40' : 'bg-white border-slate-200 hover:border-red-300',
+                                            goal.completed ? 'opacity-60' : ''
+                                        ]">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="min-w-0">
+                                                <div class="text-sm font-medium truncate"
+                                                    :class="goal.completed ? 'line-through text-gray-500' : (theme === 'dark' ? 'text-gray-100' : 'text-slate-800')"
+                                                    x-text="goal.title"></div>
+                                                <div class="mt-1 flex items-center gap-2 text-[10px]">
+                                                    <span class="px-1.5 py-0.5 rounded border font-medium"
+                                                        :class="getPriorityInfo(goal.priority).color"
+                                                        x-text="getPriorityInfo(goal.priority).label"></span>
+                                                    <span x-show="goal.completed"
+                                                        class="px-1.5 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-500">Done</span>
+                                                </div>
+                                            </div>
+                                            <button @click.stop="markDone(goal)"
+                                                class="p-1 rounded hover:bg-emerald-500/10"
+                                                :class="theme === 'dark' ? 'text-gray-500 hover:text-emerald-400' : 'text-slate-400 hover:text-emerald-500'">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <circle x-show="!goal.completed" cx="12" cy="12" r="9" stroke-width="2"></circle>
+                                                    <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                        d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 </template>
-                                <div class="group border rounded-lg overflow-hidden transition-all shadow-sm"
-                                    :class="theme === 'dark' ? 'bg-gray-900/40 border-amber-500/20' : 'bg-white border-amber-200'">
-                                    <div class="px-4 py-2 border-b flex items-center justify-between cursor-pointer"
-                                        @click="toggleKBCollapse(bit)" title="Expand / Collapse"
-                                        :class="theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-amber-50 border-amber-100'">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-[10px] font-mono text-amber-600"
-                                                x-text="formatDate(bit.date)"></span>
-                                            <h4 class="text-xs font-bold" x-text="bit.title"></h4>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <button @click.stop="copyKBToClipboard(bit)"
-                                                class="text-amber-500/80 hover:text-amber-400" title="Copy KB">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2M8 7a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2h-2">
-                                                    </path>
-                                                </svg>
-                                            </button>
-                                            <button @click.stop="toggleKBCollapse(bit)"
-                                                class="text-amber-500/80 hover:text-amber-400"
-                                                title="Expand / Collapse">
-                                                <svg x-show="isKBCollapsed(bit)" class="w-3.5 h-3.5" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                                </svg>
-                                                <svg x-show="!isKBCollapsed(bit)" class="w-3.5 h-3.5" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M5 15l7-7 7 7"></path>
-                                                </svg>
-                                            </button>
-                                            <button x-show="!bit.kbPendingUnpin" @click.stop="requestUnpinKB(bit)"
-                                                class="text-amber-500 hover:text-amber-400" title="Unpin from KB">
-                                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3.5 7 3.5V5c0-1.1-.9-2-2-2z">
-                                                    </path>
-                                                </svg>
-                                            </button>
-                                            <div x-show="bit.kbPendingUnpin" class="flex items-center gap-1">
-                                                <button @click.stop="confirmUnpinKB(bit)"
-                                                    class="px-1.5 py-0.5 rounded border text-[9px] font-semibold"
-                                                    :class="theme === 'dark' ? 'border-amber-500/40 text-amber-400 hover:bg-amber-500/10' : 'border-amber-400 text-amber-600 hover:bg-amber-50'">
-                                                    Unpin
-                                                </button>
-                                                <button @click.stop="cancelUnpinKB(bit)"
-                                                    class="px-1.5 py-0.5 rounded border text-[9px]"
-                                                    :class="theme === 'dark' ? 'border-gray-700 text-gray-400 hover:bg-gray-800' : 'border-slate-200 text-slate-500 hover:bg-slate-100'">
-                                                    Cancel
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="p-4 space-y-3" x-show="!isKBCollapsed(bit)">
-                                        <template x-if="!isKBCollapsed(bit)">
-                                            <template x-for="(block, idx) in parseMarkdownBlocks(bit.description)"
-                                                :key="bit.id + '-block-' + idx">
-                                                <div>
-                                                    <template x-if="block.type === 'text'">
-                                                        <p class="text-[11px] whitespace-pre-wrap opacity-80"
-                                                            x-text="block.content"></p>
-                                                    </template>
-                                                    <template x-if="block.type === 'code'">
-                                                        <div>
-                                                            <div x-show="block.lang"
-                                                                class="text-[9px] uppercase tracking-widest text-amber-500 mb-1"
-                                                                x-text="block.lang"></div>
-                                                            <pre class="text-[11px] font-mono whitespace-pre-wrap opacity-90"
-                                                                x-text="block.content"></pre>
-                                                        </div>
-                                                    </template>
-                                                </div>
-                                            </template>
-                                        </template>
-                                    </div>
-                                    <div class="px-4 py-2 bg-gray-500/5 flex gap-2"
-                                        x-show="bit.tags && bit.tags.length">
-                                        <template x-for="tag in (bit.tags || [])" :key="tag">
-                                            <span
-                                                class="text-[9px] px-1.5 py-0.5 rounded border border-gray-500/20 theme-text-muted"
-                                                x-text="tag"></span>
-                                        </template>
-                                    </div>
+                                <div x-show="items.length === 0" class="text-xs text-center py-6"
+                                    :class="theme === 'dark' ? 'text-gray-600' : 'text-slate-400'">
+                                    Drop P1 tasks here
                                 </div>
                             </div>
-                        </template>
-                        <div x-show="getKBItems().length === 0" class="text-center py-20 opacity-30">
-                            <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
-                                </path>
-                            </svg>
-                            <p class="text-sm">Knowledge Base is Empty</p>
-                            <p class="text-[11px] mt-1">Pin bits from your daily focus to build your KB.</p>
+                        </div>
+
+                        <!-- Q2: Plan -->
+                        <div class="rounded-xl border flex flex-col min-h-0"
+                            :class="theme === 'dark' ? 'bg-gray-950/60 border-orange-500/30' : 'bg-white border-orange-200'">
+                            <div class="px-4 py-3 border-b flex items-center justify-between gap-3"
+                                :class="theme === 'dark' ? 'border-orange-500/20 bg-orange-500/10 text-orange-300' : 'border-orange-200 bg-orange-50 text-orange-700'">
+                                <div class="text-sm font-semibold flex items-center gap-2">
+                                    <span>Plan</span>
+                                    <span class="text-[10px] uppercase tracking-widest opacity-80">(Not Urgent + Important)</span>
+                                </div>
+                                <div class="text-[10px] px-2 py-0.5 rounded-full border"
+                                    :class="theme === 'dark' ? 'border-orange-500/30 text-orange-300' : 'border-orange-200 text-orange-700'">P2</div>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-3 space-y-2" x-data="{ items: [] }"
+                                x-effect="items = getEisenhowerGoalsByPriority([2])" @dragover.prevent
+                                @drop="onDropEisenhower(2)">
+                                <template x-for="goal in items" :key="goal.id">
+                                    <div class="group p-2 rounded-lg border cursor-pointer" draggable="true"
+                                        @dragstart="startEisenhowerDrag(goal)" @dragend="clearEisenhowerDrag()"
+                                        @click="openDetail(goal)"
+                                        :class="[
+                                            theme === 'dark' ? 'bg-gray-900/60 border-gray-800 hover:border-orange-500/40' : 'bg-white border-slate-200 hover:border-orange-300',
+                                            goal.completed ? 'opacity-60' : ''
+                                        ]">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="min-w-0">
+                                                <div class="text-sm font-medium truncate"
+                                                    :class="goal.completed ? 'line-through text-gray-500' : (theme === 'dark' ? 'text-gray-100' : 'text-slate-800')"
+                                                    x-text="goal.title"></div>
+                                                <div class="mt-1 flex items-center gap-2 text-[10px]">
+                                                    <span class="px-1.5 py-0.5 rounded border font-medium"
+                                                        :class="getPriorityInfo(goal.priority).color"
+                                                        x-text="getPriorityInfo(goal.priority).label"></span>
+                                                    <span x-show="goal.completed"
+                                                        class="px-1.5 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-500">Done</span>
+                                                </div>
+                                            </div>
+                                            <button @click.stop="markDone(goal)"
+                                                class="p-1 rounded hover:bg-emerald-500/10"
+                                                :class="theme === 'dark' ? 'text-gray-500 hover:text-emerald-400' : 'text-slate-400 hover:text-emerald-500'">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <circle x-show="!goal.completed" cx="12" cy="12" r="9" stroke-width="2"></circle>
+                                                    <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                        d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+                                <div x-show="items.length === 0" class="text-xs text-center py-6"
+                                    :class="theme === 'dark' ? 'text-gray-600' : 'text-slate-400'">
+                                    Drop P2 tasks here
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Q3: Delegate -->
+                        <div class="rounded-xl border flex flex-col min-h-0"
+                            :class="theme === 'dark' ? 'bg-gray-950/60 border-blue-500/30' : 'bg-white border-blue-200'">
+                            <div class="px-4 py-3 border-b flex items-center justify-between gap-3"
+                                :class="theme === 'dark' ? 'border-blue-500/20 bg-blue-500/10 text-blue-300' : 'border-blue-200 bg-blue-50 text-blue-700'">
+                                <div class="text-sm font-semibold flex items-center gap-2">
+                                    <span>Delegate</span>
+                                    <span class="text-[10px] uppercase tracking-widest opacity-80">(Urgent + Not Important)</span>
+                                </div>
+                                <div class="text-[10px] px-2 py-0.5 rounded-full border"
+                                    :class="theme === 'dark' ? 'border-blue-500/30 text-blue-300' : 'border-blue-200 text-blue-700'">P3</div>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-3 space-y-2" x-data="{ items: [] }"
+                                x-effect="items = getEisenhowerGoalsByPriority([3])" @dragover.prevent
+                                @drop="onDropEisenhower(3)">
+                                <template x-for="goal in items" :key="goal.id">
+                                    <div class="group p-2 rounded-lg border cursor-pointer" draggable="true"
+                                        @dragstart="startEisenhowerDrag(goal)" @dragend="clearEisenhowerDrag()"
+                                        @click="openDetail(goal)"
+                                        :class="[
+                                            theme === 'dark' ? 'bg-gray-900/60 border-gray-800 hover:border-blue-500/40' : 'bg-white border-slate-200 hover:border-blue-300',
+                                            goal.completed ? 'opacity-60' : ''
+                                        ]">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="min-w-0">
+                                                <div class="text-sm font-medium truncate"
+                                                    :class="goal.completed ? 'line-through text-gray-500' : (theme === 'dark' ? 'text-gray-100' : 'text-slate-800')"
+                                                    x-text="goal.title"></div>
+                                                <div class="mt-1 flex items-center gap-2 text-[10px]">
+                                                    <span class="px-1.5 py-0.5 rounded border font-medium"
+                                                        :class="getPriorityInfo(goal.priority).color"
+                                                        x-text="getPriorityInfo(goal.priority).label"></span>
+                                                    <span x-show="goal.completed"
+                                                        class="px-1.5 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-500">Done</span>
+                                                </div>
+                                            </div>
+                                            <button @click.stop="markDone(goal)"
+                                                class="p-1 rounded hover:bg-emerald-500/10"
+                                                :class="theme === 'dark' ? 'text-gray-500 hover:text-emerald-400' : 'text-slate-400 hover:text-emerald-500'">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <circle x-show="!goal.completed" cx="12" cy="12" r="9" stroke-width="2"></circle>
+                                                    <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                        d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+                                <div x-show="items.length === 0" class="text-xs text-center py-6"
+                                    :class="theme === 'dark' ? 'text-gray-600' : 'text-slate-400'">
+                                    Drop P3 tasks here
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Q4: Eliminate -->
+                        <div class="rounded-xl border flex flex-col min-h-0"
+                            :class="theme === 'dark' ? 'bg-gray-950/60 border-gray-500/30' : 'bg-white border-gray-200'">
+                            <div class="px-4 py-3 border-b flex items-center justify-between gap-3"
+                                :class="theme === 'dark' ? 'border-gray-500/20 bg-gray-500/10 text-gray-300' : 'border-gray-200 bg-gray-50 text-gray-700'">
+                                <div class="text-sm font-semibold flex items-center gap-2">
+                                    <span>Eliminate</span>
+                                    <span class="text-[10px] uppercase tracking-widest opacity-80">(Not Urgent + Not Important)</span>
+                                </div>
+                                <div class="text-[10px] px-2 py-0.5 rounded-full border"
+                                    :class="theme === 'dark' ? 'border-gray-500/30 text-gray-300' : 'border-gray-200 text-gray-700'">P4/P5</div>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-3 space-y-2" x-data="{ items: [] }"
+                                x-effect="items = getEisenhowerGoalsByPriority([4, 5])" @dragover.prevent
+                                @drop="onDropEisenhower(5)">
+                                <template x-for="goal in items" :key="goal.id">
+                                    <div class="group p-2 rounded-lg border cursor-pointer" draggable="true"
+                                        @dragstart="startEisenhowerDrag(goal)" @dragend="clearEisenhowerDrag()"
+                                        @click="openDetail(goal)"
+                                        :class="[
+                                            theme === 'dark' ? 'bg-gray-900/60 border-gray-800 hover:border-gray-500/40' : 'bg-white border-slate-200 hover:border-gray-300',
+                                            goal.completed ? 'opacity-60' : ''
+                                        ]">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="min-w-0">
+                                                <div class="text-sm font-medium truncate"
+                                                    :class="goal.completed ? 'line-through text-gray-500' : (theme === 'dark' ? 'text-gray-100' : 'text-slate-800')"
+                                                    x-text="goal.title"></div>
+                                                <div class="mt-1 flex items-center gap-2 text-[10px]">
+                                                    <span class="px-1.5 py-0.5 rounded border font-medium"
+                                                        :class="getPriorityInfo(goal.priority).color"
+                                                        x-text="getPriorityInfo(goal.priority).label"></span>
+                                                    <span x-show="goal.completed"
+                                                        class="px-1.5 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-500">Done</span>
+                                                </div>
+                                            </div>
+                                            <button @click.stop="markDone(goal)"
+                                                class="p-1 rounded hover:bg-emerald-500/10"
+                                                :class="theme === 'dark' ? 'text-gray-500 hover:text-emerald-400' : 'text-slate-400 hover:text-emerald-500'">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <circle x-show="!goal.completed" cx="12" cy="12" r="9" stroke-width="2"></circle>
+                                                    <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                        d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+                                <div x-show="items.length === 0" class="text-xs text-center py-6"
+                                    :class="theme === 'dark' ? 'text-gray-600' : 'text-slate-400'">
+                                    Drop P4/P5 tasks here
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Standard List View (Focus Mode) -->
+                <!-- ETF Queue View -->
+                <div class="flex-1 overflow-hidden p-8" x-show="viewMode === 'etf'">
+                    <!-- Layout with task + sidebar when there are pending tasks -->
+                    <template x-if="getCurrentQueueTask()">
+                        <div class="flex gap-6 h-full">
+                            <div class="flex-1 flex flex-col space-y-6">
+                            <!-- Task Header Bar -->
+                            <div class="flex items-center justify-between px-4 py-3 rounded-xl border" :class="theme === 'dark' ? 'bg-gray-900/40 border-gray-800' : 'bg-slate-50 border-slate-200'">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-5 h-5" :class="theme === 'dark' ? 'text-indigo-400' : 'text-indigo-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <div class="text-sm font-medium" :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-700'"
+                                        x-text="'Task ' + (getQueueTaskIndex(getCurrentQueueTask()) + 1) + ' of ' + getQueueTasks().length + ' remaining'"></div>
+                                </div>
+                                <div class="relative group">
+                                    <button @click="queueReversePriority = !queueReversePriority" 
+                                        class="p-2 rounded-lg transition-all" 
+                                        :class="theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-indigo-600'">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!queueReversePriority">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path>
+                                        </svg>
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="queueReversePriority">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path>
+                                        </svg>
+                                    </button>
+                                    <div class="pointer-events-none absolute right-0 top-full mt-2 px-2 py-1 text-[10px] rounded border opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-[100]"
+                                        :class="theme === 'dark' ? 'bg-gray-900 border-gray-700 text-gray-200' : 'bg-white border-slate-200 text-slate-700'"
+                                        x-text="queueReversePriority ? 'P5→P1 (Low to High)' : 'P1→P5 (High to Low)'"></div>
+                                </div>
+                            </div>
+
+                            <!-- Current Task Card -->
+                            <div class="flex-1 rounded-2xl border-2 p-8 transition-all overflow-hidden flex flex-col" :class="theme === 'dark' ? 'bg-gray-900/60 border-indigo-500/30' : 'bg-white border-indigo-300'">
+
+                                <!-- Task Content -->
+                                <div class="space-y-4 mb-6 cursor-pointer" @click="openDetail(getCurrentQueueTask())">
+                                    <div class="flex items-start gap-3">
+                                        <h2 class="text-3xl font-bold flex-1" :class="theme === 'dark' ? 'text-gray-100' : 'text-slate-900'"
+                                            x-text="getCurrentQueueTask().title || 'Untitled Task'"></h2>
+                                        <span class="text-base px-3 py-1.5 rounded-lg border font-bold shrink-0"
+                                            :class="getPriorityInfo(getCurrentQueueTask().priority).color"
+                                            x-text="getPriorityInfo(getCurrentQueueTask().priority).label"></span>
+                                    </div>
+                                    
+                                    <div class="max-h-32 overflow-y-auto" x-show="getCurrentQueueTask().description">
+                                        <p class="text-base leading-relaxed" :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'"
+                                            x-text="getCurrentQueueTask().description"></p>
+                                    </div>
+
+                                    <!-- Metadata -->
+                                    <div class="flex flex-wrap items-center gap-4 text-sm" :class="theme === 'dark' ? 'text-gray-500' : 'text-slate-500'">
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                            <span x-text="formatDate(getCurrentQueueTask().date)"></span>
+                                        </div>
+                                        <template x-if="getCurrentQueueTask().tags && getCurrentQueueTask().tags.length > 0">
+                                            <div class="flex items-center gap-2">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                                </svg>
+                                                <span x-text="getCurrentQueueTask().tags.join(', ')"></span>
+                                            </div>
+                                        </template>
+                                        <template x-if="getCurrentQueueTask().parentId && getParentDetails(getCurrentQueueTask().parentId)">
+                                            <div class="flex items-center gap-2 px-2 py-1 rounded-full border" :class="theme === 'dark' ? 'border-purple-500/20 bg-purple-500/10 text-purple-400' : 'border-purple-200 bg-purple-50 text-purple-600'">
+                                                <span class="text-xs" x-text="'Sprint: ' + getParentDetails(getCurrentQueueTask().parentId).title"></span>
+                                            </div>
+                                        </template>
+                                        <template x-if="isRolledOver(getCurrentQueueTask())">
+                                            <div class="flex items-center gap-2">
+                                                <div class="px-2 py-1 rounded-full border font-medium inline-flex items-center gap-1" :class="theme === 'dark' ? 'border-orange-500/40 bg-orange-500/20 text-orange-300' : 'border-orange-300 bg-orange-100 text-orange-700'">
+                                                    <span class="text-xs">↻ Rollover</span>
+                                                    <span x-show="getCurrentQueueTask().rolloverCount > 0" 
+                                                        class="ml-1 px-1.5 py-0.5 rounded-full font-bold text-[10px]"
+                                                        :class="theme === 'dark' ? 'bg-orange-600 text-white' : 'bg-orange-600 text-white'"
+                                                        x-text="'+' + getCurrentQueueTask().rolloverCount + 'd'"></span>
+                                                </div>
+                                                <button @click.stop="acceptToToday(getCurrentQueueTask())"
+                                                    class="text-xs px-3 py-1 rounded-full border font-medium transition-all"
+                                                    :class="theme === 'dark' ? 'border-green-700 text-green-400 hover:bg-green-900/30' : 'border-green-600 text-green-700 hover:bg-green-50'"
+                                                    title="Accept this task to today's queue">
+                                                    Accept
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <!-- Timer Display -->
+                                <div x-show="getCurrentQueueTask().inProgress && getCurrentQueueTask().startedAt" class="mb-4">
+                                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border" :class="theme === 'dark' ? 'bg-amber-500/10 border-amber-500/30 text-amber-300' : 'bg-amber-50 border-amber-200 text-amber-700'">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span class="text-sm font-medium">Started: <span x-text="formatTime(getCurrentQueueTask().startedAt)"></span></span>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex items-center gap-4">
+                                    <button @click="startTask(getCurrentQueueTask())"
+                                        x-show="!getCurrentQueueTask().inProgress && !getCurrentQueueTask().completed"
+                                        class="flex-1 py-4 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-3"
+                                        :class="theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-indigo-500 hover:bg-indigo-600 text-white'">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M8 5v14l11-7z"></path>
+                                        </svg>
+                                        Start Working
+                                    </button>
+                                    <button @click="pauseTask(getCurrentQueueTask())"
+                                        x-show="getCurrentQueueTask().inProgress && !getCurrentQueueTask().completed"
+                                        class="flex-1 py-4 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-3"
+                                        :class="theme === 'dark' ? 'bg-amber-600 hover:bg-amber-500 text-white' : 'bg-amber-500 hover:bg-amber-600 text-white'">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"></path>
+                                        </svg>
+                                        Pause
+                                    </button>
+                                    <button @click="completeTask(getCurrentQueueTask())"
+                                        class="flex-1 py-4 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-3"
+                                        :class="theme === 'dark' ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-emerald-500 hover:bg-emerald-600 text-white'">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        Mark Done
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Up Next Preview -->
+                            <template x-if="getNextQueueTask()">
+                                <div class="rounded-xl border p-4 transition-all" :class="theme === 'dark' ? 'bg-gray-900/30 border-gray-800' : 'bg-slate-50 border-slate-200'">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-3 min-w-0">
+                                            <svg class="w-5 h-5 shrink-0" :class="theme === 'dark' ? 'text-gray-600' : 'text-slate-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                            </svg>
+                                            <div class="min-w-0">
+                                                <div class="text-xs mb-1" :class="theme === 'dark' ? 'text-gray-500' : 'text-slate-500'">Up Next:</div>
+                                                <div class="font-medium truncate" :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-700'"
+                                                    x-text="getNextQueueTask().title"></div>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs px-2 py-1 rounded border font-medium shrink-0"
+                                            :class="getPriorityInfo(getNextQueueTask().priority).color"
+                                            x-text="getPriorityInfo(getNextQueueTask().priority).label"></span>
+                                    </div>
+                                </div>
+                            </template>
+
+                        </div>
+
+                        <!-- Metrics Sidebar (always visible when there's a current task) -->
+                        <div class="w-80 flex flex-col space-y-4">
+                        <!-- Today's Progress -->
+                        <div class="rounded-xl border p-4" :class="theme === 'dark' ? 'bg-gray-900/40 border-gray-800' : 'bg-slate-50 border-slate-200'">
+                            <div class="flex items-center gap-2 mb-3">
+                                <svg class="w-5 h-5" :class="theme === 'dark' ? 'text-indigo-400' : 'text-indigo-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                <h3 class="text-sm font-bold" :class="theme === 'dark' ? 'text-gray-200' : 'text-slate-800'">Today's Progress</h3>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-sm">
+                                    <span :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'">Completed</span>
+                                    <span class="font-bold" :class="theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'"
+                                        x-text="getQueueCompletedCount() + '/' + getQueueTotalCount()"></span>
+                                </div>
+                                <div class="w-full h-2 rounded-full overflow-hidden" :class="theme === 'dark' ? 'bg-gray-800' : 'bg-slate-200'">
+                                    <div class="h-full bg-emerald-500 transition-all" :style="'width: ' + (getQueueTotalCount() > 0 ? (getQueueCompletedCount() / getQueueTotalCount() * 100) : 0) + '%'"></div>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'">Total Time</span>
+                                    <span class="font-bold" :class="theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'"
+                                        x-text="formatDuration(getTotalTimeToday())"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline -->
+                        <div class="flex-1 rounded-xl border p-4 overflow-hidden flex flex-col" :class="theme === 'dark' ? 'bg-gray-900/40 border-gray-800' : 'bg-slate-50 border-slate-200'">
+                            <div class="flex items-center gap-2 mb-3">
+                                <svg class="w-5 h-5" :class="theme === 'dark' ? 'text-indigo-400' : 'text-indigo-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <h3 class="text-sm font-bold" :class="theme === 'dark' ? 'text-gray-200' : 'text-slate-800'">Task Timeline</h3>
+                            </div>
+                            <div class="flex-1 overflow-y-auto space-y-3 pr-2">
+                                <template x-for="task in getTodayCompletedTasks()" :key="task.id">
+                                    <div class="p-3 rounded-lg border" :class="theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-slate-200'">
+                                        <div class="flex items-start justify-between gap-2 mb-1">
+                                            <div class="flex-1 min-w-0">
+                                                <div class="text-xs font-medium truncate" :class="theme === 'dark' ? 'text-gray-200' : 'text-slate-800'"
+                                                    x-text="task.title"></div>
+                                            </div>
+                                            <span class="text-[10px] px-1.5 py-0.5 rounded border shrink-0"
+                                                :class="getPriorityInfo(task.priority).color"
+                                                x-text="getPriorityInfo(task.priority).label"></span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-[10px]" :class="theme === 'dark' ? 'text-gray-500' : 'text-slate-500'">
+                                            <span x-show="task.startedAt" x-text="'Started: ' + formatTime(task.startedAt)"></span>
+                                            <span x-show="task.completedAt">•</span>
+                                            <span x-show="task.completedAt" x-text="'Done: ' + formatTime(task.completedAt)"></span>
+                                        </div>
+                                        <div class="flex items-center gap-1 mt-1">
+                                            <svg class="w-3 h-3" :class="theme === 'dark' ? 'text-gray-600' : 'text-slate-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <span class="text-[10px] font-medium" :class="theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'"
+                                                x-text="formatDuration(task.timeSpentSeconds || 0)"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                                <div x-show="getTodayCompletedTasks().length === 0" class="text-center py-8 text-xs" :class="theme === 'dark' ? 'text-gray-600' : 'text-slate-400'">
+                                    No completed tasks yet
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </template>
+
+                    <!-- Empty State for current/future dates (centered) -->
+                    <template x-if="!getCurrentQueueTask() && selectedDate >= getTodayDate()">
+                        <div class="h-full flex items-center justify-center">
+                        <div class="text-center space-y-4">
+                            <div class="text-6xl mb-4">🎉</div>
+                            <h2 class="text-2xl font-bold" :class="theme === 'dark' ? 'text-gray-200' : 'text-slate-800'">
+                                All Done!
+                            </h2>
+                            <p class="text-base" :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'">
+                                You've completed all tasks for today. Time to plan tomorrow or take a break!
+                            </p>
+                            <button @click="addGoal('daily')" 
+                                class="mt-4 px-6 py-3 rounded-lg border transition-all inline-flex items-center gap-2"
+                                :class="theme === 'dark' ? 'border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10' : 'border-indigo-300 text-indigo-600 hover:bg-indigo-50'">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                Add New Task
+                            </button>
+                        </div>
+                    </div>
+                    </template>
+
+                    <!-- Empty State for past dates (centered with timeline on right) -->
+                    <template x-if="!getCurrentQueueTask() && selectedDate < getTodayDate()">
+                        <div class="h-full flex gap-6">
+                        <div class="flex-1 flex items-center justify-center">
+                            <div class="text-center space-y-4">
+                                <div class="text-6xl mb-4">✅</div>
+                                <h2 class="text-2xl font-bold" :class="theme === 'dark' ? 'text-gray-200' : 'text-slate-800'">
+                                    Day Complete!
+                                </h2>
+                                <p class="text-base" :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'">
+                                    All tasks completed for this date.
+                                </p>
+                                <p class="text-sm" :class="theme === 'dark' ? 'text-gray-500' : 'text-slate-500'">
+                                    View your timeline on the right →
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Timeline sidebar for past dates -->
+                        <div class="w-80 flex flex-col space-y-4">
+                            <!-- Date Summary -->
+                            <div class="rounded-xl border p-4" :class="theme === 'dark' ? 'bg-gray-900/40 border-gray-800' : 'bg-slate-50 border-slate-200'">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <svg class="w-5 h-5" :class="theme === 'dark' ? 'text-indigo-400' : 'text-indigo-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                    <h3 class="text-sm font-bold" :class="theme === 'dark' ? 'text-gray-200' : 'text-slate-800'" x-text="formatDate(selectedDate)"></h3>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-sm">
+                                        <span :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'">Completed Tasks</span>
+                                        <span class="font-bold" :class="theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'"
+                                            x-text="getTodayCompletedTasks().length"></span>
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <span :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'">Total Time</span>
+                                        <span class="font-bold" :class="theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'"
+                                            x-text="formatDuration(getTotalTimeToday())"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Timeline -->
+                            <div class="flex-1 rounded-xl border p-4 overflow-hidden flex flex-col" :class="theme === 'dark' ? 'bg-gray-900/40 border-gray-800' : 'bg-slate-50 border-slate-200'">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <svg class="w-5 h-5" :class="theme === 'dark' ? 'text-indigo-400' : 'text-indigo-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <h3 class="text-sm font-bold" :class="theme === 'dark' ? 'text-gray-200' : 'text-slate-800'">Completed Tasks</h3>
+                                </div>
+                                <div class="flex-1 overflow-y-auto space-y-3 pr-2">
+                                    <template x-for="task in getTodayCompletedTasks()" :key="task.id">
+                                        <div class="p-3 rounded-lg border" :class="theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-slate-200'">
+                                            <div class="flex items-start justify-between gap-2 mb-1">
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="text-xs font-medium truncate" :class="theme === 'dark' ? 'text-gray-200' : 'text-slate-800'"
+                                                        x-text="task.title"></div>
+                                                </div>
+                                                <span class="text-[10px] px-1.5 py-0.5 rounded border shrink-0"
+                                                    :class="getPriorityInfo(task.priority).color"
+                                                    x-text="getPriorityInfo(task.priority).label"></span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-[10px]" :class="theme === 'dark' ? 'text-gray-500' : 'text-slate-500'">
+                                                <span x-show="task.startedAt" x-text="'Started: ' + formatTime(task.startedAt)"></span>
+                                                <span x-show="task.completedAt">•</span>
+                                                <span x-show="task.completedAt" x-text="'Done: ' + formatTime(task.completedAt)"></span>
+                                            </div>
+                                            <div class="flex items-center gap-1 mt-1">
+                                                <svg class="w-3 h-3" :class="theme === 'dark' ? 'text-gray-600' : 'text-slate-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                                <span class="text-[10px] font-medium" :class="theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'"
+                                                    x-text="formatDuration(task.timeSpentSeconds || 0)"></span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <div x-show="getTodayCompletedTasks().length === 0" class="text-center py-8 text-xs" :class="theme === 'dark' ? 'text-gray-600' : 'text-slate-400'">
+                                        No completed tasks
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </template>
+                </div>
+
+                <!-- Standard List View (Dashboard Mode) -->
                 <div class="flex-1 overflow-y-auto p-6 space-y-2 scrollbar-thumb-gray-800 scrollbar-track-transparent"
-                    x-show="!standupMode && viewMode === 'focus'">
+                    x-show="viewMode === 'focus'">
                     <div class="flex flex-wrap items-center gap-2 pb-2"
                         x-data="{ counts: getStatusCountsForSelectedDate() }"
                         x-effect="counts = getStatusCountsForSelectedDate()">
@@ -1155,6 +1620,87 @@
                                 x-text="counts.done"></span>
                         </button>
                     </div>
+
+                    <!-- Follow-ups Section (Always Visible) -->
+                    <template x-if="getFollowupGoals().length > 0">
+                        <div class="border-b pb-4 mb-4" :class="theme === 'dark' ? 'border-gray-800' : 'border-slate-200'">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-xs font-bold uppercase tracking-wider flex items-center gap-2"
+                                    :class="theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Follow-ups
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded-full border"
+                                        :class="theme === 'dark' ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300' : 'bg-indigo-50 border-indigo-200 text-indigo-700'"
+                                        x-text="getFollowupGoals().length"></span>
+                                </h3>
+                                <button @click="addGoal('followup')"
+                                    class="text-xs px-2 py-1 rounded border transition-colors"
+                                    :class="theme === 'dark' ? 'border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10' : 'border-indigo-300 text-indigo-600 hover:bg-indigo-50'">
+                                    + Add
+                                </button>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <template x-for="goal in getFollowupGoals()" :key="goal.id">
+                                    <div class="p-2.5 rounded-lg border transition-all cursor-pointer group" 
+                                        @click="openDetail(goal)"
+                                        :class="theme === 'dark' ? 'bg-indigo-500/5 border-indigo-500/20 hover:border-indigo-500/40 hover:bg-indigo-500/10' : 'bg-indigo-50/50 border-indigo-200 hover:border-indigo-300 hover:bg-indigo-50'">
+                                        <div class="flex items-start gap-3">
+                                            <!-- Checkbox -->
+                                            <button @click.stop="toggleComplete(goal)"
+                                                :class="[goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-500 hover:text-indigo-400'))]"
+                                                class="mt-0.5 shrink-0 transition-colors">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <circle x-show="!goal.completed && !goal.inProgress" cx="12" cy="12" r="9" stroke-width="2"></circle>
+                                                    <path x-show="goal.inProgress" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v12M6 12h12"></path>
+                                                    <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                            </button>
+                                            
+                                            <!-- Content -->
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-center gap-2 flex-wrap">
+                                                    <!-- Priority Badge -->
+                                                    <span class="text-[10px] px-1.5 py-0.5 rounded border font-medium"
+                                                        :class="getPriorityInfo(goal.priority).color"
+                                                        x-text="getPriorityInfo(goal.priority).label"></span>
+                                                    
+                                                    <!-- Title -->
+                                                    <input type="text" x-model="goal.title"
+                                                        @click.stop
+                                                        class="bg-transparent flex-1 min-w-0 focus:outline-none text-sm font-medium placeholder-gray-600"
+                                                        :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-200' : 'text-slate-800'))"
+                                                        placeholder="Follow-up task...">
+                                                </div>
+                                                
+                                                <!-- Description Preview -->
+                                                <div class="mt-1 text-[11px] truncate opacity-60" 
+                                                    x-show="goal.description"
+                                                    x-text="goal.description"></div>
+                                            </div>
+                                            
+                                            <!-- Delete Button -->
+                                            <button x-show="deletingId !== goal.id" @click.stop="deletingId = goal.id"
+                                                class="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                                                :class="theme==='dark'?'text-gray-600 hover:text-red-400':'text-slate-400 hover:text-red-500'">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                </svg>
+                                            </button>
+                                            <button x-show="deletingId === goal.id" @click.stop="deleteGoal(goal.id)"
+                                                class="text-[10px] px-1.5 py-0.5 rounded border shrink-0"
+                                                :class="theme==='dark'?'bg-red-900/50 text-red-200 hover:bg-red-800 border-red-700':'bg-red-100 text-red-700 hover:bg-red-200 border-red-200'">
+                                                Confirm
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
 
                     <template x-if="getNextAction()">
                         <div x-data="{ next: getNextAction() }" class="p-3 rounded-lg border transition-all"
@@ -1209,18 +1755,37 @@
 
                                         <!-- Rolled Over Badge -->
                                         <template x-if="isRolledOver(goal) && !goal.completed && !goal.cancelled">
-                                            <span
-                                                class="text-[10px] px-2.5 py-1.5 rounded border font-bold whitespace-nowrap"
-                                                :class="theme === 'dark' ? 'border-orange-500/60 bg-orange-500/25 text-orange-200' : 'border-orange-500/60 bg-orange-100 text-orange-700'"
-                                                :title="'Rolled over from ' + goal.rolledOverFrom">
-                                                ↻ Rollover
-                                            </span>
+                                            <div class="flex items-center gap-2">
+                                                <span
+                                                    class="text-[10px] px-2.5 py-1.5 rounded border font-bold whitespace-nowrap flex items-center gap-1"
+                                                    :class="theme === 'dark' ? 'border-orange-500/60 bg-orange-500/25 text-orange-200' : 'border-orange-500/60 bg-orange-100 text-orange-700'"
+                                                    :title="'Rolled over from ' + goal.rolledOverFrom">
+                                                    ↻ Rollover
+                                                    <span x-show="goal.rolloverCount > 0" 
+                                                        class="ml-1 px-1 py-0.5 rounded-full font-extrabold"
+                                                        :class="theme === 'dark' ? 'bg-orange-600 text-white' : 'bg-orange-600 text-white'"
+                                                        x-text="'+' + goal.rolloverCount + 'd'"></span>
+                                                </span>
+                                                <button @click.stop="acceptToToday(goal)"
+                                                    class="text-[10px] px-2 py-1 rounded border font-medium transition-all hover:scale-105"
+                                                    :class="theme === 'dark' ? 'border-green-700 text-green-400 hover:bg-green-900/30' : 'border-green-600 text-green-700 hover:bg-green-50'"
+                                                    title="Accept this task to today's queue">
+                                                    Accept
+                                                </button>
+                                            </div>
                                         </template>
                                     </div>
 
                                     <!-- Meta Row (Date/Tags/Link) -->
                                     <div class="flex flex-wrap items-center gap-3 text-xs mt-1"
                                         :class="(isRolledOver(goal) && !goal.completed && !goal.cancelled) ? (theme === 'dark' ? 'text-orange-400/70' : 'text-orange-600/70') : (theme === 'dark' ? 'text-gray-500' : 'text-slate-400')">
+
+                                        <!-- Priority Badge -->
+                                        <button @click.stop="goal.priority = goal.priority === 5 ? 1 : (goal.priority || 3) + 1"
+                                            class="text-[10px] px-1.5 py-0.5 rounded border font-medium transition-all hover:scale-105"
+                                            :class="getPriorityInfo(goal.priority).color"
+                                            :title="'Priority: ' + getPriorityInfo(goal.priority).label + ' (click to change)'"
+                                            x-text="getPriorityInfo(goal.priority).label"></button>
 
                                         <!-- Date Picker Inline (Daily Tasks) -->
                                         <template x-if="goal.type === 'daily'">
@@ -1230,35 +1795,19 @@
                                                     :class="theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-indigo-500' : 'bg-white border-slate-300 text-slate-900 focus:border-indigo-500'"
                                                     @change="goal.date = $event.target.value"
                                                     title="Click to change task date">
-                                            </div>
-                                        </template>
+                                             </div>
+                                         </template>
 
                                         <!-- Created Date Badge -->
                                         <div class="flex items-center gap-1" :title="'Created: ' + goal.createdDate"
                                             :class="isRolledOver(goal) && !goal.completed && !goal.cancelled ? (theme === 'dark' ? 'opacity-70' : 'opacity-80') : ''">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                                                 </path>
                                             </svg>
                                             <span x-text="formatDate(goal.createdDate) || 'Today'"></span>
                                         </div>
-
-                                        <!-- Current Date Badge -->
-                                        <template x-if="goal.date !== goal.createdDate">
-                                            <div class="flex items-center gap-1 text-sm"
-                                                :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-700'"
-                                                :title="'Active on: ' + goal.date">
-                                                <svg class="w-4 h-4" fill="none" stroke-width="2"
-                                                    :class="theme === 'dark' ? 'stroke-gray-400' : 'stroke-slate-700'"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                                    </path>
-                                                </svg>
-                                                <span x-text="formatDate(goal.date) || 'Today'"></span>
-                                            </div>
-                                        </template>
 
                                         <!-- Tags Badge -->
                                         <template x-if="goal.tags && goal.tags.length > 0">
@@ -1323,7 +1872,17 @@
                                         </template>
                                     </div>
 
+                                    <!-- Description with line clamp -->
+                                    <div x-show="goal.description && goal.description.trim()" 
+                                        class="mt-1 text-xs italic line-clamp-3 cursor-pointer"
+                                        :class="theme === 'dark' ? 'text-gray-500' : 'text-slate-600'"
+                                        @click.stop="openDetail(goal)"
+                                        :title="goal.description.length > 150 ? 'Click to view full description' : ''"
+                                        x-text="goal.description"></div>
+                                    
+                                    <!-- Editable textarea (hidden for display, used for quick edits) -->
                                     <textarea x-model="goal.description"
+                                        x-show="false"
                                         class="w-full bg-transparent focus:outline-none text-xs italic auto-expand resize-none overflow-hidden mt-1"
                                         :class="theme === 'dark' ? 'text-gray-500 focus:text-gray-400 placeholder-gray-800/50' : 'text-slate-600 focus:text-slate-700 placeholder-slate-400'"
                                         rows="1" placeholder="Add details or notes..."></textarea>
@@ -1385,111 +1944,6 @@
                 <!-- Focus / Notification Panel (moved to header bell) -->
             </div>
         </div>
-        <!-- Daily Bits Sidebar -->
-        <div x-show="isCompactLayout && showBits" x-cloak class="fixed inset-0 z-30"
-            :class="theme === 'dark' ? 'bg-gray-950/60' : 'bg-slate-900/20'" @click="showBits = false"></div>
-        <div x-show="showBits" x-cloak class="w-80 border-l flex flex-col transition-all shrink-0" :class="[
-        theme === 'dark' ? 'bg-gray-900/20 border-gray-800' : 'bg-slate-50 border-slate-200',
-        isCompactLayout ? 'fixed inset-y-0 right-0 z-40 w-80 max-w-[85vw] shadow-2xl' : ''
-    ]">
-            <!-- Bits Header -->
-            <div class="px-4 py-3 border-b flex items-center justify-between shrink-0"
-                :class="theme === 'dark' ? 'border-gray-800 bg-gray-900/40' : 'border-slate-200 bg-white'">
-                <div class="flex items-center gap-2">
-                    <span class="text-[10px] font-bold uppercase tracking-widest"
-                        :class="theme === 'dark' ? 'opacity-50' : 'text-slate-500'">Daily Bits</span>
-                    <span class="px-1.5 py-0.5 rounded-full text-[9px]"
-                        :class="theme === 'dark' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-100 text-indigo-700'"
-                        x-text="getBitsByDay().length"></span>
-                </div>
-                <button @click="showBits = false"
-                    :class="theme === 'dark' ? 'text-gray-500 hover:text-gray-300' : 'text-slate-500 hover:text-slate-700'">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Quick Entry -->
-            <div class="px-4 py-2 border-b space-y-2"
-                :class="theme === 'dark' ? 'border-gray-800' : 'border-slate-200'">
-                <input type="text" x-model="newBitTitle" placeholder="Title (optional)"
-                    class="w-full text-[11px] border rounded px-2 py-1.5 focus:ring-1 focus:ring-indigo-500 placeholder-gray-600"
-                    :class="theme === 'dark' ? 'bg-transparent text-gray-300 border-gray-700' : 'bg-white text-slate-800 border-slate-300 placeholder-slate-400'">
-                <textarea x-model="newBitText" rows="3" @keydown="handleQuickBitKeydown($event, $el)"
-                    @input="autoResizeTextarea($el)"
-                    placeholder="Markdown / code (Enter for new lines, Ctrl+Enter to add)"
-                    class="w-full text-[11px] border rounded px-2 py-1.5 focus:ring-1 focus:ring-indigo-500 placeholder-gray-600 resize-none overflow-hidden"
-                    :class="theme === 'dark' ? 'bg-transparent text-gray-300 border-gray-700' : 'bg-white text-slate-800 border-slate-300 placeholder-slate-400'"></textarea>
-            </div>
-
-            <!-- Bits List (Jupyter Style) -->
-            <div class="flex-1 overflow-y-auto px-4 py-3 space-y-2 scrollbar-thin">
-                <template x-for="bit in getBitsByDay()" :key="bit.id">
-                    <div class="group relative">
-                        <!-- Cell Index/Line -->
-                        <div class="absolute -left-6 top-2 w-5 text-[9px] font-mono text-right"
-                            :class="theme === 'dark' ? 'opacity-20' : 'text-slate-400'"
-                            x-text="'[' + ($index + 1) + ']'"></div>
-
-                        <!-- Bit Content -->
-                        <div class="rounded border transition-all relative" :class="[
-                                bit.isKB ? (theme === 'dark' ? 'border-amber-500/30 bg-amber-500/5' : 'border-amber-500/20 bg-amber-50') : (theme === 'dark' ? 'border-gray-800 bg-gray-950/50' : 'border-slate-200 bg-white'),
-                                'hover:border-indigo-500/30'
-                            ]">
-                            <div class="p-2">
-                                <input type="text" x-model="bit.title"
-                                    class="w-full bg-transparent border-none p-0 focus:ring-0 text-[11px] font-medium"
-                                    :class="theme === 'dark' ? 'text-gray-200' : 'text-slate-800'"
-                                    placeholder="Title...">
-
-                                <textarea x-model="bit.description" rows="1"
-                                    @input="handleBitDescriptionInput(bit, $el)"
-                                    class="w-full bg-transparent border-none p-0 focus:ring-0 text-[10px] font-mono mt-1 opacity-70 resize-none overflow-hidden"
-                                    :class="theme === 'dark' ? 'text-gray-400' : 'text-slate-600'"
-                                    placeholder="Code, query, or details..."></textarea>
-                            </div>
-
-                            <!-- Actions floating on hover -->
-                            <div
-                                class="absolute right-1 top-1 opacity-0 group-hover:opacity-100 flex items-center gap-0.5 transition-opacity">
-                                <button @click="toggleBitKB(bit)" class="p-0.5 rounded hover:bg-amber-500/10"
-                                    :title="bit.isKB ? 'Remove from KB' : 'Pin to KB'"
-                                    :class="bit.isKB ? 'text-amber-500' : 'text-gray-500'">
-                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3.5 7 3.5V5c0-1.1-.9-2-2-2z"></path>
-                                    </svg>
-                                </button>
-                                <button @click="convertBitToTask(bit)"
-                                    class="p-0.5 rounded hover:bg-emerald-500/10 text-gray-500 hover:text-emerald-500"
-                                    title="Convert to Task">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4v16m8-8H4"></path>
-                                    </svg>
-                                </button>
-                                <button @click="deleteGoal(bit.id)"
-                                    class="p-0.5 rounded hover:bg-red-500/10 text-gray-500 hover:text-red-500"
-                                    title="Delete">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <!-- KB Indicator -->
-                            <div x-show="bit.isKB"
-                                class="absolute left-0 top-0 bottom-0 w-0.5 bg-amber-500/50 rounded-l"></div>
-                        </div>
-                    </div>
-                </template>
-                <div x-show="getBitsByDay().length === 0" class="text-center py-12 opacity-20">
-                    <p class="text-[9px] uppercase tracking-widest italic">Bits appear here</p>
-                </div>
-            </div>
-        </div>
         </div>
     </main>
 
@@ -1549,6 +2003,17 @@
                             <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
                                 <div class="h-full bg-emerald-500 transition-all duration-1000"
                                     :style="`width: ${getCompletionStats('daily').percent}%`"></div>
+                            </div>
+                        </div>
+                        <!-- Follow-ups -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-indigo-400">Follow-ups</span>
+                                <span class="text-gray-400" x-text="getCompletionStats('followup').text"></span>
+                            </div>
+                            <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-indigo-500 transition-all duration-1000"
+                                    :style="`width: ${getCompletionStats('followup').percent}%`"></div>
                             </div>
                         </div>
                     </div>
@@ -1739,6 +2204,48 @@
                                 :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'">
                         </div>
 
+                        <!-- Priority -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Priority</label>
+                            <div class="flex gap-2">
+                                <button @click="editingGoal.priority = 1" type="button"
+                                    class="flex-1 px-3 py-2 text-sm font-medium rounded border transition-all"
+                                    :class="(editingGoal.priority || 3) === 1 
+                                        ? 'bg-red-500/20 text-red-400 border-red-500/30 ring-2 ring-red-500/30' 
+                                        : (theme === 'dark' ? 'border-gray-700 text-gray-500 hover:border-red-500/30' : 'border-slate-300 text-slate-500 hover:border-red-400')">
+                                    P1 High
+                                </button>
+                                <button @click="editingGoal.priority = 2" type="button"
+                                    class="flex-1 px-3 py-2 text-sm font-medium rounded border transition-all"
+                                    :class="(editingGoal.priority || 3) === 2 
+                                        ? 'bg-orange-500/20 text-orange-400 border-orange-500/30 ring-2 ring-orange-500/30' 
+                                        : (theme === 'dark' ? 'border-gray-700 text-gray-500 hover:border-orange-500/30' : 'border-slate-300 text-slate-500 hover:border-orange-400')">
+                                    P2
+                                </button>
+                                <button @click="editingGoal.priority = 3" type="button"
+                                    class="flex-1 px-3 py-2 text-sm font-medium rounded border transition-all"
+                                    :class="(editingGoal.priority || 3) === 3 
+                                        ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30 ring-2 ring-yellow-500/30' 
+                                        : (theme === 'dark' ? 'border-gray-700 text-gray-500 hover:border-yellow-500/30' : 'border-slate-300 text-slate-500 hover:border-yellow-400')">
+                                    P3 Med
+                                </button>
+                                <button @click="editingGoal.priority = 4" type="button"
+                                    class="flex-1 px-3 py-2 text-sm font-medium rounded border transition-all"
+                                    :class="(editingGoal.priority || 3) === 4 
+                                        ? 'bg-blue-500/20 text-blue-400 border-blue-500/30 ring-2 ring-blue-500/30' 
+                                        : (theme === 'dark' ? 'border-gray-700 text-gray-500 hover:border-blue-500/30' : 'border-slate-300 text-slate-500 hover:border-blue-400')">
+                                    P4
+                                </button>
+                                <button @click="editingGoal.priority = 5" type="button"
+                                    class="flex-1 px-3 py-2 text-sm font-medium rounded border transition-all"
+                                    :class="(editingGoal.priority || 3) === 5 
+                                        ? 'bg-gray-500/20 text-gray-400 border-gray-500/30 ring-2 ring-gray-500/30' 
+                                        : (theme === 'dark' ? 'border-gray-700 text-gray-500 hover:border-gray-500/30' : 'border-slate-300 text-slate-500 hover:border-gray-400')">
+                                    P5 Low
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- Description -->
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Notes /
@@ -1854,9 +2361,10 @@
                 fileName: '',
                 unsavedChanges: false,
                 reviewMode: false,
-                standupMode: false,
+                viewMode: 'focus',
                 showMetrics: false,
                 deletingId: null,
+                queueReversePriority: false,
                 // New States
                 showYearly: false,
                 statusFilter: 'all',
@@ -1867,13 +2375,8 @@
                 showDetailPanel: false,
                 editingGoal: null,
                 calendarDate: new Date(), // Month being viewed
-                showBits: true, // Show Daily Bits by default
                 isCompactLayout: false,
                 showStrategyPanel: false,
-                previousShowBits: true,
-                newBitText: '', // For quick entry
-                newBitTitle: '', // Quick entry title
-                viewMode: 'focus', // 'focus', 'kb'
                 showToast: false,
                 toastMessage: '',
                 toastTimeoutId: null,
@@ -1885,6 +2388,7 @@
                 showOnboarding: false,
                 onboardingMessage: 'Create a JSON file so your tasks can be saved and backed up.',
                 fileSetupRequired: false,
+                draggedGoalId: null,
 
                 async init() {
                     // Theme Init
@@ -1940,6 +2444,17 @@
                         if (typeof g.rolledOverFrom === 'undefined') {
                             g.rolledOverFrom = null;
                         }
+                        // Add priority field for all tasks (default to 3 = medium, follow-ups default to 2 = high)
+                        if (typeof g.priority === 'undefined') {
+                            g.priority = g.type === 'followup' ? 2 : 3;
+                        }
+                        // Add rollover tracking fields
+                        if (typeof g.rolloverCount === 'undefined') {
+                            g.rolloverCount = 0;
+                        }
+                        if (typeof g.acceptedToDate === 'undefined') {
+                            g.acceptedToDate = null;
+                        }
                         delete g.time;
                     });
 
@@ -1975,17 +2490,6 @@
                     const compact = window.innerWidth < 1200;
                     if (compact === this.isCompactLayout) return;
                     this.isCompactLayout = compact;
-
-                    if (compact) {
-                        this.previousShowBits = this.showBits;
-                        this.showBits = false;
-                        this.showStrategyPanel = false;
-                        return;
-                    }
-
-                    if (typeof this.previousShowBits === 'boolean') {
-                        this.showBits = this.previousShowBits;
-                    }
                     this.showStrategyPanel = false;
                 },
 
@@ -1994,19 +2498,29 @@
                     let dailyCount = 0;
                     let weeklyCount = 0;
 
+                    // Get last active date from localStorage
+                    const lastActiveDate = localStorage.getItem('mktask_lastActiveDate');
+
                     this.goals.forEach(g => {
                         // Skip completed, cancelled, or tasks without dates
                         if (g.completed || g.cancelled || !g.date) return;
 
                         // Daily rollover: uncompleted tasks from previous days
                         if (g.type === 'daily' && g.date < today) {
-                            const originalDate = g.date; // Save original date before changing
-                            g.date = today;
-                            g.rolledOverFrom = originalDate; // Use the saved original date
-                            if (!g.activeDates.includes(today)) {
-                                g.activeDates.push(today);
+                            // If task hasn't been accepted to today yet
+                            if (!g.acceptedToDate || g.acceptedToDate !== today) {
+                                const originalDate = g.date;
+                                g.date = today;
+                                g.rolledOverFrom = originalDate;
+                                if (!g.activeDates.includes(today)) {
+                                    g.activeDates.push(today);
+                                }
+                                // Increment rollover count if date has changed since last session
+                                if (lastActiveDate && lastActiveDate < today) {
+                                    g.rolloverCount = (g.rolloverCount || 0) + 1;
+                                }
+                                dailyCount++;
                             }
-                            dailyCount++;
                         }
 
                         // Weekly rollover: uncompleted sprint tasks from previous weeks
@@ -2032,15 +2546,37 @@
                         // Force Alpine.js to detect the changes by reassigning the array
                         this.goals = [...this.goals];
                     }
+
+                    // Update last active date
+                    localStorage.setItem('mktask_lastActiveDate', today);
                 },
 
                 isRolledOver(goal) {
-                    // A task is rolled over if its rolledOverFrom is set
-                    const result = goal.rolledOverFrom !== null && goal.rolledOverFrom !== undefined;
-                    if (result) {
-                        console.log(`Task "${goal.title}" is rolled over from ${goal.rolledOverFrom}`);
-                    }
-                    return result;
+                    // A task is rolled over if it's from a previous date and hasn't been accepted to today
+                    return goal.rolledOverFrom !== null && 
+                           goal.rolledOverFrom !== undefined && 
+                           (!goal.acceptedToDate || goal.acceptedToDate !== this.selectedDate);
+                },
+
+                acceptToToday(goal) {
+                    // Store undo info before accepting
+                    const previousAcceptedToDate = goal.acceptedToDate;
+                    
+                    // Accept a rolled-over task to today's queue
+                    goal.acceptedToDate = this.selectedDate;
+                    
+                    // Setup undo action
+                    this.lastUndoAction = { 
+                        type: 'accept', 
+                        payload: { 
+                            goalId: goal.id, 
+                            previousAcceptedToDate: previousAcceptedToDate 
+                        } 
+                    };
+                    this.showUndoMessage('Rollover task accepted.');
+                    
+                    // Clear the visual rollover status by saving
+                    this.saveFile(true);
                 },
 
                 isCurrentDay(goal) {
@@ -2118,15 +2654,21 @@
                         );
                     }
 
-                    if (type === 'daily') {
+                    if (type === 'daily' || type === 'followup') {
                         return list.sort((a, b) => {
+                            // First by status (incomplete before complete)
                             const rankDiff = this.getStatusRank(a) - this.getStatusRank(b);
-                            if (rankDiff === 0) {
-                                const dateA = a.date || '00000000';
-                                const dateB = b.date || '00000000';
-                                return dateB.localeCompare(dateA);
-                            }
-                            return rankDiff;
+                            if (rankDiff !== 0) return rankDiff;
+                            
+                            // Then by priority (lower number = higher priority)
+                            const priorityA = a.priority || 3;
+                            const priorityB = b.priority || 3;
+                            if (priorityA !== priorityB) return priorityA - priorityB;
+                            
+                            // Finally by date
+                            const dateA = a.date || '00000000';
+                            const dateB = b.date || '00000000';
+                            return dateB.localeCompare(dateA);
                         });
                     }
 
@@ -2152,7 +2694,13 @@
                         list = list.filter(g => g.title.toLowerCase().includes(q) || (g.description && g.description.toLowerCase().includes(q)));
                     }
 
-                    return list.sort((a, b) => this.getStatusRank(a) - this.getStatusRank(b));
+                    return list.sort((a, b) => {
+                        const rankDiff = this.getStatusRank(a) - this.getStatusRank(b);
+                        if (rankDiff !== 0) return rankDiff;
+                        const priorityA = a.priority || 3;
+                        const priorityB = b.priority || 3;
+                        return priorityA - priorityB;
+                    });
                 },
 
                 getDailyFocusGoals() {
@@ -2168,7 +2716,202 @@
                         list = list.filter(g => this.matchesStatusFilter(g));
                     }
 
-                    return list.sort((a, b) => this.getStatusRank(a) - this.getStatusRank(b));
+                    return list.sort((a, b) => {
+                        const rankDiff = this.getStatusRank(a) - this.getStatusRank(b);
+                        if (rankDiff !== 0) return rankDiff;
+                        const priorityA = a.priority || 3;
+                        const priorityB = b.priority || 3;
+                        return priorityA - priorityB;
+                    });
+                },
+
+                getEisenhowerGoals() {
+                    const yyyyMmDd = this.selectedDate;
+                    let list = this.goals.filter(g => g.type === 'daily' && g.date === yyyyMmDd && !g.cancelled);
+
+                    if (this.searchQuery) {
+                        const q = this.searchQuery.toLowerCase();
+                        list = list.filter(g =>
+                            g.title.toLowerCase().includes(q) ||
+                            (g.description && g.description.toLowerCase().includes(q)) ||
+                            (g.tags && g.tags.some(t => t.toLowerCase().includes(q)))
+                        );
+                    }
+
+                    return list.sort((a, b) => {
+                        const rankDiff = this.getStatusRank(a) - this.getStatusRank(b);
+                        if (rankDiff !== 0) return rankDiff;
+                        const priorityA = a.priority || 3;
+                        const priorityB = b.priority || 3;
+                        return priorityA - priorityB;
+                    });
+                },
+
+                getEisenhowerGoalsByPriority(priorities) {
+                    const list = this.getEisenhowerGoals();
+                    return list.filter(g => priorities.includes(g.priority || 3));
+                },
+
+                startEisenhowerDrag(goal) {
+                    if (!goal) return;
+                    this.draggedGoalId = goal.id;
+                },
+
+                clearEisenhowerDrag() {
+                    this.draggedGoalId = null;
+                },
+
+                onDropEisenhower(priority) {
+                    if (!this.draggedGoalId) return;
+                    const goal = this.goals.find(g => g.id === this.draggedGoalId);
+                    if (!goal) return;
+                    goal.priority = priority;
+                    this.draggedGoalId = null;
+                },
+
+                getQueueTasks() {
+                    const yyyyMmDd = this.selectedDate;
+                    let list = this.goals.filter(g => 
+                        g.type === 'daily' && 
+                        g.date === yyyyMmDd && 
+                        !g.completed && 
+                        !g.cancelled
+                    );
+
+                    if (this.searchQuery) {
+                        const q = this.searchQuery.toLowerCase();
+                        list = list.filter(g =>
+                            g.title.toLowerCase().includes(q) ||
+                            (g.description && g.description.toLowerCase().includes(q))
+                        );
+                    }
+
+                    return list.sort((a, b) => {
+                        const priorityA = a.priority || 3;
+                        const priorityB = b.priority || 3;
+                        
+                        if (this.queueReversePriority) {
+                            if (priorityA !== priorityB) return priorityB - priorityA;
+                        } else {
+                            if (priorityA !== priorityB) return priorityA - priorityB;
+                        }
+                        
+                        const dateA = a.createdDate || '00000000';
+                        const dateB = b.createdDate || '00000000';
+                        return dateA.localeCompare(dateB);
+                    });
+                },
+
+                getCurrentQueueTask() {
+                    const tasks = this.getQueueTasks();
+                    return tasks.length > 0 ? tasks[0] : null;
+                },
+
+                getNextQueueTask() {
+                    const tasks = this.getQueueTasks();
+                    return tasks.length > 1 ? tasks[1] : null;
+                },
+
+                getQueueTaskIndex(task) {
+                    if (!task) return -1;
+                    return this.getQueueTasks().findIndex(t => t.id === task.id);
+                },
+
+                getQueueCompletedCount() {
+                    const yyyyMmDd = this.selectedDate;
+                    return this.goals.filter(g => 
+                        g.type === 'daily' && 
+                        g.date === yyyyMmDd && 
+                        g.completed
+                    ).length;
+                },
+
+                getQueueTotalCount() {
+                    const yyyyMmDd = this.selectedDate;
+                    return this.goals.filter(g => 
+                        g.type === 'daily' && 
+                        g.date === yyyyMmDd && 
+                        !g.cancelled
+                    ).length;
+                },
+
+                startTask(goal) {
+                    if (!goal) return;
+                    goal.inProgress = true;
+                    goal.completed = false;
+                    goal.startedAt = new Date().toISOString();
+                },
+
+                pauseTask(goal) {
+                    if (!goal) return;
+                    goal.inProgress = false;
+                    if (goal.startedAt) {
+                        const startTime = new Date(goal.startedAt).getTime();
+                        const now = Date.now();
+                        const elapsed = Math.floor((now - startTime) / 1000);
+                        goal.timeSpentSeconds = (goal.timeSpentSeconds || 0) + elapsed;
+                        goal.startedAt = null;
+                    }
+                },
+
+                completeTask(goal) {
+                    if (!goal) return;
+                    if (goal.inProgress && goal.startedAt) {
+                        const startTime = new Date(goal.startedAt).getTime();
+                        const now = Date.now();
+                        const elapsed = Math.floor((now - startTime) / 1000);
+                        goal.timeSpentSeconds = (goal.timeSpentSeconds || 0) + elapsed;
+                    }
+                    goal.inProgress = false;
+                    goal.completed = true;
+                    goal.completedAt = new Date().toISOString();
+                    goal.startedAt = null;
+                },
+
+                formatTime(isoString) {
+                    if (!isoString) return '';
+                    const date = new Date(isoString);
+                    return date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
+                },
+
+                formatDuration(seconds) {
+                    if (!seconds || seconds === 0) return '0m';
+                    const hours = Math.floor(seconds / 3600);
+                    const minutes = Math.floor((seconds % 3600) / 60);
+                    if (hours > 0) {
+                        return `${hours}h ${minutes}m`;
+                    }
+                    return `${minutes}m`;
+                },
+
+                getTotalTimeToday() {
+                    const yyyyMmDd = this.selectedDate;
+                    const tasks = this.goals.filter(g => g.type === 'daily' && g.date === yyyyMmDd);
+                    return tasks.reduce((total, task) => total + (task.timeSpentSeconds || 0), 0);
+                },
+
+                getTodayCompletedTasks() {
+                    const yyyyMmDd = this.selectedDate;
+                    return this.goals
+                        .filter(g => g.type === 'daily' && g.date === yyyyMmDd && g.completed && g.completedAt)
+                        .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
+                },
+
+                getFollowupGoals() {
+                    let list = this.goals.filter(g => g.type === 'followup' && !g.completed && !g.cancelled);
+
+                    if (this.searchQuery) {
+                        const q = this.searchQuery.toLowerCase();
+                        list = list.filter(g => g.title.toLowerCase().includes(q) || (g.description && g.description.toLowerCase().includes(q)));
+                    }
+
+                    return list.sort((a, b) => {
+                        const rankDiff = this.getStatusRank(a) - this.getStatusRank(b);
+                        if (rankDiff !== 0) return rankDiff;
+                        const priorityA = a.priority || 3;
+                        const priorityB = b.priority || 3;
+                        return priorityA - priorityB;
+                    });
                 },
 
                 getUniqueTags() {
@@ -2275,6 +3018,18 @@
                     return parsed.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', weekday: 'short' });
                 },
 
+                getPriorityInfo(priority) {
+                    const p = priority || 3;
+                    const map = {
+                        1: { label: 'P1', color: 'bg-red-500/20 text-red-400 border-red-500/30' },
+                        2: { label: 'P2', color: 'bg-orange-500/20 text-orange-400 border-orange-500/30' },
+                        3: { label: 'P3', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
+                        4: { label: 'P4', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+                        5: { label: 'P5', color: 'bg-gray-500/20 text-gray-400 border-gray-500/30' }
+                    };
+                    return map[p] || map[3];
+                },
+
                 getHasTasksForDate(dateStr) {
                     return this.goals.some(g => g.type === 'daily' && g.date === dateStr);
                 },
@@ -2368,12 +3123,20 @@
                         description: '',
                         tags: [],
                         date: '',
+                        priority: 3, // 1=Highest, 2=High, 3=Medium, 4=Low, 5=Lowest
                         // Rollover tracking
                         createdDate: getLocalDateKey(),
                         // Array of dates this task has been active on (for tracking rollovers)
                         activeDates: [getLocalDateKey()],
                         // Which date did this task get rolled over from
-                        rolledOverFrom: null
+                        rolledOverFrom: null,
+                        // Time tracking for ETF
+                        startedAt: null,
+                        completedAt: null,
+                        timeSpentSeconds: 0,
+                        // Rollover tracking
+                        rolloverCount: 0,
+                        acceptedToDate: null
                     };
 
                     if (type === 'daily') {
@@ -2387,6 +3150,13 @@
                     if (type === 'sprint') {
                         goal.createdDate = getLocalDateKey();
                         goal.activeDates = [getLocalDateKey()];
+                    }
+
+                    if (type === 'followup') {
+                        goal.date = this.selectedDate;
+                        goal.createdDate = this.selectedDate;
+                        goal.activeDates = [this.selectedDate];
+                        goal.priority = 2; // Default to high priority for follow-ups
                     }
 
                     this.goals.unshift(goal);
@@ -2441,14 +3211,13 @@
                             const child = this.goals.find(g => g.id === update.id);
                             if (child) child.parentId = update.parentId;
                         });
-                    }
-
-                    if (action.type === 'kb-unpin' && action.payload) {
-                        const { id, isKB, tags } = action.payload;
-                        const item = this.goals.find(g => g.id === id);
-                        if (item) {
-                            item.isKB = isKB;
-                            item.tags = Array.isArray(tags) ? [...tags] : [];
+                    } else if (action.type === 'accept' && action.payload) {
+                        // Undo accept rollover task
+                        const { goalId, previousAcceptedToDate } = action.payload;
+                        const goal = this.goals.find(g => g.id === goalId);
+                        if (goal) {
+                            goal.acceptedToDate = previousAcceptedToDate;
+                            this.saveFile(true);
                         }
                     }
 
@@ -2459,31 +3228,6 @@
                         clearTimeout(this.undoTimeoutId);
                         this.undoTimeoutId = null;
                     }
-                },
-
-                requestUnpinKB(bit) {
-                    if (!bit) return;
-                    bit.kbPendingUnpin = true;
-                },
-
-                cancelUnpinKB(bit) {
-                    if (!bit) return;
-                    bit.kbPendingUnpin = false;
-                },
-
-                confirmUnpinKB(bit) {
-                    if (!bit) return;
-                    const prev = {
-                        id: bit.id,
-                        isKB: bit.isKB,
-                        tags: Array.isArray(bit.tags) ? [...bit.tags] : []
-                    };
-                    bit.isKB = false;
-                    bit.tags = (bit.tags || []).filter(t => t !== 'kb');
-                    bit.kbPendingUnpin = false;
-
-                    this.lastUndoAction = { type: 'kb-unpin', payload: prev };
-                    this.showUndoMessage('KB item unpinned.');
                 },
 
                 toggleComplete(goal) {
@@ -2504,6 +3248,12 @@
                     // Start as in-progress
                     goal.inProgress = true;
                     goal.completed = false;
+                },
+
+                markDone(goal) {
+                    if (!goal) return;
+                    goal.inProgress = false;
+                    goal.completed = true;
                 },
 
                 setNextAction(goal) {
@@ -2542,95 +3292,6 @@
                     return Math.round((linked / daily.length) * 100);
                 },
 
-                getBitsByDay() {
-                    return this.goals.filter(g => g.type === 'note' && g.date === this.selectedDate)
-                        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-                },
-
-                getKBItems() {
-                    let list = this.goals.filter(g => g.type === 'note' && (g.isKB || (g.tags && g.tags.includes('kb'))));
-
-                    if (this.searchQuery) {
-                        const q = this.searchQuery.toLowerCase();
-                        list = list.filter(g =>
-                            g.title.toLowerCase().includes(q) ||
-                            (g.description && g.description.toLowerCase().includes(q)) ||
-                            (g.tags && g.tags.some(t => t.toLowerCase().includes(q)))
-                        );
-                    }
-
-                    return list.sort((a, b) => {
-                        const dateA = a.date || a.createdAt || '';
-                        const dateB = b.date || b.createdAt || '';
-                        if (dateA !== dateB) return dateB.localeCompare(dateA);
-                        return new Date(b.createdAt) - new Date(a.createdAt);
-                    });
-                },
-
-                parseMarkdownBlocks(text) {
-                    if (!text) return [];
-                    const lines = text.split('\n');
-                    const blocks = [];
-                    let inCode = false;
-                    let codeLang = '';
-                    let textBuffer = [];
-                    let codeBuffer = [];
-
-                    const flushText = () => {
-                        const content = textBuffer.join('\n').trim();
-                        if (content) blocks.push({ type: 'text', content });
-                        textBuffer = [];
-                    };
-
-                    const flushCode = () => {
-                        const content = codeBuffer.join('\n').trimEnd();
-                        if (content || codeLang) blocks.push({ type: 'code', content, lang: codeLang });
-                        codeBuffer = [];
-                        codeLang = '';
-                    };
-
-                    lines.forEach((line) => {
-                        const fenceMatch = line.match(/^```\s*([^\s`]*)\s*$/);
-                        if (fenceMatch) {
-                            if (inCode) {
-                                flushCode();
-                                inCode = false;
-                            } else {
-                                flushText();
-                                inCode = true;
-                                codeLang = fenceMatch[1] || '';
-                            }
-                            return;
-                        }
-
-                        if (inCode) {
-                            codeBuffer.push(line);
-                        } else {
-                            textBuffer.push(line);
-                        }
-                    });
-
-                    if (inCode) {
-                        flushCode();
-                    } else {
-                        flushText();
-                    }
-
-                    return blocks;
-                },
-
-                isKBCollapsed(bit) {
-                    return bit.kbCollapsed !== false;
-                },
-
-                toggleKBCollapse(bit) {
-                    if (typeof bit.kbCollapsed === 'undefined') {
-                        bit.kbCollapsed = false;
-                        return;
-                    }
-                    bit.kbCollapsed = !bit.kbCollapsed;
-                },
-
                 getDescriptionPreview(text, maxLen = 120) {
                     if (!text) return '';
                     const firstLine = text.split('\n').find(line => line.trim());
@@ -2638,20 +3299,6 @@
                     const cleaned = firstLine.trim().replace(/\s+/g, ' ');
                     if (cleaned.length <= maxLen) return cleaned;
                     return cleaned.slice(0, maxLen - 3) + '...';
-                },
-
-                async copyKBToClipboard(bit) {
-                    const title = bit.title ? bit.title.trim() : '';
-                    const description = bit.description ? bit.description.trim() : '';
-                    const content = [title, description].filter(Boolean).join('\n\n');
-
-                    try {
-                        await navigator.clipboard.writeText(content);
-                        this.showToastMessage('KB copied to clipboard');
-                    } catch (err) {
-                        console.error('Copy failed', err);
-                        prompt('Copy your KB item:', content);
-                    }
                 },
 
                 showToastMessage(message) {
@@ -2690,8 +3337,7 @@
                         // Open file picker
                         const [fileHandle] = await window.showOpenFilePicker({
                             types: [
-                                { description: 'JSON Files', accept: { 'application/json': ['.json'] } },
-                                { description: 'All Files', accept: { '*/*': ['*'] } }
+                                { description: 'JSON Files', accept: { 'application/json': ['.json'] } }
                             ]
                         });
                         this.fileHandle = fileHandle;
@@ -2786,101 +3432,6 @@
                     }
                 },
 
-                handleBitDescriptionInput(bit, el) {
-                    this.autoResizeTextarea(el);
-                    if (bit.title && bit.title.trim()) return;
-
-                    const extracted = this.extractTitleFromFencedCode(bit.description || '');
-                    if (extracted) {
-                        bit.title = extracted;
-                    }
-                },
-
-                autoResizeTextarea(el) {
-                    if (!el) return;
-                    el.style.height = 'auto';
-                    el.style.height = el.scrollHeight + 'px';
-                },
-
-                extractTitleFromFencedCode(text) {
-                    if (!text) return '';
-                    const lines = text.split('\n');
-                    let inCode = false;
-
-                    for (let i = 0; i < lines.length; i++) {
-                        const line = lines[i];
-                        const fenceMatch = line.match(/^```\s*([^\s`]*)\s*$/);
-                        if (fenceMatch) {
-                            inCode = !inCode;
-                            continue;
-                        }
-                        if (inCode) {
-                            const trimmed = line.trim();
-                            if (trimmed) return trimmed;
-                        }
-                    }
-
-                    return '';
-                },
-
-                handleQuickBitKeydown(e, el) {
-                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                        e.preventDefault();
-                        this.addBit();
-                        this.autoResizeTextarea(el);
-                        return;
-                    }
-                },
-
-                addBit() {
-                    if (this.fileSetupRequired && !this.fileHandle) {
-                        this.requestFileSetup('Create a data file before adding notes.');
-                        return;
-                    }
-                    if (!this.newBitText.trim() && !this.newBitTitle.trim()) return;
-                    const raw = this.newBitText.replace(/\r\n/g, '\n');
-                    const titleFallback = raw.split('\n').find(line => line.trim());
-                    const title = (this.newBitTitle.trim() || titleFallback || 'Untitled').trim();
-                    const description = raw.trimEnd();
-
-                    const bit = {
-                        id: crypto.randomUUID(),
-                        type: 'note',
-                        title,
-                        completed: false,
-                        parentId: '',
-                        createdAt: new Date().toISOString(),
-                        description,
-                        tags: [],
-                        date: this.selectedDate,
-                        isKB: false
-                    };
-                    this.goals.push(bit);
-                    this.newBitText = '';
-                    this.newBitTitle = '';
-                },
-
-                toggleBitKB(bit) {
-                    bit.isKB = !bit.isKB;
-                    if (bit.isKB) {
-                        if (!bit.tags.includes('kb')) {
-                            bit.tags.push('kb');
-                        }
-                    } else {
-                        bit.tags = (bit.tags || []).filter(t => t !== 'kb');
-                    }
-                },
-
-                convertBitToTask(bit) {
-                    bit.type = 'daily';
-                    bit.inProgress = false;
-                    bit.completed = false;
-                    bit.statusTag = '';
-                    bit.isNextAction = false;
-                    bit.blockedAt = '';
-                    // keep title and description
-                },
-
                 async generateStandup() {
                     const target = parseLocalDateKey(this.selectedDate) || new Date();
                     // Yesterday relative to selected day
@@ -2943,41 +3494,20 @@
                     const yStr = getLocalDateKey(yesterday);
                     const pStr = getLocalDateKey(pastDate);
 
-                    // EMBEDDED SAMPLE DATA
+                    // EMBEDDED SAMPLE DATA (tasks only)
                     const sample = [
-                        { "id": "year-1", "type": "yearly", "title": "Build MVP Identity Provider in Golang", "completed": false, "parentId": "", "createdAt": "2026-01-01T10:00:00.000Z", "description": "Full-featured IDP with SAML, OIDC, OAuth support.", "tags": ["golang", "security", "backend"], "date": "2026-12-31" },
-                        { "id": "q1-1", "type": "quarterly", "title": "Core Auth Protocols (OIDC & OAuth)", "completed": false, "parentId": "year-1", "createdAt": "2026-01-02T10:00:00.000Z", "description": "Implement standard flows: Authorization Code, Client Credentials.", "tags": ["protocol", "core"], "date": "2026-03-31" },
-                        { "id": "q1-2", "type": "quarterly", "title": "Operational Readiness & Observability", "completed": false, "parentId": "year-1", "createdAt": "2026-01-05T10:00:00.000Z", "description": "Dashboards, alerts, and runbooks for auth services across environments.", "tags": ["ops", "observability", "reliability"], "date": "2026-03-31" },
-                        { "id": "sprint-1", "type": "sprint", "title": "User API & Storage", "completed": true, "parentId": "q1-1", "createdAt": "2026-02-01T10:00:00.000Z", "description": "CRUDS for Users, Password Hashing (Argon2).", "tags": ["api", "db"], "date": pStr },
-                        { "id": "sprint-2", "type": "sprint", "title": "OIDC Token Generation", "completed": false, "parentId": "q1-1", "createdAt": "2026-02-08T10:00:00.000Z", "description": "JWT signing, Key rotation, Discovery endpoint.", "tags": ["oidc", "crypto"], "date": tStr },
-                        { "id": "sprint-3", "type": "sprint", "title": "Audit Trails & Security Events", "completed": false, "parentId": "q1-2", "createdAt": "2026-02-15T10:00:00.000Z", "description": "Capture auth events, admin actions, and sensitive changes with retention policies.", "tags": ["security", "logging", "audit"], "date": tStr },
-                        { "id": "sprint-4", "type": "sprint", "title": "Monitoring & Alerting Baselines", "completed": false, "parentId": "q1-2", "createdAt": "2026-03-01T10:00:00.000Z", "description": "Define SLOs, error budgets, and alert thresholds for auth services.", "tags": ["slo", "alerts", "metrics"], "date": tStr },
+                        { "id": "year-1", "type": "yearly", "title": "Build MVP Identity Provider", "completed": false, "cancelled": false, "parentId": "", "createdAt": "2026-01-01T10:00:00.000Z", "description": "Ship core auth and observability features.", "tags": ["security", "backend"], "date": "2026-12-31", "priority": 3, "createdDate": "2026-01-01", "activeDates": ["2026-01-01"], "rolledOverFrom": null },
+                        { "id": "q1-1", "type": "quarterly", "title": "Core Auth Protocols (OIDC & OAuth)", "completed": false, "inProgress": false, "cancelled": false, "isNextAction": false, "parentId": "year-1", "createdAt": "2026-01-02T10:00:00.000Z", "description": "Implement standard flows and token lifecycle.", "tags": ["protocol", "core"], "date": "2026-03-31", "priority": 2, "createdDate": "2026-01-02", "activeDates": ["2026-01-02"], "rolledOverFrom": null },
+                        { "id": "sprint-1", "type": "sprint", "title": "Token Refresh & Testing", "completed": false, "inProgress": true, "cancelled": false, "isNextAction": false, "parentId": "q1-1", "createdAt": "2026-02-08T10:00:00.000Z", "description": "Refresh token flow, rotation, and tests.", "tags": ["oidc", "testing"], "date": tStr, "priority": 2, "createdDate": tStr, "activeDates": [tStr], "rolledOverFrom": null },
 
-                        // Overdue task (should rollover on next load/init)
-                        { "id": "day-overdue", "type": "daily", "title": "[ROLLOVER] Past Due Task", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": pStr, "description": "This was supposed to be done last sprint.", "tags": ["urgent"], "date": pStr },
+                        { "id": "followup-1", "type": "followup", "title": "Follow up with Security on JWKS rotation policy", "completed": false, "inProgress": false, "cancelled": false, "isNextAction": false, "parentId": "", "createdAt": yStr, "description": "Confirm 30-day vs 90-day rotation requirement.", "tags": ["security", "compliance"], "date": tStr, "priority": 1, "createdDate": yStr, "activeDates": [yStr, tStr], "rolledOverFrom": yStr, "quarterlyParentId": "" },
+                        { "id": "followup-2", "type": "followup", "title": "Follow up with PM on audit log retention", "completed": false, "inProgress": false, "cancelled": false, "isNextAction": false, "parentId": "", "createdAt": tStr, "description": "Need confirmation on 1-year vs 3-year retention.", "tags": ["pm", "requirements"], "date": tStr, "priority": 3, "createdDate": tStr, "activeDates": [tStr], "rolledOverFrom": null, "quarterlyParentId": "" },
 
-                        // Historical tasks (to see dots)
-                        { "id": "day-hist-1", "type": "daily", "title": "Historical Research", "completed": true, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": pStr, "description": "Checking logs.", "tags": ["research"], "date": pStr },
-                        { "id": "day-hist-2", "type": "daily", "title": "Past Discussion", "completed": true, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": yStr, "description": "Met with team.", "tags": ["meeting"], "date": yStr },
+                        { "id": "day-rollover", "type": "daily", "title": "[ROLLOVER] Finish refresh token tests", "completed": false, "inProgress": false, "cancelled": false, "isNextAction": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": yStr, "description": "Tests rolled from yesterday.", "tags": ["testing"], "date": tStr, "priority": 2, "createdDate": yStr, "activeDates": [yStr, tStr], "rolledOverFrom": yStr },
 
-                        // Today's tasks
-                        { "id": "day-1", "type": "daily", "title": "Design User Schema", "completed": true, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Postgres schema for users.", "tags": ["db", "design"], "date": tStr },
-                        { "id": "day-2", "type": "daily", "title": "Draft OIDC Discovery Doc", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": yStr, "description": "Define /.well-known endpoints.", "tags": ["oidc"], "date": yStr },
-                        { "id": "day-3", "type": "daily", "title": "Client Credentials Flow", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": pStr, "description": "Token endpoint validations.", "tags": ["oauth"], "date": pStr },
-                        { "id": "day-4", "type": "daily", "title": "Unit Tests for User Service", "completed": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": yStr, "description": "Table-driven tests.", "tags": ["testing"], "date": yStr },
-                        { "id": "day-5", "type": "daily", "title": "Define JWT Claims", "completed": false, "parentId": "sprint-2", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Identify standard and custom claims for access and ID tokens.", "tags": ["oidc", "design"], "date": tStr },
-                        { "id": "day-6", "type": "daily", "title": "Rotate Signing Keys", "completed": false, "parentId": "sprint-2", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Implement JWKS rotation and update discovery endpoints.", "tags": ["crypto", "keys"], "date": tStr },
-                        { "id": "day-7", "type": "daily", "title": "Audit Event Schema", "completed": false, "parentId": "sprint-3", "quarterlyParentId": "q1-2", "createdAt": tStr, "description": "Define event payloads for login, token issuance, and admin actions.", "tags": ["audit", "schema"], "date": tStr },
-                        { "id": "day-8", "type": "daily", "title": "SLO Drafts", "completed": false, "parentId": "sprint-4", "quarterlyParentId": "q1-2", "createdAt": tStr, "description": "Draft latency and availability SLOs for auth endpoints.", "tags": ["slo", "reliability"], "date": tStr },
-
-                        // Daily Bits (Notes/KB)
-                        { "id": "bit-1", "type": "note", "title": "Splunk Troubleshooting: auth-service", "completed": false, "parentId": "", "createdAt": tStr, "description": "index=prod service=auth_service level=error | stats count by errorCode", "tags": ["splunk", "ops"], "date": tStr, "isKB": false },
-                        { "id": "bit-2", "type": "note", "title": "OIDC redirect edge cases", "completed": false, "parentId": "", "createdAt": tStr, "description": "Remember to enforce exact redirect URI match.", "tags": ["oidc"], "date": tStr, "isKB": false },
-                        { "id": "kb-1", "type": "note", "title": "Argon2 Configuration Best Practices", "completed": false, "parentId": "", "createdAt": pStr, "description": "Memory: 64MB, Iterations: 3, Parallelism: 4\nUse crypto/rand for salt generation.", "tags": ["security", "kb"], "date": pStr, "isKB": true },
-                        { "id": "kb-2", "type": "note", "title": "Splunk Auth Error Triage", "completed": false, "parentId": "", "createdAt": tStr, "description": "```spl\nindex=prod service=auth_service level=error\n| stats count by errorCode\n| sort -count\n```\nRun during on-call triage.", "tags": ["splunk", "kb"], "date": tStr, "isKB": true },
-                        { "id": "kb-3", "type": "note", "title": "Go Helper: Safe Parse Int", "completed": false, "parentId": "", "createdAt": tStr, "description": "```go\nfunc parseInt(s string) (int, error) {\n    v, err := strconv.Atoi(strings.TrimSpace(s))\n    if err != nil {\n        return 0, fmt.Errorf(\"invalid int: %w\", err)\n    }\n    return v, nil\n}\n```", "tags": ["golang", "kb"], "date": tStr, "isKB": true },
-                        { "id": "kb-4", "type": "note", "title": "OAuth Error Mapping", "completed": false, "parentId": "", "createdAt": tStr, "description": "```json\n{\n  \"invalid_client\": 401,\n  \"invalid_grant\": 400,\n  \"invalid_scope\": 400\n}\n```", "tags": ["oauth", "kb"], "date": tStr, "isKB": true },
-                        { "id": "bit-id-1", "type": "note", "title": "User session trace ID", "completed": false, "parentId": "", "createdAt": tStr, "description": "trace-550e8400-e29b-41d4-a716-446655440000", "tags": ["debug"], "date": tStr, "isKB": false }
+                        { "id": "day-1", "type": "daily", "title": "Implement refresh token endpoint", "completed": false, "inProgress": true, "cancelled": false, "isNextAction": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Add rotation and revocation support.", "tags": ["oidc", "api"], "date": tStr, "priority": 1, "createdDate": tStr, "activeDates": [tStr], "rolledOverFrom": null },
+                        { "id": "day-2", "type": "daily", "title": "Write integration tests", "completed": false, "inProgress": false, "cancelled": false, "isNextAction": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Cover token grant types and refresh flow.", "tags": ["testing"], "date": tStr, "priority": 3, "createdDate": tStr, "activeDates": [tStr], "rolledOverFrom": null },
+                        { "id": "day-3", "type": "daily", "title": "Update API documentation", "completed": false, "inProgress": false, "cancelled": false, "isNextAction": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": tStr, "description": "Document refresh token flow.", "tags": ["docs"], "date": tStr, "priority": 4, "createdDate": tStr, "activeDates": [tStr], "rolledOverFrom": null }
                     ];
 
                     this.goals = sample;
