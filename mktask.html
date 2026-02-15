@@ -763,10 +763,9 @@
                     ]">
                     <!-- Standup View Toggle -->
                     <div class="flex flex-wrap items-center gap-2 mb-1">
-                        <div>
+                        <div x-show="viewMode === 'em'">
                             <h2 class="text-xl font-bold flex items-center gap-2">
-                                <span :class="theme === 'dark' ? 'text-white' : 'text-slate-900'"
-                                    x-text="viewMode === 'em' ? 'EM' : 'Dashboard'"></span>
+                                <span :class="theme === 'dark' ? 'text-white' : 'text-slate-900'">EM</span>
                                 <span x-show="viewMode !== 'eh'" class="text-sm font-normal px-2 py-0.5 rounded-full border"
                                     :class="theme === 'dark' ? 'text-gray-400 bg-gray-900 border-gray-800' : 'text-slate-500 bg-white border-slate-200'"
                                     x-text="formatDate(selectedDate)"></span>
@@ -776,6 +775,15 @@
                                 </button>
                             </h2>
                             <div x-show="viewMode === 'eh'" class="hidden"></div>
+                        </div>
+                        <div x-show="viewMode === 'standup'"  class="flex items-center gap-2">
+                            <span class="text-sm font-normal px-2 py-0.5 rounded-full border"
+                                :class="theme === 'dark' ? 'text-gray-400 bg-gray-900 border-gray-800' : 'text-slate-500 bg-white border-slate-200'"
+                                x-text="formatDate(selectedDate)"></span>
+                            <button @click="goToday()" x-show="selectedDate !== getTodayDate()"
+                                class="text-xs text-indigo-500 hover:text-indigo-400 underline">
+                                Back to Today
+                            </button>
                         </div>
                         <div class="flex items-center gap-1 ml-4 border-l pl-4"
                             :class="[theme === 'dark' ? 'border-gray-800' : 'border-slate-200', viewMode === 'standup' ? 'ml-0 pl-0 border-l-0 sm:ml-4 sm:pl-4 sm:border-l' : '']"
@@ -1584,10 +1592,6 @@
                         x-data="{ counts: getStatusCountsForSelectedDate() }"
                         x-effect="counts = getStatusCountsForSelectedDate()"
                         :class="theme === 'dark' ? 'bg-gray-950' : 'bg-slate-50'">
-                        <h2 class="text-sm font-bold uppercase tracking-wider shrink-0"
-                            :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-700'">
-                            Dashboard
-                        </h2>
                         <div class="flex flex-wrap items-center gap-2 flex-1">
                         <button @click="statusFilter = 'all'; showAllOpenTasks = false" class="px-2 py-0.5 text-[10px] rounded border"
                             :class="statusFilter === 'all'
