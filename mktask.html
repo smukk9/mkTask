@@ -1648,86 +1648,6 @@
                     <!-- Scrollable Content Area -->
                     <div class="flex-1 overflow-y-auto p-6 space-y-2 scrollbar-thumb-gray-800 scrollbar-track-transparent">
 
-                    <!-- Follow-ups Section (Always Visible) -->
-                    <template x-if="getFollowupGoals().length > 0">
-                        <div class="border-b pb-4 mb-4" :class="theme === 'dark' ? 'border-gray-800' : 'border-slate-200'">
-                            <div class="flex items-center justify-between mb-2">
-                                <h3 class="text-xs font-bold uppercase tracking-wider flex items-center gap-2"
-                                    :class="theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                    </svg>
-                                    Follow-ups
-                                    <span class="text-[10px] px-1.5 py-0.5 rounded-full border"
-                                        :class="theme === 'dark' ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300' : 'bg-indigo-50 border-indigo-200 text-indigo-700'"
-                                        x-text="getFollowupGoals().length"></span>
-                                </h3>
-                                <button @click="addGoal('followup')"
-                                    class="text-xs px-2 py-1 rounded border transition-colors"
-                                    :class="theme === 'dark' ? 'border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10' : 'border-indigo-300 text-indigo-600 hover:bg-indigo-50'">
-                                    + Add
-                                </button>
-                            </div>
-                            
-                            <div class="space-y-2">
-                                <template x-for="goal in getFollowupGoals()" :key="goal.id">
-                                    <div class="p-2.5 rounded-lg border transition-all cursor-pointer group" 
-                                        @click="openDetail(goal)"
-                                        :class="theme === 'dark' ? 'bg-indigo-500/5 border-indigo-500/20 hover:border-indigo-500/40 hover:bg-indigo-500/10' : 'bg-indigo-50/50 border-indigo-200 hover:border-indigo-300 hover:bg-indigo-50'">
-                                        <div class="flex items-start gap-3">
-                                            <!-- Checkbox -->
-                                            <button @click.stop="toggleComplete(goal)"
-                                                :class="[goal.completed ? 'text-emerald-500 hover:text-emerald-400' : (goal.inProgress ? 'text-amber-400 hover:text-amber-300' : (theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-500 hover:text-indigo-400'))]"
-                                                class="mt-0.5 shrink-0 transition-colors">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <circle x-show="!goal.completed && !goal.inProgress" cx="12" cy="12" r="9" stroke-width="2"></circle>
-                                                    <path x-show="goal.inProgress" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v12M6 12h12"></path>
-                                                    <path x-show="goal.completed" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
-                                                </svg>
-                                            </button>
-                                            
-                                            <!-- Content -->
-                                            <div class="flex-1 min-w-0">
-                                                <div class="flex items-center gap-2 flex-wrap">
-                                                    <!-- Priority Badge -->
-                                                    <span class="text-[10px] px-1.5 py-0.5 rounded border font-medium"
-                                                        :class="getPriorityInfo(goal.priority).color"
-                                                        x-text="getPriorityInfo(goal.priority).label"></span>
-                                                    
-                                                    <!-- Title -->
-                                                    <input type="text" x-model="goal.title"
-                                                        @click.stop
-                                                        class="bg-transparent flex-1 min-w-0 focus:outline-none text-sm font-medium placeholder-gray-600"
-                                                        :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-200' : 'text-slate-800'))"
-                                                        placeholder="Follow-up task...">
-                                                </div>
-                                                
-                                                <!-- Description Preview -->
-                                                <div class="mt-1 text-[11px] truncate opacity-60" 
-                                                    x-show="goal.description"
-                                                    x-text="goal.description"></div>
-                                            </div>
-                                            
-                                            <!-- Delete Button -->
-                                            <button x-show="deletingId !== goal.id" @click.stop="deletingId = goal.id"
-                                                class="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-                                                :class="theme==='dark'?'text-gray-600 hover:text-red-400':'text-slate-400 hover:text-red-500'">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                </svg>
-                                            </button>
-                                            <button x-show="deletingId === goal.id" @click.stop="deleteGoal(goal.id)"
-                                                class="text-[10px] px-1.5 py-0.5 rounded border shrink-0"
-                                                :class="theme==='dark'?'bg-red-900/50 text-red-200 hover:bg-red-800 border-red-700':'bg-red-100 text-red-700 hover:bg-red-200 border-red-200'">
-                                                Confirm
-                                            </button>
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
-                    </template>
 
                     <template x-if="getNextAction()">
                         <div x-data="{ next: getNextAction() }" class="p-3 rounded-lg border transition-all"
@@ -1773,12 +1693,13 @@
 
                                 <!-- Content -->
                                 <div class="flex-1 min-w-0 space-y-1" @click.stop>
-                                    <div class="flex items-center gap-2">
+                                    <div class="flex items-center gap-2 flex-wrap">
                                         <input type="text" x-model="goal.title" @keydown.enter="addGoal('daily')"
                                             @focus="selectedGoalId = goal.id"
-                                            class="bg-transparent w-full focus:outline-none text-base font-medium placeholder-gray-600"
+                                            class="bg-transparent flex-1 min-w-0 focus:outline-none text-base font-medium placeholder-gray-600"
                                             :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (isRolledOver(goal) && !goal.completed && !goal.cancelled ? (theme === 'dark' ? 'text-orange-200 font-semibold' : 'text-orange-800 font-semibold') : (theme === 'dark' ? 'text-gray-200' : 'text-slate-800')))"
                                             placeholder="What needs to be done?">
+
 
                                         <!-- Rolled Over Badge -->
                                         <template x-if="isRolledOver(goal) && !goal.completed && !goal.cancelled">
@@ -1958,6 +1879,28 @@
                                             </path>
                                         </svg>
                                     </button>
+                                    <!-- Delete Button -->
+                                    <button x-show="deletingId !== goal.id" @click.stop="deletingId = goal.id"
+                                        class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded"
+                                        :class="theme === 'dark' ? 'text-gray-600 hover:text-red-500' : 'text-slate-400 hover:text-red-600'"
+                                        title="Delete this task">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                    <button x-show="deletingId === goal.id" @click.stop="deleteGoal(goal.id)"
+                                        class="opacity-100 p-0.5 rounded text-[10px] px-2 font-medium"
+                                        :class="theme === 'dark' ? 'bg-red-900/50 text-red-200 hover:bg-red-800 border border-red-700' : 'bg-red-100 text-red-700 hover:bg-red-200 border border-red-200'"
+                                        title="Confirm delete">
+                                        Confirm
+                                    </button>
+                                    <button x-show="deletingId === goal.id" @click.stop="deletingId = null"
+                                        class="opacity-100 p-0.5 rounded text-[10px] px-2 font-medium"
+                                        :class="theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700' : 'bg-slate-200 text-slate-700 hover:bg-slate-300 border border-slate-300'"
+                                        title="Cancel delete">
+                                        Cancel
+                                    </button>
                                 </div>
                             </div>
                     </template>
@@ -2026,23 +1969,7 @@
                             <div class="flex justify-between text-xs mb-1">
                                 <span class="text-emerald-400">Daily Tasks</span>
                                 <span class="text-gray-400" x-text="getCompletionStats('daily').text"></span>
-                            </div>
-                            <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
-                                <div class="h-full bg-emerald-500 transition-all duration-1000"
-                                    :style="`width: ${getCompletionStats('daily').percent}%`"></div>
-                            </div>
-                        </div>
-                        <!-- Follow-ups -->
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-indigo-400">Follow-ups</span>
-                                <span class="text-gray-400" x-text="getCompletionStats('followup').text"></span>
-                            </div>
-                            <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
-                                <div class="h-full bg-indigo-500 transition-all duration-1000"
-                                    :style="`width: ${getCompletionStats('followup').percent}%`"></div>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
 
@@ -2472,9 +2399,9 @@
                         if (typeof g.rolledOverFrom === 'undefined') {
                             g.rolledOverFrom = null;
                         }
-                        // Add priority field for all tasks (default to 3 = medium, follow-ups default to 2 = high)
+                        // Add priority field for all tasks (default to 3 = medium)
                         if (typeof g.priority === 'undefined') {
-                            g.priority = g.type === 'followup' ? 2 : 3;
+                            g.priority = 3;
                         }
                         // Add rollover tracking fields
                         if (typeof g.rolloverCount === 'undefined') {
@@ -2682,7 +2609,7 @@
                         );
                     }
 
-                    if (type === 'daily' || type === 'followup') {
+                    if (type === 'daily') {
                         return list.sort((a, b) => {
                             // First by status (incomplete before complete)
                             const rankDiff = this.getStatusRank(a) - this.getStatusRank(b);
@@ -2937,22 +2864,6 @@
                         .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
                 },
 
-                getFollowupGoals() {
-                    let list = this.goals.filter(g => g.type === 'followup' && !g.completed && !g.cancelled);
-
-                    if (this.searchQuery) {
-                        const q = this.searchQuery.toLowerCase();
-                        list = list.filter(g => g.title.toLowerCase().includes(q) || (g.description && g.description.toLowerCase().includes(q)));
-                    }
-
-                    return list.sort((a, b) => {
-                        const rankDiff = this.getStatusRank(a) - this.getStatusRank(b);
-                        if (rankDiff !== 0) return rankDiff;
-                        const priorityA = a.priority || 3;
-                        const priorityB = b.priority || 3;
-                        return priorityA - priorityB;
-                    });
-                },
 
                 getUniqueTags() {
                     const allTags = new Set();
@@ -3207,13 +3118,6 @@
                     if (type === 'sprint') {
                         goal.createdDate = getLocalDateKey();
                         goal.activeDates = [getLocalDateKey()];
-                    }
-
-                    if (type === 'followup') {
-                        goal.date = this.selectedDate;
-                        goal.createdDate = this.selectedDate;
-                        goal.activeDates = [this.selectedDate];
-                        goal.priority = 2; // Default to high priority for follow-ups
                     }
 
                     this.goals.unshift(goal);
@@ -3556,9 +3460,6 @@
                         { "id": "year-1", "type": "yearly", "title": "Build MVP Identity Provider", "completed": false, "cancelled": false, "parentId": "", "createdAt": "2026-01-01T10:00:00.000Z", "description": "Ship core auth and observability features.", "tags": ["security", "backend"], "date": "2026-12-31", "priority": 3, "createdDate": "2026-01-01", "activeDates": ["2026-01-01"], "rolledOverFrom": null },
                         { "id": "q1-1", "type": "quarterly", "title": "Core Auth Protocols (OIDC & OAuth)", "completed": false, "inProgress": false, "cancelled": false, "isNextAction": false, "parentId": "year-1", "createdAt": "2026-01-02T10:00:00.000Z", "description": "Implement standard flows and token lifecycle.", "tags": ["protocol", "core"], "date": "2026-03-31", "priority": 2, "createdDate": "2026-01-02", "activeDates": ["2026-01-02"], "rolledOverFrom": null },
                         { "id": "sprint-1", "type": "sprint", "title": "Token Refresh & Testing", "completed": false, "inProgress": true, "cancelled": false, "isNextAction": false, "parentId": "q1-1", "createdAt": "2026-02-08T10:00:00.000Z", "description": "Refresh token flow, rotation, and tests.", "tags": ["oidc", "testing"], "date": tStr, "priority": 2, "createdDate": tStr, "activeDates": [tStr], "rolledOverFrom": null },
-
-                        { "id": "followup-1", "type": "followup", "title": "Follow up with Security on JWKS rotation policy", "completed": false, "inProgress": false, "cancelled": false, "isNextAction": false, "parentId": "", "createdAt": yStr, "description": "Confirm 30-day vs 90-day rotation requirement.", "tags": ["security", "compliance"], "date": tStr, "priority": 1, "createdDate": yStr, "activeDates": [yStr, tStr], "rolledOverFrom": yStr, "quarterlyParentId": "" },
-                        { "id": "followup-2", "type": "followup", "title": "Follow up with PM on audit log retention", "completed": false, "inProgress": false, "cancelled": false, "isNextAction": false, "parentId": "", "createdAt": tStr, "description": "Need confirmation on 1-year vs 3-year retention.", "tags": ["pm", "requirements"], "date": tStr, "priority": 3, "createdDate": tStr, "activeDates": [tStr], "rolledOverFrom": null, "quarterlyParentId": "" },
 
                         { "id": "day-rollover", "type": "daily", "title": "[ROLLOVER] Finish refresh token tests", "completed": false, "inProgress": false, "cancelled": false, "isNextAction": false, "parentId": "sprint-1", "quarterlyParentId": "q1-1", "createdAt": yStr, "description": "Tests rolled from yesterday.", "tags": ["testing"], "date": tStr, "priority": 2, "createdDate": yStr, "activeDates": [yStr, tStr], "rolledOverFrom": yStr },
 
