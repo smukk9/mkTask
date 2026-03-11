@@ -315,7 +315,7 @@
             </button>
             <!-- Global Search -->
             <div class="relative group">
-                <input type="text" x-model="searchQuery" x-ref="searchInput" placeholder="Search..."
+                <input type="text" id="global-search" name="globalSearch" aria-label="Search tasks" x-model="searchQuery" x-ref="searchInput" placeholder="Search..."
                     class="bg-transparent border theme-border rounded px-3 py-1.5 text-xs w-32 focus:w-48 focus:outline-none focus:border-indigo-500 transition-all placeholder-gray-500"
                     :class="theme === 'dark' ? 'text-gray-300' : 'text-slate-700'">
                 <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -480,7 +480,7 @@
                                 :style="`width: ${getProgress(goal.id)}%`"></div>
                         </div>
                         <div class="flex items-start justify-between gap-2 mb-1">
-                            <input type="text" x-model="goal.title"
+                            <input type="text" x-model="goal.title" name="yearlyGoalTitle" aria-label="Yearly goal title"
                                 class="bg-transparent w-full focus:outline-none text-sm font-semibold placeholder-gray-700"
                                 :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-300' : 'text-slate-800'))"
                                 placeholder="Yearly Vision...">
@@ -488,8 +488,8 @@
                             <!-- Actions -->
                             <div class="flex items-center gap-1 shrink-0">
                                 <!-- Detail Button -->
-                                <button @click="openDetail(goal)"
-                                    class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded hover:bg-indigo-500/10"
+                                <button @click.stop.prevent="openDetailById(goal.id)"
+                                    class="opacity-100 transition-all p-0.5 rounded hover:bg-indigo-500/10"
                                     :class="theme==='dark'?'text-gray-500 hover:text-indigo-400':'text-slate-400 hover:text-indigo-500'"
                                     title="Edit Details">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -576,7 +576,7 @@
                                     </svg>
                                 </button>
                                 <div class="flex-1 min-w-0">
-                                    <input type="text" x-model="goal.title"
+                                    <input type="text" x-model="goal.title" name="quarterlyGoalTitle" aria-label="Quarterly goal title"
                                         class="bg-transparent w-full focus:outline-none text-sm font-medium placeholder-gray-700"
                                         :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-300' : 'text-slate-800'))"
                                         placeholder="Objective...">
@@ -619,8 +619,8 @@
                                 </div>
                                 <div class="flex items-center gap-1">
                                     <!-- View Details -->
-                                    <button @click="openDetail(goal)"
-                                        class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded hover:bg-purple-500/10"
+                                    <button @click.stop.prevent="openDetailById(goal.id)"
+                                        class="opacity-100 transition-all p-0.5 rounded hover:bg-purple-500/10"
                                         :class="theme==='dark'?'text-gray-500 hover:text-purple-400':'text-slate-400 hover:text-purple-500'"
                                         title="View Details">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -689,7 +689,7 @@
                                     </svg>
                                 </button>
                                 <div class="flex-1 min-w-0">
-                                    <input type="text" x-model="goal.title"
+                                    <input type="text" x-model="goal.title" name="sprintGoalTitle" aria-label="Sprint goal title"
                                         class="bg-transparent w-full focus:outline-none text-sm font-medium placeholder-gray-700"
                                         :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (theme === 'dark' ? 'text-gray-300' : 'text-slate-800'))"
                                         placeholder="Sprint Goal...">
@@ -729,8 +729,8 @@
                                 </div>
                                 <div class="flex items-center gap-1">
                                     <!-- View Details -->
-                                    <button @click="openDetail(goal)"
-                                        class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded hover:bg-blue-500/10"
+                                    <button @click.stop.prevent="openDetailById(goal.id)"
+                                        class="opacity-100 transition-all p-0.5 rounded hover:bg-blue-500/10"
                                         :class="theme==='dark'?'text-gray-50 hover:text-blue-400':'text-slate-400 hover:text-blue-500'"
                                         title="View Details">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -871,7 +871,7 @@
                                                     </span>
                                                 </template>
                                             </div>
-                                            <button @click.stop="openDetail(goal)"
+                                            <button @click.stop.prevent="openDetailById(goal.id)"
                                                 class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded"
                                                 :class="theme==='dark'?'text-gray-500 hover:text-emerald-400':'text-slate-400 hover:text-emerald-500'"
                                                 title="View Details">
@@ -940,7 +940,7 @@
                                                             </span>
                                                         </template>
                                                     </div>
-                                                    <button @click.stop="openDetail(goal)"
+                                                    <button @click.stop.prevent="openDetailById(goal.id)"
                                                         class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded"
                                                         :class="theme==='dark'?'text-gray-500 hover:text-emerald-400':'text-slate-400 hover:text-emerald-500'"
                                                         title="View Details">
@@ -1015,7 +1015,7 @@
                                                     </span>
                                                 </template>
                                             </div>
-                                            <button @click.stop="openDetail(goal)"
+                                            <button @click.stop.prevent="openDetailById(goal.id)"
                                                 class="opacity-0 group-hover:opacity-100 transition-all p-0.5 rounded"
                                                 :class="theme==='dark'?'text-gray-500 hover:text-blue-400':'text-slate-400 hover:text-blue-500'"
                                                 title="View Details">
@@ -1059,7 +1059,7 @@
                                 <template x-for="goal in items" :key="goal.id">
                                     <div class="group p-2 rounded-lg border cursor-pointer" draggable="true"
                                         @dragstart="startEisenhowerDrag(goal)" @dragend="clearEisenhowerDrag()"
-                                        @click="openDetail(goal)"
+                                        @click.stop.prevent="openDetailById(goal.id)"
                                         :class="[
                                             theme === 'dark' ? 'bg-gray-900/60 border-gray-800 hover:border-red-500/40' : 'bg-white border-slate-200 hover:border-red-300',
                                             goal.completed ? 'opacity-60' : ''
@@ -1114,7 +1114,7 @@
                                 <template x-for="goal in items" :key="goal.id">
                                     <div class="group p-2 rounded-lg border cursor-pointer" draggable="true"
                                         @dragstart="startEisenhowerDrag(goal)" @dragend="clearEisenhowerDrag()"
-                                        @click="openDetail(goal)"
+                                        @click.stop.prevent="openDetailById(goal.id)"
                                         :class="[
                                             theme === 'dark' ? 'bg-gray-900/60 border-gray-800 hover:border-orange-500/40' : 'bg-white border-slate-200 hover:border-orange-300',
                                             goal.completed ? 'opacity-60' : ''
@@ -1169,7 +1169,7 @@
                                 <template x-for="goal in items" :key="goal.id">
                                     <div class="group p-2 rounded-lg border cursor-pointer" draggable="true"
                                         @dragstart="startEisenhowerDrag(goal)" @dragend="clearEisenhowerDrag()"
-                                        @click="openDetail(goal)"
+                                        @click.stop.prevent="openDetailById(goal.id)"
                                         :class="[
                                             theme === 'dark' ? 'bg-gray-900/60 border-gray-800 hover:border-blue-500/40' : 'bg-white border-slate-200 hover:border-blue-300',
                                             goal.completed ? 'opacity-60' : ''
@@ -1224,7 +1224,7 @@
                                 <template x-for="goal in items" :key="goal.id">
                                     <div class="group p-2 rounded-lg border cursor-pointer" draggable="true"
                                         @dragstart="startEisenhowerDrag(goal)" @dragend="clearEisenhowerDrag()"
-                                        @click="openDetail(goal)"
+                                        @click.stop.prevent="openDetailById(goal.id)"
                                         :class="[
                                             theme === 'dark' ? 'bg-gray-900/60 border-gray-800 hover:border-gray-500/40' : 'bg-white border-slate-200 hover:border-gray-300',
                                             goal.completed ? 'opacity-60' : ''
@@ -1303,7 +1303,7 @@
                                     <div class="flex items-start gap-3">
                                         <h2 class="text-3xl font-bold flex-1" :class="theme === 'dark' ? 'text-gray-100' : 'text-slate-900'"
                                             x-text="getCurrentQueueTask().title || 'Untitled Task'"></h2>
-                                        <button @click="openDetail(getCurrentQueueTask())"
+                                        <button @click.stop.prevent="openDetailById(getCurrentQueueTask().id)"
                                             class="p-2 rounded-lg shrink-0 transition-colors"
                                             :class="theme === 'dark' ? 'text-gray-500 hover:text-indigo-400 hover:bg-gray-800' : 'text-slate-400 hover:text-indigo-600 hover:bg-slate-100'"
                                             title="View Details">
@@ -1721,9 +1721,10 @@
                                 </button>
 
                                 <!-- Content -->
-                                <div class="flex-1 min-w-0 space-y-1" @click.stop>
-                                    <div class="flex items-center gap-2 flex-wrap" @click.stop="openDetail(goal)">
-                                        <input type="text" x-model="goal.title" @keydown.enter="addGoal('daily')"
+                                <div class="flex-1 min-w-0 space-y-1" @click.stop="openDetailById(goal.id)">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <input type="text" x-model="goal.title" name="dailyGoalTitle" aria-label="Daily task title" @keydown.enter="addGoal('daily')"
+                                            @click.stop
                                             @focus="selectedGoalId = goal.id"
                                             class="bg-transparent flex-1 min-w-0 focus:outline-none text-base font-medium placeholder-gray-600"
                                             :class="goal.completed ? 'line-through decoration-2 text-gray-500' : (goal.inProgress ? 'text-amber-400' : (isRolledOver(goal) && !goal.completed && !goal.cancelled ? (theme === 'dark' ? 'text-orange-200 font-semibold' : 'text-orange-800 font-semibold') : (theme === 'dark' ? 'text-gray-200' : 'text-slate-800')))"
@@ -1767,7 +1768,7 @@
                                         <!-- Date Picker Inline (Daily Tasks) -->
                                         <template x-if="goal.type === 'daily'">
                                             <div class="relative" @click.stop x-data="{ dateOpen: false }">
-                                                <input type="date" x-model="goal.date"
+                                                <input type="date" x-model="goal.date" name="dailyGoalDate" aria-label="Daily task date"
                                                     class="text-[11px] px-2 py-1 rounded border"
                                                     :class="theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-indigo-500' : 'bg-white border-slate-300 text-slate-900 focus:border-indigo-500'"
                                                     @change="goal.date = $event.target.value"
@@ -1853,12 +1854,12 @@
                                     <div x-show="goal.description && goal.description.trim()" 
                                         class="mt-1 text-xs italic line-clamp-3 cursor-pointer"
                                         :class="theme === 'dark' ? 'text-gray-500' : 'text-slate-600'"
-                                        @click.stop="openDetail(goal)"
+                                        @click.stop.prevent="openDetailById(goal.id)"
                                         :title="goal.description.length > 150 ? 'Click to view full description' : ''"
                                         x-text="goal.description"></div>
                                     
                                     <!-- Editable textarea (hidden for display, used for quick edits) -->
-                                    <textarea x-model="goal.description"
+                                    <textarea x-model="goal.description" name="dailyGoalDescription" aria-label="Daily task description"
                                         x-show="false"
                                         class="w-full bg-transparent focus:outline-none text-xs italic auto-expand resize-none overflow-hidden mt-1"
                                         :class="theme === 'dark' ? 'text-gray-500 focus:text-gray-400 placeholder-gray-800/50' : 'text-slate-600 focus:text-slate-700 placeholder-slate-400'"
@@ -1878,7 +1879,7 @@
                                             </path>
                                         </svg>
                                     </button>
-                                    <button @click.stop="openDetail(goal)" class="p-0.5 rounded hover:bg-emerald-500/10"
+                                    <button @click.stop.prevent="openDetailById(goal.id)" class="p-0.5 rounded hover:bg-emerald-500/10"
                                         :class="theme==='dark'?'text-gray-500 hover:text-emerald-400':'text-slate-400 hover:text-emerald-500'"
                                         title="View Details">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1998,7 +1999,12 @@
                             <div class="flex justify-between text-xs mb-1">
                                 <span class="text-emerald-400">Daily Tasks</span>
                                 <span class="text-gray-400" x-text="getCompletionStats('daily').text"></span>
-
+                            </div>
+                            <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-emerald-500 transition-all duration-1000"
+                                    :style="`width: ${getCompletionStats('daily').percent}%`"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -2129,13 +2135,18 @@
             :class="theme === 'dark' ? 'bg-gray-950/60 backdrop-blur-sm' : 'bg-slate-900/20 backdrop-blur-sm'"
             x-show="showDetailPanel" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
-            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="closeDetail()"></div>
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="closeDetail(true)"></div>
 
         <!-- Panel -->
         <div class="relative w-full max-w-md h-full shadow-2xl flex flex-col transition-transform transform"
             :class="theme === 'dark' ? 'bg-gray-900 border-l border-gray-800' : 'bg-white border-l border-slate-200'"
-            x-show="showDetailPanel" x-transition:enter="translate-x-full" x-transition:enter-end="translate-x-0"
-            x-transition:leave="translate-x-0" x-transition:leave-end="translate-x-full">
+            x-show="showDetailPanel" 
+            x-transition:enter="transition-transform ease-out duration-300" 
+            x-transition:enter-start="translate-x-full" 
+            x-transition:enter-end="translate-x-0"
+            x-transition:leave="transition-transform ease-in duration-200" 
+            x-transition:leave-start="translate-x-0" 
+            x-transition:leave-end="translate-x-full">
 
             <template x-if="editingGoal">
                 <div class="flex flex-col h-full">
@@ -2170,9 +2181,9 @@
                     <div class="flex-1 overflow-y-auto p-6 space-y-6">
                         <!-- Title -->
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Task
+                            <label for="detail-task-name" class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Task
                                 Name</label>
-                            <textarea x-model="editingGoal.title"
+                            <textarea id="detail-task-name" name="detailTaskName" x-model="editingGoal.title"
                                 class="w-full bg-transparent text-lg font-bold focus:outline-none resize-none"
                                 :class="theme === 'dark' ? 'text-white placeholder-gray-700' : 'text-slate-900 placeholder-slate-300'"
                                 rows="2" placeholder="What needs to be done?"></textarea>
@@ -2180,16 +2191,16 @@
 
                         <!-- Date -->
                         <div x-show="editingGoal.type === 'daily'">
-                            <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Scheduled
+                            <label for="detail-scheduled-date" class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Scheduled
                                 For</label>
-                            <input type="date" x-model="editingGoal.date"
+                            <input type="date" id="detail-scheduled-date" name="detailScheduledDate" x-model="editingGoal.date"
                                 class="w-full bg-transparent border rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                                 :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'">
                         </div>
 
                         <!-- Priority -->
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Priority</label>
+                            <div class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Priority</div>
                             <div class="flex gap-2">
                                 <button @click="editingGoal.priority = 1" type="button"
                                     class="flex-1 px-3 py-2 text-sm font-medium rounded border transition-all"
@@ -2231,9 +2242,9 @@
 
                         <!-- Description -->
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Notes /
+                            <label for="detail-notes" class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Notes /
                                 Description</label>
-                            <textarea x-model="editingGoal.description"
+                            <textarea id="detail-notes" name="detailNotes" x-model="editingGoal.description"
                                 class="w-full bg-transparent border rounded p-3 h-64 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none text-sm leading-relaxed"
                                 :class="theme==='dark' ? 'border-gray-700 text-gray-300 placeholder-gray-700' : 'border-slate-300 text-slate-700 placeholder-slate-400'"
                                 placeholder="Add specific details, sub-tasks, or thoughts..."></textarea>
@@ -2242,9 +2253,9 @@
                         <!-- Parent Link -->
                         <div x-show="editingGoal.type === 'daily'" class="space-y-4">
                             <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Linked
+                                <label for="detail-linked-sprint" class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Linked
                                     Sprint Goal</label>
-                                <select x-model="editingGoal.parentId"
+                                <select id="detail-linked-sprint" name="detailLinkedSprint" x-model="editingGoal.parentId"
                                     class="w-full bg-transparent border rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
                                     :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'">
                                     <option value="">No Link</option>
@@ -2254,9 +2265,9 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Linked
+                                <label for="detail-linked-quarterly" class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Linked
                                     Quarterly Goal</label>
-                                <select x-model="editingGoal.quarterlyParentId"
+                                <select id="detail-linked-quarterly" name="detailLinkedQuarterly" x-model="editingGoal.quarterlyParentId"
                                     class="w-full bg-transparent border rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
                                     :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'">
                                     <option value="">No Link</option>
@@ -2267,9 +2278,9 @@
                             </div>
                         </div>
                         <div x-show="editingGoal.type !== 'yearly' && editingGoal.type !== 'daily'">
-                            <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Linked
+                            <label for="detail-linked-goal" class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Linked
                                 Goal</label>
-                            <select x-model="editingGoal.parentId"
+                            <select id="detail-linked-goal" name="detailLinkedGoal" x-model="editingGoal.parentId"
                                 class="w-full bg-transparent border rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
                                 :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'">
                                 <option value="">No Link</option>
@@ -2283,9 +2294,9 @@
 
                         <!-- Tags -->
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Tags (comma
+                            <label for="detail-tags" class="block text-xs font-bold uppercase tracking-wider mb-2 opacity-50">Tags (comma
                                 separated)</label>
-                            <input type="text" :value="editingGoal.tags ? editingGoal.tags.join(', ') : ''"
+                            <input type="text" id="detail-tags" name="detailTags" :value="editingGoal.tags ? editingGoal.tags.join(', ') : ''"
                                 @input="editingGoal.tags = $event.target.value.split(',').map(t => t.trim()).filter(t => t)"
                                 class="w-full bg-transparent border rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
                                 :class="theme==='dark' ? 'border-gray-700 text-gray-300' : 'border-slate-300 text-slate-700'"
@@ -2377,6 +2388,8 @@
                 strategySplitPercent: 50,
                 strategyResizeMoveHandler: null,
                 strategyResizeUpHandler: null,
+                detailOpenedAt: 0,
+                detailCloseTimeoutId: null,
                 suspendAutosave: false,
                 saveRequestId: 0,
 
@@ -2406,12 +2419,108 @@
 
                     this.updateLayoutMode();
                     window.addEventListener('resize', () => this.updateLayoutMode());
-                    this.requestFileSetup('Open an existing JSON file or create a new one before adding tasks.');
+                    const restored = await this.restoreLastFileHandleAndLoad();
+                    if (!restored) {
+                        this.requestFileSetup('Open an existing JSON file or create a new one before adding tasks.');
+                    }
                 },
 
                 setSaveState(state, errorMessage = '') {
                     this.saveState = state;
                     this.saveErrorMessage = errorMessage;
+                },
+
+                async getHandleStore(mode = 'readonly') {
+                    if (!('indexedDB' in window)) return null;
+                    const db = await new Promise((resolve, reject) => {
+                        const request = indexedDB.open('mkTaskFileHandles', 1);
+                        request.onupgradeneeded = () => {
+                            const database = request.result;
+                            if (!database.objectStoreNames.contains('handles')) {
+                                database.createObjectStore('handles');
+                            }
+                        };
+                        request.onsuccess = () => resolve(request.result);
+                        request.onerror = () => reject(request.error);
+                    });
+
+                    const tx = db.transaction('handles', mode);
+                    const store = tx.objectStore('handles');
+                    return { db, tx, store };
+                },
+
+                async persistLastFileHandle(fileHandle) {
+                    try {
+                        const handleStore = await this.getHandleStore('readwrite');
+                        if (!handleStore) return;
+                        const { db, tx, store } = handleStore;
+                        await new Promise((resolve, reject) => {
+                            const request = store.put(fileHandle, 'lastFileHandle');
+                            request.onsuccess = () => resolve();
+                            request.onerror = () => reject(request.error);
+                        });
+                        await new Promise((resolve, reject) => {
+                            tx.oncomplete = () => resolve();
+                            tx.onerror = () => reject(tx.error);
+                            tx.onabort = () => reject(tx.error);
+                        });
+                        db.close();
+                    } catch (err) {
+                        console.warn('Could not persist file handle', err);
+                    }
+                },
+
+                async clearPersistedFileHandle() {
+                    try {
+                        const handleStore = await this.getHandleStore('readwrite');
+                        if (!handleStore) return;
+                        const { db, tx, store } = handleStore;
+                        await new Promise((resolve, reject) => {
+                            const request = store.delete('lastFileHandle');
+                            request.onsuccess = () => resolve();
+                            request.onerror = () => reject(request.error);
+                        });
+                        await new Promise((resolve, reject) => {
+                            tx.oncomplete = () => resolve();
+                            tx.onerror = () => reject(tx.error);
+                            tx.onabort = () => reject(tx.error);
+                        });
+                        db.close();
+                    } catch (err) {
+                        console.warn('Could not clear persisted file handle', err);
+                    }
+                },
+
+                async restoreLastFileHandleAndLoad() {
+                    if (!('showOpenFilePicker' in window) || !('indexedDB' in window)) return false;
+                    try {
+                        const handleStore = await this.getHandleStore('readonly');
+                        if (!handleStore) return false;
+                        const { db, store } = handleStore;
+                        const fileHandle = await new Promise((resolve, reject) => {
+                            const request = store.get('lastFileHandle');
+                            request.onsuccess = () => resolve(request.result || null);
+                            request.onerror = () => reject(request.error);
+                        });
+                        db.close();
+                        if (!fileHandle) return false;
+
+                        let permission = 'prompt';
+                        if (fileHandle.queryPermission) {
+                            permission = await fileHandle.queryPermission({ mode: 'readwrite' });
+                        }
+                        if (permission !== 'granted' && fileHandle.requestPermission) {
+                            permission = await fileHandle.requestPermission({ mode: 'readwrite' });
+                        }
+                        if (permission !== 'granted') return false;
+
+                        await this.loadGoalsFromHandle(fileHandle);
+                        this.showToastMessage(`Loaded ${this.goals.length} tasks from last file.`);
+                        return true;
+                    } catch (err) {
+                        console.warn('Could not restore last file handle', err);
+                        return false;
+                    }
                 },
 
                 normalizeGoal(goal) {
@@ -2479,6 +2588,7 @@
                     this.suspendAutosave = false;
 
                     this.completeFileSetup();
+                    await this.persistLastFileHandle(fileHandle);
 
                     const rolledOver = this.checkRollover();
                     if (rolledOver) {
@@ -2583,7 +2693,6 @@
                     });
 
                     if (dailyCount > 0 || weeklyCount > 0) {
-                        console.log(`Rolled over ${dailyCount} daily + ${weeklyCount} weekly tasks.`);
                         // Force Alpine.js to detect the changes by reassigning the array
                         this.goals = [...this.goals];
                         return true;
@@ -3142,16 +3251,40 @@
                 },
 
                 // --- Actions ---
-                openDetail(goal) {
-                    if (!goal) return;
-                    this.editingGoal = goal;
-                    this.selectedGoalId = goal.id;
+                openDetailById(goalId) {
+                    if (!goalId) return;
+                    const currentGoal = this.goals.find(g => String(g.id) === String(goalId));
+                    if (!currentGoal) {
+                        this.showToastMessage('Could not open task details.');
+                        return;
+                    }
+                    if (this.detailCloseTimeoutId) {
+                        clearTimeout(this.detailCloseTimeoutId);
+                        this.detailCloseTimeoutId = null;
+                    }
+
+                    this.editingGoal = currentGoal;
+                    this.selectedGoalId = currentGoal.id;
+                    this.detailOpenedAt = Date.now();
                     this.showDetailPanel = true;
                 },
 
-                closeDetail() {
+                openDetail(goal) {
+                    if (!goal) return;
+                    const goalId = typeof goal === 'object' ? goal.id : goal;
+                    this.openDetailById(goalId);
+                },
+
+                closeDetail(fromBackdrop = false) {
+                    if (fromBackdrop && Date.now() - this.detailOpenedAt < 200) return;
                     this.showDetailPanel = false;
-                    setTimeout(() => { this.editingGoal = null; }, 300); // Wait for transition
+                    if (this.detailCloseTimeoutId) {
+                        clearTimeout(this.detailCloseTimeoutId);
+                    }
+                    this.detailCloseTimeoutId = setTimeout(() => {
+                        this.editingGoal = null;
+                        this.detailCloseTimeoutId = null;
+                    }, 300); // Wait for transition
                 },
 
                 addGoal(type) {
@@ -3381,7 +3514,6 @@
 
                 async loadFromFileLocation() {
                     if (!this.fileHandle) {
-                        console.log('ℹ No file selected');
                         return false;
                     }
                     try {
@@ -3497,6 +3629,7 @@
 
                         this.fileName = '';
                         this.fileHandle = null;
+                        await this.clearPersistedFileHandle();
                         this.markFileSetupRequired(true, 'Database cleared. Open a file before adding tasks.', false);
                         this.setSaveState('no-file');
                         alert("Database deleted. Open a file before adding tasks.");
@@ -3573,6 +3706,7 @@
                         });
                         this.fileHandle = fileHandle;
                         this.fileName = fileHandle.name;
+                        await this.persistLastFileHandle(fileHandle);
                         this.completeFileSetup();
                         const saved = await this.saveFile(true);
                         if (saved) {
